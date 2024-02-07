@@ -1,0 +1,62 @@
+.navbar {
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  background-color: #003580;
+}
+
+.navContainer {
+  width: 100%;
+  max-width: 1024px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navItems {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.navLink {
+  margin-left: 10px; /* Add margin between buttons if needed */
+}
+
+.navButtonLogin {
+  border: none;
+  width: 15vh;
+  padding: 5px 10px ;
+  cursor: pointer;
+  color: #003580;
+}
+
+.navButtonRegister {
+  border: none;
+  width: 15vh;
+  padding: 5px 10px ;
+  cursor: pointer;
+  color: #003580;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px; /* Adjust padding as needed */
+}
+
+.logo {
+  display: flex;
+  font-size: 24px; /* Adjust font size as needed */
+ 
+}
+
+.context {
+  margin-left: auto; /* Push "ติดต่อเรา" to the right */
+}

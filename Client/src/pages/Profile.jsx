@@ -4,6 +4,7 @@ import { useSelector } from "react-redux"
 import { useNavigate } from 'react-router-dom';
 import { updateUserStart, updateUserSuccess, updateUserFailure, deleteUserFailure, deleteUserStart, deleteUserSuccess, signoutUserStart } from "../redux/user/userSlice"
 import { useDispatch } from "react-redux"
+import Navbar from '../components/navbar/Navbar';
 
 export default function Profile() {
 
@@ -12,6 +13,9 @@ export default function Profile() {
     const [updateSuccess, setUpdateSuccess] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const [showListingError, setShowListingError] = useState(false);
+    const [userListings, setUserListings] = useState([]);
 
 
     const handleChange = (e) => {
@@ -59,7 +63,7 @@ export default function Profile() {
                 return;
             }
             dispatch(deleteUserSuccess(data));
-            navigate('/login'); 
+            navigate('/login');
         } catch (error) {
             dispatch(deleteUserFailure(error.message));
         }
@@ -75,15 +79,19 @@ export default function Profile() {
                 return;
             }
             dispatch(deleteUserSuccess(data));
-            navigate('/login'); 
+            navigate('/login');
 
         } catch (error) {
             dispatch(deleteUserFailure(error.message));
         }
     };
 
+
+
+
     return (
         <>
+            <Navbar />
             {currentUser && (
                 <div className='p-3 max-w-lg mx-auto'>
                     <h1 className='text-3xl font-semibold text-center my-4'>Profile</h1>
@@ -116,7 +124,7 @@ export default function Profile() {
                             style={{ width: '30%', borderRadius: '5px', marginTop: '10px' }}
                             onChange={handleChange}
                         />
-                         <input
+                        <input
                             type='phone'
                             placeholder='phone'
                             id='phone'
@@ -137,7 +145,7 @@ export default function Profile() {
                             {loading ? 'Loading...' : 'Update'}
                         </button>
                         <br />
-                      
+
                     </form>
 
                     <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
@@ -152,7 +160,9 @@ export default function Profile() {
                     </div>
 
                     <p style={{ color: 'red' }}>{error ? error : ''}</p>
-                    <p style={{ color: 'green' }}>{updateSuccess ? 'Update successfully!' : ''}</p>
+                    <p style={{ color: 'green' }}>
+                        {updateSuccess ? 'Update successfully!' : ''}
+                    </p>  
                 </div>
             )}
         </>

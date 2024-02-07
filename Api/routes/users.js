@@ -26,9 +26,10 @@ router.post("/update/:id", verifyToken, updatedUser);
 router.delete("/:id", verifyToken, deleteUser);
 
 //GET
-router.get("/getuser/:id", verifyUser, getUser);
+router.get("/getuser", verifyUser, getUser);
 
-router.get('/list/:id', verifyToken, getUserListings);
+//GET owner
+router.get('/listing/:id', verifyToken, getUserListings);
 
 //GET ALL
 router.get("/", verifyAdmin, getallUser);

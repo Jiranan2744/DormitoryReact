@@ -57,26 +57,17 @@ export const getUser = async (req, res, next) => {
 }
 
 export const getUserListings = async (req, res, next) => {
-  try {
-    // Check if the user is authorized to view the listings
-    if (req.user.id !== req.params.id) {
-      return next(createError(401, 'You can only view your own listings!'));
-    }
-
-    // Retrieve dormitories and rooms associated with the user
-    const userDormitories = await Dormitory.find({ userRef: req.params.id });
-    const userRooms = await Room.find({ userRef: req.params.id });
-
-    // Combine dormitories and rooms into a single response
-    const userListings = { dormitories: userDormitories, rooms: userRooms };
-
-    // Send the combined listings as a JSON response
-    res.status(200).json(userListings);
-  } catch (error) {
-    // Pass any errors to the error handling middleware
-    next(error);
-  }
-};
+    if (req.user.id === req.params.id) {
+        try {
+          const dormitorys = await Dormitory.find({ userRef: req.params.id });
+          res.status(200).json(dormitorys);
+        } catch (error) {
+          next(error);
+        }
+      } else {
+        return next(createError(401, 'You can only view your own listings!'));
+      }
+    };
 
 
 

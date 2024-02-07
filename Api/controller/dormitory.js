@@ -1,5 +1,6 @@
 import Dormitory from "../modals/Dormitory.js";
 import Room from "../modals/Room.js"
+import { createError } from "../utils/error.js";
 
 
 export const createDormitory = async (req, res, next) => {
@@ -12,28 +13,48 @@ export const createDormitory = async (req, res, next) => {
 }
 
 export const updatedDormitory = async (req, res, next) => {
+
+    const dormitory = await Dormitory.findById(req.params.id);
+
+    if(!dormitory){
+        return next(createError(404, 'Dormitory not found!'));
+    }
+    if(req.user.id !== dormitory.userRef){
+        return next(createError(401, 'You can only update your own listing!'));
+    }
     try {
         const updatedDormitory = await Dormitory.findByIdAndUpdate(
             req.params.id,
-            { $set: req.body },
+            req.body,
             { new: true }
         );
         res.status(200).json(updatedDormitory);
 
-    } catch (err) {
-        next(err);
+    } catch (error) {
+        next(error);
     }
 };
 
 export const deleteDormitory = async (req, res, next) => {
+    
+    const dormitory = await Dormitory.findById(req.params.id);
+
+    if(!dormitory){
+        return next(createError(404, 'Dormitory not found!'));
+    }
+
+    if(req.user.id !== dormitory.userRef.toString()){
+        return next(createError(401, 'You can only delete your own listing!'));
+    }
     try {
         await Dormitory.findByIdAndDelete(req.params.id)
         res.status(200).json("Dormitory has been deleted.")
 
-    } catch (err) {
-        next(err);
+    } catch (error) {
+        next(error);
     }
 };
+
 
 export const getDormitory = async (req, res, next) => {
     try {

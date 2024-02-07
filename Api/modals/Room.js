@@ -55,10 +55,10 @@ const RoomSchema = new mongoose.Schema({
         required: true,
     },
 
-    userRef: {
-        type: String,
-        required: true,
-      },
+    // userRef: {
+    //     type: String,
+    //     required: true,
+    //   },
 
 
     // roomNumbers: [{ number: Number, unavailableDates: { type: [Date] } }],

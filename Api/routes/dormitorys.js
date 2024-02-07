@@ -2,7 +2,7 @@ import express from "express";
 import Dormitory from "../modals/Dormitory.js";
 import { createError } from "../utils/error.js";
 import { createDormitory, deleteDormitory, getDormitory, getallDormitory, updatedDormitory, getDormitoryRooms } from "../controller/dormitory.js";
-import { verifyAdmin } from "../utils/verifyToken.js";
+import { verifyAdmin, verifyToken } from "../utils/verifyToken.js";
 
 const router = express.Router();
 
@@ -10,12 +10,12 @@ const router = express.Router();
 router.post("/", verifyAdmin, createDormitory);
 
 //UPDATE
-router.put("/:id", verifyAdmin, updatedDormitory);
+router.put("/update/:id", verifyToken, updatedDormitory);
 
 //DELETE
-router.delete("/:id", verifyAdmin, deleteDormitory);
+router.delete("/delete/:id", verifyToken, deleteDormitory);
 
-//GET
+//GET ID
 router.get("/find/:id", getDormitory);
 
 //GET ALL

@@ -56,11 +56,11 @@ const Navbar = () => {
 
               <Dropdown.Menu>
                 {/* Your dropdown content goes here */}
-                <Dropdown.Item href="/reserve">
+                <Dropdown.Item href="/dashboard?tab=dormitory list">
                   <FontAwesomeIcon icon={faList} style={{ marginRight: '5px' }} />
                   รายการจองหอพัก
                 </Dropdown.Item>
-                <Dropdown.Item href="/dashboard?tab=dormitory list">
+                <Dropdown.Item href="/reserve">
                   <FontAwesomeIcon icon={faList} style={{ marginRight: '5px' }} />
                   รายการประกาศหอพัก
                 </Dropdown.Item>

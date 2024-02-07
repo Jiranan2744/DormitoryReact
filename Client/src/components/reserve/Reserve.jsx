@@ -1,39 +1,214 @@
-import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { faFileCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Navbar from '../navbar/Navbar';
+import { Link } from 'react-router-dom';
+import Table from 'react-bootstrap/Table';
+import { Button } from '@mui/material';
 
 function Reserve() {
+
 
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
 
-
   const [showListingError, setShowListingError] = useState(false);
-  
+  const [userListings, setUserListings] = useState([]);
+
   const handleShowList = async () => {
-    try{
+    try {
       setShowListingError(false);
-      const res = await fetch(`/users/list/${currentUser._id}`);
+      const res = await fetch(`/users/listing/${currentUser._id}`);
       const data = await res.json();
-      if(data.success === false){
+      if (data.success === false) {
         setShowListingError(true);
         return;
       }
-
-    }catch(error){
+      setUserListings(data);
+    } catch (error) {
       setShowListingError(true);
     }
-  }
+  };
+
+  const handleListDelete = async (listingId) => {
+    try {
+      const res = await fetch(`/dormitorys/delete/${listingId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+
+      if (data.success === false) {
+        console.log(data.message);
+        return;
+      }
+      setUserListings((prev) =>
+        prev.filter((list) => list._id !== listingId)
+      );
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
 
   return (
     <div>
-      <button onClick={handleShowList}
-        style={{ color: 'green' }}
-      >
-        รายการจองหอพัก
-      </button>
-      <p style={{color: 'red'}}>{showListingError ? 'Error show listing' : ''}</p>
+      <Navbar />
+      <div style={{ flexDirection: 'column', gap: '2px', paddingLeft: '35vh', marginTop: '5vh' }}>
+        <span style={{ fontSize: '1.5rem', fontWeight: '600' }}>ลงประกาศหอพัก</span>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <FontAwesomeIcon
+          icon={faFileCirclePlus}
+          onClick={handleShowList}
+          style={{
+            cursor: 'pointer',
+            marginBottom: '16px',
+            marginTop: '5vh',
+            fontSize: '100px',
+            color: '#D4D4D4',
+          }}
+        />
+        <br />
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <br />
+          <Table striped bordered style={{ width: '100%' }}>
+
+            <thead style={{ textAlign: 'center' }} >
+              <tr>
+                <th>ไอดี</th>
+                <th>ชื่อหอพัก (ไทย)</th>
+                <th>ชื่อหอพัก (อังกฤษ)</th>
+                <th>อีเมล์</th>
+                <th>เบอร์โทร</th>
+                <th>ไลน์</th>
+              </tr>
+            </thead>
+            <tbody>
+              {userListings && userListings.length > 0 && userListings.map((listing) => (
+                <tr key={listing._id}>
+                  <td>
+                    <td>
+                      <Link
+                        style={{
+                          color: '#374151',
+                          fontWeight: '300',
+                          textDecoration: 'none',
+                          cursor: 'pointer',
+                          display: 'block',
+                          margin: '2vh',
+                          textAlign: 'center',
+                        }}
+                        to={`/listing/${listing._id}`}
+                      >
+                        {listing._id}
+                      </Link>
+                    </td>
+                  </td>
+                  <td>
+                    <Link
+                      style={{
+                        color: '#374151',
+                        fontWeight: '300',
+                        textDecoration: 'none',
+                        cursor: 'pointer',
+                        display: 'block',
+                        margin: '2vh',
+                        textAlign: 'center',
+                      }}
+                      to={`/listing/${listing._id}`}
+                    >
+                      {listing.tname}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      style={{
+                        color: '#374151',
+                        fontWeight: '300',
+                        textDecoration: 'none',
+                        cursor: 'pointer',
+                        display: 'block',
+                        margin: '2vh',
+                        textAlign: 'center',
+                      }}
+                      to={`/listing/${listing._id}`}
+                    >
+                      {listing.ename}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      style={{
+                        color: '#374151',
+                        fontWeight: '300',
+                        textDecoration: 'none',
+                        cursor: 'pointer',
+                        display: 'block',
+                        margin: '2vh',
+                        textAlign: 'center',
+                      }}
+                      to={`/listing/${listing._id}`}
+                    >
+                      {listing.email}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      style={{
+                        color: '#374151',
+                        fontWeight: '300',
+                        textDecoration: 'none',
+                        cursor: 'pointer',
+                        display: 'block',
+                        margin: '2vh',
+                        textAlign: 'center',
+                      }}
+                      to={`/listing/${listing._id}`}
+                    >
+                      {listing.phone}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      style={{
+                        color: '#374151',
+                        fontWeight: '300',
+                        textDecoration: 'none',
+                        cursor: 'pointer',
+                        display: 'block',
+                        margin: '2vh',
+                        textAlign: 'center',
+                      }}
+                      to={`/listing/${listing._id}`}
+                    >
+                      {listing.line}
+                    </Link>
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <Button onClick={() => handleListDelete(listing._id)} style={{ color: 'red', borderRadius: '5px', borderRightColor: 'red', margin: '2vh', }}>
+                      Delete
+                    </Button>
+                    <Button onClick={() => handleListDelete(listing._id)} style={{ color: 'green', borderRadius: '5px', borderRightColor: 'green', margin: '2vh', }}>
+                      Edit
+                    </Button>
+                  </td>
+
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
+
+      </div>
+
+      {/* เเจ้ง error */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+        <p style={{ color: 'red' }}>{showListingError ? 'Error showing listing' : ''}</p>
+      </div>
     </div>
-  )
+
+  );
 }
 
-export default Reserve
+export default Reserve;

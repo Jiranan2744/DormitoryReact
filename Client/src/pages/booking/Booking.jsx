@@ -49,6 +49,8 @@ const Booking = () => {
   const handleShow = () => setShow(true);
 
   const { data, loading, error } = useFetch(`/dormitorys/find/${id}`);
+
+
   const navigate = useNavigate()
 
   const nextProcess = () => {
@@ -56,7 +58,6 @@ const Booking = () => {
     setStep((prevStep) => prevStep + 1);
   }
 
-  //ชื่อไม่ขึ้น (null)
   useEffect(() => {
     axios.get("/users/getuser").then((data) => {
       data.data.phone = `0${data.data.phone}`

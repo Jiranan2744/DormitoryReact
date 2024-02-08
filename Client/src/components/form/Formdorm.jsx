@@ -2,18 +2,12 @@ import React, { useEffect, useState } from 'react';
 
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
-import Table from 'react-bootstrap/Table';
-import Container from 'react-bootstrap/Container';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-import Switch from '@mui/material/Switch';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import { useNavigate } from 'react-router-dom'
-import Alert from 'react-bootstrap/Alert';
 import Navbar from "../../components/navbar/Navbar";
 
-import axios from 'axios';
 import { app } from '../../firebase';
 import {
   getDownloadURL,
@@ -42,7 +36,7 @@ export default function Formdorm() {
     province: '',
     code: '',
     description: '',
-    // typeRooms: '',
+    typeRooms: '',
     sizeRooms: '',
     mindaily: '',
     maxdaily: '',
@@ -132,36 +126,19 @@ export default function Formdorm() {
     }
   };
 
-  const [typeRoom, setTypeRoom] = useState('')
-  const [sizeRoom, setSizeRoom] = useState('')
-  const [mindaily, setMinDaily] = useState('')
-  const [maxdaily, setMaxDaily] = useState('')
-  const [minmonthly, setMinMonthly] = useState('')
-  const [maxmonthly, setMaxMonthly] = useState('')
-  const [billWater, setBillWater] = useState('')
-  const [setWater, setSetWater] = useState('')
-  const [billElectricity, setBillElectricity] = useState('')
-  const [insurance, setInsurance] = useState('')
-  const [service, setService] = useState('')
-  const [advance, setAdvance] = useState('')
-  const [billtelephone, setBilltelephone] = useState('')
-  const [billinternet, setBillinternet] = useState('')
-  const [desc, setDesc] = useState('')
-  const [img, setImg] = useState('')
-  const [status, setStatus] = useState('')
 
   const navigate = useNavigate();
 
-
+  //CREATE DORMITORYS
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
+
       setLoading(true);
       setError(false);
-  
-      // First request to '/dormitorys'
-      const resDormitorys = await fetch('/dormitorys', {
+
+      const res = await fetch('/dormitorys', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -171,46 +148,19 @@ export default function Formdorm() {
           userRef: currentUser._id,
         }),
       });
-  
-      const dormitoryData = await resDormitorys.json();
-  
+
+      const data = await res.json();
       setLoading(false);
-  
-      if (dormitoryData.success === false) {
-        setError(dormitoryData.message);
-        return;
+
+      if (data.success === false) {
+        setError(data.message);
       }
-  
-      // Second request to '/rooms'
-      const resRooms = await fetch('/rooms', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          userRef: currentUser._id,
-        }),
-      });
-  
-      const roomData = await resRooms.json();
-  
-      setLoading(false);
-  
-      if (roomData.success === false) {
-        setError(roomData.message);
-        return;
-      }
-  
-      navigate(`/reserve/${dormitoryData._id}/${roomData._id}`);
+      navigate(`/reserve/${data._id}`);
     } catch (error) {
       setError(error.message);
       setLoading(false);
     }
   };
-  
-  
-
 
   //Multi Checkbox
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -254,11 +204,6 @@ export default function Formdorm() {
     }
   };
 
-  //Switch Free or Full
-  const [state, setState] = useState({
-    full: 0,
-    free: 0,
-  });
 
   //Alert
   const [tname, setTname] = useState('')
@@ -544,25 +489,21 @@ export default function Formdorm() {
                     <tbody>
                       <tr>
                         <td>
-                          <select
-                            aria-label="Default select example"
-                            id="typeRooms"
-                            required
-                            // onChange={handleChange}
-                            // className="form-control"
-                          >
-                            <option value="">เลือกรูปแบบห้อง</option>
-                            <option value="studio">สตูดิโอ</option>
-                            <option value="1room">ห้อง 1 ห้องนอน</option>
-                            <option value="2room">ห้อง 2 ห้องนอน</option>
-                          </select>
-
-
-
+                          <InputGroup style={{ width: '20vh' }} className="mb-2">
+                            <input
+                              type="text"
+                              placeholder=""
+                              id="typeRooms"
+                              style={{ width: '20vh' }}
+                              className={isValidCode ? 'form-control' : 'form-control is-invalid'}
+                              required
+                              onChange={handleChange}
+                              value={formData.typeRooms}
+                            />
+                          </InputGroup>
                         </td>
-
                         <td>
-                          <InputGroup style={{ width: '30vh' }} className="mb-2 p-3">
+                          <InputGroup style={{ width: '25vh' }} className="mb-2 p-3">
                             <input
                               type='text'
                               id="sizeRooms"
@@ -722,22 +663,22 @@ export default function Formdorm() {
 
                     <Form.Group as={Row} className="m-2" controlId="formHorizontalEmail">
                       <Form.Label column sm={5} style={{ width: '20vh', fontWeight: 'normal', color: '#666666' }}>
-                        ค่าส่วนกลาง
+                        ค่ามัดจำ
                       </Form.Label>
                       <InputGroup style={{ width: '30vh' }} className="mb-2">
                         <input
                           type='number'
-                          id="service"
+                          id="advance"
                           aria-describedby="basic-addon2"
                           className='form-control'
                           required
                           onChange={handleChange}
-                          value={formData.service}
+                          value={formData.advance}
                         />
-                        <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
+                        <InputGroup.Text id="basic-addon2">บาท</InputGroup.Text>
                       </InputGroup>
-                      <Form.Label column sm={5} style={{ width: '50vh', fontWeight: 'normal' }}>
-                        เช่น ค่าส่วนกลาง 200 บาท/เดือน
+                      <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
+                        กรณีหากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
                       </Form.Label>
                     </Form.Group>
 
@@ -757,6 +698,27 @@ export default function Formdorm() {
                         />
                         <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                       </InputGroup>
+                    </Form.Group>
+
+                    <Form.Group as={Row} className="m-2" controlId="formHorizontalEmail">
+                      <Form.Label column sm={5} style={{ width: '20vh', fontWeight: 'normal', color: '#666666' }}>
+                        ค่าส่วนกลาง
+                      </Form.Label>
+                      <InputGroup style={{ width: '30vh' }} className="mb-2">
+                        <input
+                          type='number'
+                          id="service"
+                          aria-describedby="basic-addon2"
+                          className='form-control'
+                          required
+                          onChange={handleChange}
+                          value={formData.service}
+                        />
+                        <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
+                      </InputGroup>
+                      <Form.Label column sm={5} style={{ width: '50vh', fontWeight: 'normal' }}>
+                        เช่น ค่าส่วนกลาง 200 บาท/เดือน
+                      </Form.Label>
                     </Form.Group>
 
                     <Form.Group as={Row} className="m-2" controlId="formHorizontalEmail">
@@ -795,23 +757,7 @@ export default function Formdorm() {
                       </InputGroup>
                     </Form.Group>
 
-                    <Form.Group as={Row} className="m-2" controlId="formHorizontalEmail">
-                      <Form.Label column sm={5} style={{ width: '20vh', fontWeight: 'normal', color: '#666666' }}>
-                        ค่าอื่นๆ
-                      </Form.Label>
-                      <InputGroup style={{ width: '30vh' }} className="mb-2">
-                        <input
-                          type='number'
-                          id="advance"
-                          aria-describedby="basic-addon2"
-                          className='form-control'
-                          required
-                          onChange={handleChange}
-                          value={formData.advance}
-                        />
-                        <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
-                      </InputGroup>
-                    </Form.Group>
+
                     < br />
 
                     <Form.Group className="">
@@ -850,7 +796,6 @@ export default function Formdorm() {
                                 id='images'
                                 accept='image/*'
                                 multiple
-
                                 onChange={(e) => setFiles(e.target.files)}
                               />
                               <button

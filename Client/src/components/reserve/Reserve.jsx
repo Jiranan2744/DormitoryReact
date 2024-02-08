@@ -1,4 +1,4 @@
-import { faFileCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faFileCirclePlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -74,7 +74,7 @@ function Reserve() {
           <br />
           <Table striped bordered style={{ width: '100%' }}>
 
-            <thead style={{ textAlign: 'center' }} >
+            {/* <thead style={{ textAlign: 'center' }} >
               <tr>
                 <th>ไอดี</th>
                 <th>ชื่อหอพัก (ไทย)</th>
@@ -83,11 +83,10 @@ function Reserve() {
                 <th>เบอร์โทร</th>
                 <th>ไลน์</th>
               </tr>
-            </thead>
+            </thead> */}
             <tbody>
               {userListings && userListings.length > 0 && userListings.map((listing) => (
                 <tr key={listing._id}>
-                  <td>
                     <td>
                       <Link
                         style={{
@@ -96,7 +95,7 @@ function Reserve() {
                           textDecoration: 'none',
                           cursor: 'pointer',
                           display: 'block',
-                          margin: '2vh',
+                          margin: '3vh',
                           textAlign: 'center',
                         }}
                         to={`/listing/${listing._id}`}
@@ -104,7 +103,7 @@ function Reserve() {
                         {listing._id}
                       </Link>
                     </td>
-                  </td>
+                 
                   <td>
                     <Link
                       style={{
@@ -113,7 +112,7 @@ function Reserve() {
                         textDecoration: 'none',
                         cursor: 'pointer',
                         display: 'block',
-                        margin: '2vh',
+                        margin: '3vh',
                         textAlign: 'center',
                       }}
                       to={`/listing/${listing._id}`}
@@ -129,7 +128,7 @@ function Reserve() {
                         textDecoration: 'none',
                         cursor: 'pointer',
                         display: 'block',
-                        margin: '2vh',
+                        margin: '3vh',
                         textAlign: 'center',
                       }}
                       to={`/listing/${listing._id}`}
@@ -145,7 +144,7 @@ function Reserve() {
                         textDecoration: 'none',
                         cursor: 'pointer',
                         display: 'block',
-                        margin: '2vh',
+                        margin: '3vh',
                         textAlign: 'center',
                       }}
                       to={`/listing/${listing._id}`}
@@ -161,7 +160,7 @@ function Reserve() {
                         textDecoration: 'none',
                         cursor: 'pointer',
                         display: 'block',
-                        margin: '2vh',
+                        margin: '3vh',
                         textAlign: 'center',
                       }}
                       to={`/listing/${listing._id}`}
@@ -177,7 +176,7 @@ function Reserve() {
                         textDecoration: 'none',
                         cursor: 'pointer',
                         display: 'block',
-                        margin: '2vh',
+                        margin: '3vh',
                         textAlign: 'center',
                       }}
                       to={`/listing/${listing._id}`}
@@ -186,14 +185,26 @@ function Reserve() {
                     </Link>
                   </td>
                   <td style={{ textAlign: 'center' }}>
-                    <Button onClick={() => handleListDelete(listing._id)} style={{ color: 'red', borderRadius: '5px', borderRightColor: 'red', margin: '2vh', }}>
-                      Delete
+                    <Button onClick={() => handleListDelete(listing._id)} style={{ color: 'red', borderRadius: '5px', margin: '1vh', backgroundColor: '#ff7f7f' }}>
+                      <FontAwesomeIcon icon={faTrash} style={{ marginRight: '8px' }} /> Delete
                     </Button>
-                    <Button onClick={() => handleListDelete(listing._id)} style={{ color: 'green', borderRadius: '5px', borderRightColor: 'green', margin: '2vh', }}>
-                      Edit
-                    </Button>
-                  </td>
 
+                    <Link
+                      to={`/update/${listing._id}`}
+                      style={{
+                        color: 'green',
+                        borderRadius: '5px',
+                        borderRightColor: 'green',
+                        display: 'inline-block',
+                        padding: '8px 16px',  // Adjust padding as needed
+                        textDecoration: 'none',
+                        backgroundColor: 'lightgreen',  // Optional background color
+                        margin: '2vh',
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faEdit} style={{ marginRight: '8px' }} /> Edit
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>

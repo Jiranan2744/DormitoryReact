@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 const RoomSchema = new mongoose.Schema({
 
-    // typeRooms: {
-    //     type: String,
-    //     required: true,
-    // },
+    typeRooms: {
+        type: String,
+        required: true,
+    },
     sizeRooms: {
         type: Number,
         required: true,
@@ -54,17 +54,17 @@ const RoomSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    userRoom: {
+        type: String,
+        required: true,
+    },
 
     // userRef: {
     //     type: String,
     //     required: true,
     //   },
-
-
+    
     // roomNumbers: [{ number: Number, unavailableDates: { type: [Date] } }],
-},
-    { timestamps: true }
-);
-
+});
 
 export default mongoose.model("Room", RoomSchema)

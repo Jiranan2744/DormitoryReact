@@ -74,16 +74,5 @@ export const getallDormitory = async (req, res, next) => {
     }
 };
 
-export const getDormitoryRooms = async (req, res, next) => {
-    try {
-        const dormitory = await Dormitory.findById(req.params.id);
-        const list = await Promise.all(
-            dormitory.rooms.map((room) => {
-                return Room.findById(room);
-            })
-        );
-        res.status(200).json(list);
-    } catch (err) {
-        next(err);
-    }
-};
+
+

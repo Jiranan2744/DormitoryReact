@@ -9,6 +9,7 @@ import Formdorm from "./components/form/Formdorm";
 import Dashboard from "./pages/dashboard/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
 import Profile from "./pages/Profile";
+import UpdateDormitory from "./pages/UpdateDormitory";
 
 function App() {
   return (
@@ -29,9 +30,10 @@ function App() {
 
           <Route element={<PrivateRoute />}>
             <Route path='/profile' element={<Profile />} />
-
           </Route>
 
+            <Route path='/update/:listingId' element={<UpdateDormitory />} />
+          
 
         </Routes>
       </BrowserRouter>

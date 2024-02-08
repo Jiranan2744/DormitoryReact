@@ -1,5 +1,7 @@
 import Room from "../modals/Room.js"
 import Dormitory from "../modals/Dormitory.js"
+import { createError } from "../utils/error.js";
+
 
 // export const createRoom = async (req, res, next) => {
 //     const dormitoryId = req.params.dormitoryid;
@@ -29,17 +31,26 @@ export const createNewRoom = async (req, res, next) => {
     }
 }
 
-export const updatedRoom= async (req, res, next) => {
+export const updatedRoom = async (req, res, next) => {
+    
+    const room = await Room.findById(req.params.id);
+
+    if(!room){
+        return next(createError(404, 'Room not found!'));
+    }
+    if(req.user.id !== room.userRoom){
+        return next(createError(401, 'You can only update your own listing!'));
+    }
     try {
         const updatedRoom = await Room.findByIdAndUpdate(
             req.params.id,
-            { $set: req.body },
+            req.body,
             { new: true }
         );
         res.status(200).json(updatedRoom);
 
-    } catch (err) {
-        next(err);
+    } catch (error) {
+        next(error);
     }
 }
 
@@ -76,8 +87,8 @@ export const getallRoom = async (req, res, next) => {
     try {
         const rooms = await Room.find();
         res.status(200).json(rooms);
-
     } catch (err) {
         next(err);
     }
 }
+

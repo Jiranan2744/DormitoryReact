@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { useState } from "react"
 import { useSelector } from "react-redux"
 import { useNavigate } from 'react-router-dom';
@@ -13,10 +12,6 @@ export default function Profile() {
     const [updateSuccess, setUpdateSuccess] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    const [showListingError, setShowListingError] = useState(false);
-    const [userListings, setUserListings] = useState([]);
-
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -85,9 +80,6 @@ export default function Profile() {
             dispatch(deleteUserFailure(error.message));
         }
     };
-
-
-
 
     return (
         <>

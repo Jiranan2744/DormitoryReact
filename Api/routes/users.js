@@ -28,7 +28,7 @@ router.delete("/:id", verifyToken, deleteUser);
 //GET
 router.get("/getuser", verifyUser, getUser);
 
-//GET owner
+//GET USER+DORMITORY+ROOM
 router.get('/listing/:id', verifyToken, getUserListings);
 
 //GET ALL

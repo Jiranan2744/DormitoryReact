@@ -1,5 +1,6 @@
 import User from "../modals/User.js";
 import Room from "../modals/Room.js";
+
 import bcryptjs from 'bcryptjs';
 import { createError } from '../utils/error.js';
 
@@ -56,18 +57,19 @@ export const getUser = async (req, res, next) => {
     }
 }
 
+//GET USER+DORMITORY
 export const getUserListings = async (req, res, next) => {
     if (req.user.id === req.params.id) {
         try {
-          const dormitorys = await Dormitory.find({ userRef: req.params.id });
-          res.status(200).json(dormitorys);
+            const dormitorys = await Dormitory.find({ userRef: req.params.id });
+            res.status(200).json(dormitorys);
         } catch (error) {
-          next(error);
+            next(error);
         }
-      } else {
+    } else {
         return next(createError(401, 'You can only view your own listings!'));
-      }
-    };
+    }
+};
 
 
 

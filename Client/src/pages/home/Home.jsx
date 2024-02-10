@@ -13,7 +13,7 @@ function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/dormitorys');
+        const response = await axios.get('http://localhost:8800/api/dormitorys');
         setDormitorys(response.data);
       } catch (error) {
         console.error('Error fetching dormitories:', error);

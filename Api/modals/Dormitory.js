@@ -12,7 +12,7 @@ const DormitorySchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required:true
+        required:false
     },
     phone: {
         type: String,
@@ -54,17 +54,10 @@ const DormitorySchema = new mongoose.Schema({
         type: Array,
         required: true,
     },
-
-    imagePayment: {
-        type: Array,
-        required: true,
-    },
-
     description: {
         type: String,
         required: true,
     },
-
     typeRooms: {
         type: String,
         required: true,
@@ -117,11 +110,11 @@ const DormitorySchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-
     userRef: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User", // Reference to the User model
         required: true,
-      },
+    },
    
 });
 

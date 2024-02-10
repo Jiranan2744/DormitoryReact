@@ -87,6 +87,12 @@ export default function Profile() {
             {currentUser && (
                 <div className='p-3 max-w-lg mx-auto'>
                     <h1 className='text-3xl font-semibold text-center my-4'>Profile</h1>
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
+
+                        <span style={{ padding: '5px', textAlign: 'left' }} >สถานะผู้ใช้งาน:</span>
+                        <p style={{ color: 'green', padding: '5px' }}>{currentUser.role}</p>
+
+                    </div>
                     <form onSubmit={handleSubmit} className="mb-3" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <input
                             type='text'
@@ -129,10 +135,14 @@ export default function Profile() {
                             type='password'
                             placeholder='password'
                             id='password'
+                            defaultValue={currentUser.password}
                             className='border p-3 rounded-lg'
                             style={{ width: '30%', borderRadius: '5px', marginTop: '10px' }}
+                            onChange={handleChange}
                         />
+
                         <br />
+
                         <button disabled={loading} className="rounded-lg uppercase hover:opacity-95 disabled:opacity-80" style={{ backgroundColor: 'rgb(51, 65, 85)', color: '#ffffff', borderRadius: '5px', width: '30%', padding: '5px', height: '10%' }} >
                             {loading ? 'Loading...' : 'Update'}
                         </button>
@@ -151,10 +161,11 @@ export default function Profile() {
                         </span>
                     </div>
 
+
                     <p style={{ color: 'red' }}>{error ? error : ''}</p>
                     <p style={{ color: 'green' }}>
                         {updateSuccess ? 'Update successfully!' : ''}
-                    </p>  
+                    </p>
                 </div>
             )}
         </>

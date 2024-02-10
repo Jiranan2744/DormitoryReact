@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import './booking.css';
 import useFetch from '../../hooks/useFetch';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChair,
@@ -38,6 +38,7 @@ import {
   ref,
   uploadBytesResumable,
 } from 'firebase/storage';
+import { useSelector } from 'react-redux';
 
 const generatePayload = require('promptpay-qr');
 
@@ -51,14 +52,25 @@ const Booking = () => {
   const [show, setShow] = useState(false);
   const [step, setStep] = useState(1);
   const [qrCode, setqrCode] = useState("sample");
+
+  console.log(userDetail._id)
   const handleClose = () => {
     setStep(1)
     setShow(false)
   };
   const handleShow = () => setShow(true);
 
-  const { data, loading, error } = useFetch(`/dormitorys/find/${id}`);
+  const { currentUser } = useSelector((state) => state.user);
+
+
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const params = useParams();
+  const { data } = useFetch(`/dormitorys/find/${id}`);
   const [files, setFiles] = useState([]);
+
+  console.log(data)
 
   const [formData, setFormData] = useState({
     image: [],
@@ -67,6 +79,9 @@ const Booking = () => {
 
   const [imageUploadError, setImageUploadError] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  const listingId = params.listingId;
+
 
   const navigate = useNavigate()
 
@@ -162,6 +177,36 @@ const Booking = () => {
     });
   };
 
+  const handleSuccess = async (e) => {
+    e.preventDefault();
+    try {
+
+      setLoading(true);
+      setError(false);
+
+      const res = await fetch(`/dormitorys/update/${params.listingId}`, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              ...formData,
+              userRef: currentUser._id,
+          }),
+      });
+
+      const data = await res.json();
+      setLoading(false);
+
+      if (data.success === false) {
+          setError(data.message);
+      }
+      navigate(`/booking/${listingId}`);
+  } catch (error) {
+      setError(error.message);
+      setLoading(false);
+  }
+};
 
   return (
     <div>
@@ -211,10 +256,7 @@ const Booking = () => {
               <span>{data.no} {data.street} {data.road} {data.district} {data.subdistrict} {data.province} {data.code}</span>
             </div>
 
-            <span className="hotelPriceHighlight">
-              Book a stay over ${data.cheapestPrice} at this property and get a
-              free airport taxi
-            </span>
+            
             <br />
             {/* Image */}
             <div className="hotelImages">
@@ -457,15 +499,30 @@ const Booking = () => {
                         </div>
                       </Form>
                     )}
+
+                  </Modal.Body>
+
+                  <Modal.Body>
+                    {step === 3 && (
+                      <>
+                        <p style={{ textAlign: 'center' }}>จองเสร็จสิ้น</p>
+                      </>
+                    )}
                   </Modal.Body>
 
                   <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
-                      Close
+                      ปิด
                     </Button>
-                    <Button variant="primary" type="submit" onClick={nextProcess}>
-                      Next
-                    </Button>
+                    {step !== 3 ? (
+                      <Button variant="primary" type="submit" onClick={nextProcess}>
+                        ถัดไป
+                      </Button>
+                    ) : (
+                      <Button variant="primary" type="submit" onClick={handleSuccess}>
+                        ยืนยันการจอง
+                      </Button>
+                    )}
                   </Modal.Footer>
                 </Modal>
               </div>

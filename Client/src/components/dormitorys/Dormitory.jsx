@@ -25,7 +25,6 @@ function Dormitory() {
               <span className="fpCity">{item.no} {item.road} {item.district} {item.subdistrict} {item.province} {item.code}</span>
               
 
-
               <Link to={`/booking/${item._id}`}>
                 <button className='btn btn-success'> View Details </button>
               </Link>

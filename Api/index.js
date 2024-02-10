@@ -8,6 +8,8 @@ import doritorysRoute from "./routes/dormitorys.js"
 import cookieParser from "cookie-parser"
 import cors from "cors"
 
+import reserveRoute from "./routes/rooms.js"
+
 const app = express();
 
 dotenv.config();
@@ -51,6 +53,8 @@ app.use("/api/auth", authRoute);
 app.use("/api/rooms", roomsRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/dormitorys", doritorysRoute);
+app.use("/api/reserve", reserveRoute)
+
 
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
@@ -63,7 +67,7 @@ app.use((err, req, res, next) => {
 
 });
 
-app.listen(8080, () => {
+app.listen(8800, () => {
     connect()
     console.log("Connected to backend.");
 });

@@ -146,6 +146,7 @@ export default function Formdorm() {
         body: JSON.stringify({
           ...formData,
           userRef: currentUser._id,
+          
         }),
       });
 
@@ -155,7 +156,7 @@ export default function Formdorm() {
       if (data.success === false) {
         setError(data.message);
       }
-      navigate(`/reserve/${data._id}`);
+      navigate(`/booking/${data._id}`);
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -830,8 +831,6 @@ export default function Formdorm() {
                         </div>
                       </Card>
                     </Form.Group>
-
-
                     < br />
                     <Form.Label column sm={5} style={{ width: '30%', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
                       รายละเอียดหอพัก

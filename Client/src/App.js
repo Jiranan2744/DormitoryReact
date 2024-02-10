@@ -10,6 +10,7 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
 import Profile from "./pages/Profile";
 import UpdateDormitory from "./pages/UpdateDormitory";
+import Mybooking from "./pages/Mybooking";
 
 function App() {
   return (
@@ -32,8 +33,9 @@ function App() {
             <Route path='/profile' element={<Profile />} />
           </Route>
 
-            <Route path='/update/:listingId' element={<UpdateDormitory />} />
-          
+          <Route path='/update/:listingId' element={<UpdateDormitory />} />
+
+          <Route path='/mybooking' element={<Mybooking />} />
 
         </Routes>
       </BrowserRouter>

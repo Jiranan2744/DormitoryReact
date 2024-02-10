@@ -5,10 +5,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import Navbar from '../navbar/Navbar';
 import { Link } from 'react-router-dom';
 import Table from 'react-bootstrap/Table';
-import { Button } from '@mui/material';
+import { Tab, Nav, Button } from 'react-bootstrap';
+
 
 function Reserve() {
-
 
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
@@ -57,18 +57,28 @@ function Reserve() {
       <div style={{ flexDirection: 'column', gap: '2px', paddingLeft: '35vh', marginTop: '5vh' }}>
         <span style={{ fontSize: '1.5rem', fontWeight: '600' }}>ลงประกาศหอพัก</span>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <FontAwesomeIcon
-          icon={faFileCirclePlus}
-          onClick={handleShowList}
-          style={{
-            cursor: 'pointer',
-            marginBottom: '16px',
-            marginTop: '5vh',
-            fontSize: '100px',
-            color: '#D4D4D4',
-          }}
-        />
+      <div style={{ display: 'flex', flexDirection: 'column'}}>
+      <Tab.Container defaultActiveKey="tab1">
+          <Nav variant="tabs" style={{marginLeft: '35vh', padding: '5px'}}>
+            <Nav.Item>
+              <Nav.Link href='/'>
+                Home
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="tab2" onClick={handleShowList}>
+                My Dormitory
+              </Nav.Link>
+            </Nav.Item>
+          </Nav>
+          {/* Sliding content panel */}
+          <Tab.Content>
+            <Tab.Pane eventKey="tab1">
+              {/* Your content for the first tab */}
+            </Tab.Pane>
+            {/* Add more Tab.Pane components for additional tabs */}
+          </Tab.Content>
+        </Tab.Container>
         <br />
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <br />
@@ -185,7 +195,7 @@ function Reserve() {
                     </Link>
                   </td>
                   <td style={{ textAlign: 'center' }}>
-                    <Button onClick={() => handleListDelete(listing._id)} style={{ color: 'red', borderRadius: '5px', margin: '1vh', backgroundColor: '#ff7f7f' }}>
+                    <Button onClick={() => handleListDelete(listing._id)} style={{ color: 'red', borderRadius: '5px', margin: '1vh', backgroundColor: '#ff7f7f', border: 'none', padding: '8px 16px' }}>
                       <FontAwesomeIcon icon={faTrash} style={{ marginRight: '8px' }} /> Delete
                     </Button>
 
@@ -217,6 +227,7 @@ function Reserve() {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
         <p style={{ color: 'red' }}>{showListingError ? 'Error showing listing' : ''}</p>
       </div>
+      
     </div>
 
   );

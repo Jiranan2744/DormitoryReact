@@ -56,7 +56,7 @@ const Navbar = () => {
 
               <Dropdown.Menu>
                 {/* Your dropdown content goes here */}
-                <Dropdown.Item href="/dashboard?tab=dormitory list">
+                <Dropdown.Item href="/mybooking">
                   <FontAwesomeIcon icon={faList} style={{ marginRight: '5px' }} />
                   รายการจองหอพัก
                 </Dropdown.Item>

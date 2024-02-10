@@ -161,7 +161,7 @@ export default function UpdateDormitory() {
             if (data.success === false) {
                 setError(data.message);
             }
-            navigate(`/reserve/${data._id}`);
+            navigate(`/booking/${data._id}`);
         } catch (error) {
             setError(error.message);
             setLoading(false);
@@ -847,4 +847,3 @@ export default function UpdateDormitory() {
         </div>
     );
 }
-

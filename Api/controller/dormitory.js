@@ -1,18 +1,35 @@
 import Dormitory from "../modals/Dormitory.js";
-import Room from "../modals/Room.js"
+import User from "../modals/User.js"
 import { createError } from "../utils/error.js";
 
 
 export const createDormitory = async (req, res, next) => {
     try {
-        const dormitory = await Dormitory.create(req.body);
+        const { userRef, ...dormitoryData } = req.body;
+
+        if (!userRef) {
+            return res.status(400).json({ error: "userRef is required for dormitory ownership." });
+        }
+        // Assuming you have a Dormitory model
+        const dormitory = await Dormitory.create({
+            userRef,
+            ...dormitoryData,
+        });
+        // Set the role to "owner" for the associated user
+        const user = await User.findById(userRef);
+        if(user){
+            user.role = "owner";
+            await user.save();
+        }
+
         return res.status(200).json(dormitory);
     } catch (err) {
         next(err);
     }
-}
+};
 
-export const updatedDormitory = async (req, res, next) => {
+
+export const updateDormitory = async (req, res, next) => {
 
     const dormitory = await Dormitory.findById(req.params.id);
 
@@ -73,6 +90,3 @@ export const getallDormitory = async (req, res, next) => {
         next(err);
     }
 };
-
-
-

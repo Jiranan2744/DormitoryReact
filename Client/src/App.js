@@ -6,11 +6,12 @@ import Dormitory from "./components/dormitorys/Dormitory";
 import Booking from "./pages/booking/Booking";
 import Reserve from "./components/reserve/Reserve";
 import Formdorm from "./components/form/Formdorm";
-import Dashboard from "./pages/dashboard/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
 import Profile from "./pages/Profile";
 import UpdateDormitory from "./pages/UpdateDormitory";
 import Mybooking from "./pages/Mybooking";
+import CustomerReserve from "./pages/CustomerReserve";
+import Admin from "./pages/Admin";
 
 function App() {
   return (
@@ -36,6 +37,11 @@ function App() {
           <Route path='/update/:listingId' element={<UpdateDormitory />} />
 
           <Route path='/mybooking' element={<Mybooking />} />
+
+          <Route path="/reservation/reserve/owner/:dormitoryId" element={<CustomerReserve />} />
+
+          <Route path="/admin-dashboard" element={<Admin /> } />
+
 
         </Routes>
       </BrowserRouter>

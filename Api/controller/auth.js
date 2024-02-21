@@ -3,11 +3,12 @@ import bcrypt from "bcryptjs";
 import { createError } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 
-export const roles = {
-    admin: "ADMIN",
-    owner: "OWNER",
-    client: "CLIENT",
-};
+const roles = {
+    admin: 'admin',
+    owner: 'owner',
+    users: 'users',
+    customer: "customer",
+  };
 
 export const register = async (req, res, next) => {
     try {
@@ -28,7 +29,7 @@ export const register = async (req, res, next) => {
             // Assuming dormitoryId is the property that indicates ownership
             newUser.role = roles.owner;
         } else {
-            newUser.role = roles.client; // Set to another default role if needed
+            newUser.role = roles.users; // Set to another default role if needed
         }
 
         await newUser.save();
@@ -37,7 +38,6 @@ export const register = async (req, res, next) => {
         next(error);
     }
 };
-
 
 
 export const login = async (req, res, next) => {

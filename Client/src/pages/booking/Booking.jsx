@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './booking.css';
 import useFetch from '../../hooks/useFetch';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -24,10 +24,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
-import Card from 'react-bootstrap/Card';
-import InputGroup from 'react-bootstrap/InputGroup';
 import Row from 'react-bootstrap/Row';
-import { Input } from '@mui/material';
 import axios from 'axios';
 import QRCode from 'qrcode.react';
 
@@ -62,7 +59,6 @@ const Booking = () => {
 
   const { currentUser } = useSelector((state) => state.user);
 
-
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -73,15 +69,14 @@ const Booking = () => {
   console.log(data)
 
   const [formData, setFormData] = useState({
-    image: [],
     imagePayment: [],
+    isReservationEnabled: '',
   })
 
   const [imageUploadError, setImageUploadError] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const listingId = params.listingId;
-
 
   const navigate = useNavigate()
 
@@ -177,36 +172,79 @@ const Booking = () => {
     });
   };
 
-  const handleSuccess = async (e) => {
+
+  const getDormitoryId = () => {
+    const pathArray = window.location.pathname.split('/');
+    const dormId = pathArray[pathArray.length - 1];
+
+    return dormId;
+  };
+
+  // Function to handle reservation success
+  const handleReservationSuccess = async (e) => {
     e.preventDefault();
     try {
-
       setLoading(true);
       setError(false);
 
-      const res = await fetch(`/dormitorys/update/${params.listingId}`, {
-          method: 'PUT',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-              ...formData,
-              userRef: currentUser._id,
-          }),
+      // If there are no images, set imagePayment to null
+      const imagePayment = formData.imagePayment.length > 0 ? formData.imagePayment : null;
+
+      // Retrieve dormitory ID from the current page or component
+      const dormId = getDormitoryId();
+
+      // Retrieve user ID from your authentication system (assuming currentUser is correctly set)
+      const userId = currentUser._id;
+
+      // Send a POST request to the server
+      const res = await fetch(`/reservation/reserve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          dormitoryId: dormId,
+          userId: userId,
+          imagePayment,
+          // ... other fields
+        }),
       });
 
-      const data = await res.json();
+      // Parse the response from the server
+      const responseData = await res.json();
       setLoading(false);
 
-      if (data.success === false) {
-          setError(data.message);
+      // Handle the response
+      if (responseData.success === false) {
+        setError(responseData.message);
+      } else {
+        // Reservation created successfully
+        // Navigate to the desired page (adjust as needed)
       }
-      navigate(`/booking/${listingId}`);
-  } catch (error) {
+    } catch (error) {
+      console.error("Error in handleReservationSuccess:", error);
       setError(error.message);
       setLoading(false);
-  }
-};
+    }
+  };
+
+
+  const [facilities, setFacilities] = useState([]);
+  const [dormitoryId, setDormitoryId] = useState();
+
+  useEffect(() => {
+    // Fetch facilities data from your API
+    fetch(`/dormitorys/optionselect/${params.id}`)
+      .then(response => response.json())
+      .then(data => {
+        // Ensure data is an array before setting the state
+        if (Array.isArray(data)) {
+          setFacilities(data);
+        }
+      })
+      .catch(error => console.error('Error fetching facilities:', error));
+  }, [dormitoryId]);
+
 
   return (
     <div>
@@ -256,7 +294,7 @@ const Booking = () => {
               <span>{data.no} {data.street} {data.road} {data.district} {data.subdistrict} {data.province} {data.code}</span>
             </div>
 
-            
+
             <br />
             {/* Image */}
             <div className="hotelImages">
@@ -276,14 +314,15 @@ const Booking = () => {
               <div className="hotelDetailsTexts">
                 <div>
                   <table className="table table-hover">
-                    <thead className="table-light">
+                    <thead className="table-light" style={{textAlign: 'center'}}>
                       <tr>
                         <th>ประเภทห้อง</th>
                         <th>ขนาดห้องพัก</th>
                         <th>ค่าเช่ารายวัน</th>
-                        <th>ค่าเช่ารายเดือน</th>                      </tr>
+                        <th>ค่าเช่ารายเดือน</th>
+                      </tr>
                     </thead>
-                    <tbody>
+                    <tbody style={{textAlign: 'center'}}>
                       <tr>
                         <td>{data.typeRooms}</td>
                         <td>{data.sizeRooms}</td>
@@ -296,57 +335,38 @@ const Booking = () => {
 
                   <div style={{ width: '100vh', height: '30vh', alignItems: 'left', justifyContent: 'center' }}>
                     <h1>สิ่งอำนวยความสะดวก</h1>
-                    <div className="icon-container" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', padding: '20px' }}>
-                      <div className="icon-row" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <div className="icon" style={{ textAlign: 'center', margin: '10px' }}>
-                          <FontAwesomeIcon icon={faFan} />
-                          <span>เครื่องปรับอากาศ</span>
-                        </div>
-                        <div className="icon" style={{ textAlign: 'center', margin: '10px' }}>
-                          <FontAwesomeIcon icon={faChair} />
-                          <span>เฟอร์นิเจอร์-ตู้-เตียง</span>
-                        </div>
-                        <div className="icon" style={{ textAlign: 'center', margin: '10px' }}>
-                          <FontAwesomeIcon icon={faTemperatureArrowUp} />
-                          <span>เครื่องทำน้ำอุ่น</span>
-                        </div>
-                        <div className="icon" style={{ textAlign: 'center', margin: '10px' }}>
-                          <FontAwesomeIcon icon={faFan} />
-                          <span>พัดลม</span>
-                        </div>
-                      </div>
+                    <div className="icon-container" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', padding: '20px' }}>
+                      {facilities.map(facility => (
+                        <div key={facility._id} className="icon" style={{ textAlign: 'center', margin: '10px' }}>
+                          {/* Use the appropriate icon based on your facility data */}
+                          {facility.facilities_name === 'ลิฟต์' && <FontAwesomeIcon icon={faElevator} />}
+                          {facility.facilities_name === 'เครื่องปรับอากาศ' && <FontAwesomeIcon icon={faFan} />}
+                          {facility.facilities_name === 'เฟอร์นิเจอร์-ตู้-เตียง' && <FontAwesomeIcon icon={faChair} />}
+                          {facility.facilities_name === 'พัดลม' && <FontAwesomeIcon icon={faFan} />}
+                          {facility.facilities_name === 'TV' && <FontAwesomeIcon icon={faTv} />}
+                          {facility.facilities_name === 'โทรศัพท์สายตรง' && <FontAwesomeIcon icon={faTv} />}
+                          {facility.facilities_name === 'อินเทอร์เน็ตไร้สาย (WIFI)' && <FontAwesomeIcon icon={faTv} />}
+                          {facility.facilities_name === 'เครื่องทำน้ำอุ่น' && <FontAwesomeIcon icon={faTemperatureArrowUp} />}
+                          {facility.facilities_name === 'มีระบบรักษาความปลอดภัย (คีย์การ์ด)' &&  <FontAwesomeIcon icon={faWifi} />}
+                          {facility.facilities_name === 'มีระบบรักษาความปลอดภัย (สเเกนลายนิ้วมือ)' && <FontAwesomeIcon icon={faWifi} />}
+                          {facility.facilities_name === 'กล้องวงจรปิด (CCTV)' && <FontAwesomeIcon icon={faWifi} />}
+                          {facility.facilities_name === 'รปภ.' && <FontAwesomeIcon icon={faWifi} />}
+                          {facility.facilities_name === 'ที่จอดรถ' && <FontAwesomeIcon icon={faSquareParking} />}
+                          {facility.facilities_name === 'ที่จอดรถมอเตอร์ไซต์/จักรยาน' && <FontAwesomeIcon icon={faSquareParking} />}
+                          {facility.facilities_name === 'สระว่ายน้ำ' && <FontAwesomeIcon icon={faWifi} />}
+                          {facility.facilities_name === 'ฟิตเนส' && <FontAwesomeIcon icon={faDumbbell} />}
+                          {facility.facilities_name === 'ร้านขายอาหาร' && <FontAwesomeIcon icon={faWifi} />}
+                          {facility.facilities_name === 'ร้านค้า สะดวกซื้อ' && <FontAwesomeIcon icon={faWifi} />}
+                          {facility.facilities_name === 'ร้านซัก-รีด' && <FontAwesomeIcon icon={faWifi} />}
+                          {facility.facilities_name === 'ร้านทำผม-เสริมสวย' && <FontAwesomeIcon icon={faWifi} />}
+                          {facility.facilities_name === 'อนุญาติให้สูบบุหรี่ในห้องพัก' && <FontAwesomeIcon icon={faWifi} />}
+                          {facility.facilities_name === 'อนุญาติให้เลี้ยงสัตว์' && <FontAwesomeIcon icon={faWifi} />}
 
-                      <div className="icon-row" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <div className="icon" style={{ textAlign: 'center', margin: '10px' }}>
-                          <FontAwesomeIcon icon={faTv} />
-                          <span>TV</span>
+                          {facility.facilities_name && <span>{facility.facilities_name}</span>}
                         </div>
-                        <div className="icon" style={{ textAlign: 'center', margin: '10px' }}>
-                          <FontAwesomeIcon icon={faSquareParking} />
-                          <span>ที่จอดรถ</span>
-                        </div>
-                        <div className="icon" style={{ textAlign: 'center', margin: '10px' }}>
-                          <FontAwesomeIcon icon={faElevator} />
-                          <span>ลิฟต์</span>
-                        </div>
-                        <div className="icon" style={{ textAlign: 'center', margin: '10px' }}>
-                          <FontAwesomeIcon icon={faDumbbell} />
-                          <span>ฟิตเนส</span>
-                        </div>
-                      </div>
-
-                      <div className="icon-row" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <div className="icon" style={{ textAlign: 'center', margin: '10px' }}>
-                          <FontAwesomeIcon icon={faWifi} />
-                          <span>อินเทอร์เน็ตไร้สาย (WIFI)</span>
-                        </div>
-                        <div className="icon" style={{ textAlign: 'center', margin: '10px' }}>
-                          <FontAwesomeIcon icon={faWifi} />
-                          <span>อินเทอร์เน็ตไร้สาย (WIFI)</span>
-                        </div>
-                      </div>
-
+                      ))}
                     </div>
+
                     <div className="" style={{ margin: '10px', padding: '10px', border: '1px solid #ccc', borderRadius: '8px' }}>
                       <h1 style={{ fontSize: '24px', marginBottom: '10px' }}>รายละเอียด</h1>
                       <span style={{ fontSize: '16px', color: '#333' }}>{data.description}</span>
@@ -500,37 +520,32 @@ const Booking = () => {
                       </Form>
                     )}
 
-                  </Modal.Body>
-
-                  <Modal.Body>
-                    {step === 3 && (
-                      <>
-                        <p style={{ textAlign: 'center' }}>จองเสร็จสิ้น</p>
-                      </>
-                    )}
-                  </Modal.Body>
-
-                  <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                      ปิด
-                    </Button>
-                    {step !== 3 ? (
-                      <Button variant="primary" type="submit" onClick={nextProcess}>
-                        ถัดไป
+                    <Modal.Footer>
+                      <Button variant="secondary" onClick={handleClose}>
+                        ปิด
                       </Button>
-                    ) : (
-                      <Button variant="primary" type="submit" onClick={handleSuccess}>
-                        ยืนยันการจอง
-                      </Button>
-                    )}
-                  </Modal.Footer>
+
+                      {step === 1 && (
+                        <Button variant="primary" type="submit" onClick={nextProcess}>
+                          ถัดไป
+                        </Button>
+                      )}
+
+                      {step !== 1 && (
+                        <Button variant="primary" type="submit" onClick={handleReservationSuccess}>
+                          ยืนยันการจอง
+                        </Button>
+                      )}
+                    </Modal.Footer>
+                  </Modal.Body>
                 </Modal>
               </div>
             </div>
           </div>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 

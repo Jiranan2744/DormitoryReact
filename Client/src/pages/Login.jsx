@@ -9,9 +9,6 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link, useNavigate } from 'react-router-dom';
 
-import Alert from 'react-bootstrap/Alert';
-
-
 import { logInStart, logInSuccess, logInFailure } from '../redux/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -29,10 +26,11 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     if (!formData.email || !formData.password) {
       return dispatch(logInFailure('Please fill all the fields'));
     }
-
+  
     try {
       dispatch(logInStart());
       const res = await fetch('/auth/login', {
@@ -42,18 +40,27 @@ const Login = () => {
         },
         body: JSON.stringify(formData),
       });
+  
       const data = await res.json();
       if (data.success === false) {
         dispatch(logInFailure(data));
         return;
       }
+  
       dispatch(logInSuccess(data));
-      navigate('/');
+      if (data.isAdmin) {
+        // Redirect admin to the admin dashboard
+        navigate('/admin-dashboard');
+      } else if (data.role === 'owner' || data.role === 'customer') {
+        navigate('/');
+      } else {
+        navigate('/admin-dashboard');
+      }
     } catch (error) {
       dispatch(logInFailure(error));
     }
   };
-
+  
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">

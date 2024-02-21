@@ -1,9 +1,6 @@
-import User from "../modals/User.js";
-import Room from "../modals/Room.js";
-
 import bcryptjs from 'bcryptjs';
 import { createError } from '../utils/error.js';
-
+import User from "../modals/User.js";
 import Dormitory from "../modals/Dormitory.js";
 
 export const updatedUser = async (req, res, next) => {
@@ -34,6 +31,8 @@ export const updatedUser = async (req, res, next) => {
     }
 };
 
+
+
 export const deleteUser = async (req, res, next) => {
     if (req.user.id !== req.params.id)
     return next(createError(401, 'You can only delete your own account!'));
@@ -57,7 +56,7 @@ export const getUser = async (req, res, next) => {
     }
 }
 
-//GET USER+DORMITORY
+//GET OWNER+DORMITORY
 export const getUserListings = async (req, res, next) => {
     if (req.user.id === req.params.id) {
         try {
@@ -70,7 +69,6 @@ export const getUserListings = async (req, res, next) => {
         return next(createError(401, 'You can only view your own listings!'));
     }
 };
-
 
 
 export const getallUser = async (req, res, next) => {

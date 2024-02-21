@@ -7,6 +7,8 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import { useNavigate } from 'react-router-dom'
 import Navbar from "../../components/navbar/Navbar";
+import Modal from 'react-bootstrap/Modal';
+import axios from 'axios';
 
 import { app } from '../../firebase';
 import {
@@ -17,6 +19,7 @@ import {
 } from 'firebase/storage';
 
 import { useSelector } from 'react-redux';
+import Button from 'react-bootstrap/esm/Button';
 
 export default function Formdorm() {
   const { currentUser } = useSelector((state) => state.user);
@@ -49,6 +52,7 @@ export default function Formdorm() {
     billInternet: '',
     billTelephone: '',
     service: '',
+    facilities: [],
   })
 
   const [imageUploadError, setImageUploadError] = useState(false);
@@ -126,7 +130,6 @@ export default function Formdorm() {
     }
   };
 
-
   const navigate = useNavigate();
 
   //CREATE DORMITORYS
@@ -134,9 +137,11 @@ export default function Formdorm() {
     e.preventDefault();
 
     try {
-
       setLoading(true);
       setError(false);
+
+      // Assuming selectedOptions contains the IDs of selected facilities
+      const selectedFacilities = selectedOptions.map((facilityId) => ({ _id: facilityId }));
 
       const res = await fetch('/dormitorys', {
         method: 'POST',
@@ -146,7 +151,7 @@ export default function Formdorm() {
         body: JSON.stringify({
           ...formData,
           userRef: currentUser._id,
-          
+          facilities: selectedFacilities, // Include the selected facilities in the request
         }),
       });
 
@@ -155,46 +160,28 @@ export default function Formdorm() {
 
       if (data.success === false) {
         setError(data.message);
+      } else {
+        // Navigate only if there is no error
+        navigate(`/booking/${data._id}`);
       }
-      navigate(`/booking/${data._id}`);
     } catch (error) {
       setError(error.message);
       setLoading(false);
     }
   };
 
-  //Multi Checkbox
-  const [selectedOptions, setSelectedOptions] = useState([]);
-
-  //สิ่งอำนวยความสะดวก
-  const options = [
-    { id: 1, label: 'เครื่องปรับอากาศ' },
-    { id: 2, label: 'เฟอร์นิเจอร์-ตู้-เตียง' },
-    { id: 3, label: 'พัดลม' },
-    { id: 4, label: 'TV' },
-    { id: 5, label: 'โทรศัพท์สายตรง' },
-    { id: 6, label: 'อินเทอร์เน็ตไร้สาย (WIFI)' },
-    { id: 7, label: 'เคเบิลทีวี' },
-    { id: 8, label: 'ลิฟต์' },
-    { id: 9, label: 'คีย์การ์ด' },
-    { id: 10, label: 'สแกนลายนิ้วมือ' },
-    { id: 11, label: 'กล้องวงจรปิด' },
-    { id: 12, label: 'รปภ.' },
-    { id: 13, label: 'ที่จอดรถ' },
-    { id: 14, label: 'ที่จอดรถมอเตอร์ไซต์' },
-    { id: 15, label: 'สระว่ายน้ำ' },
-    { id: 16, label: 'ฟิตเนส' },
-    { id: 17, label: 'ร้านขายอาหาร' },
-    { id: 18, label: 'ร้านค้า' },
-    { id: 19, label: 'ร้านซัก-รีด' },
-    { id: 20, label: 'ร้านทำผม-เสริมสวย' },
-    { id: 21, label: 'อนุญาตให้เลี้ยงสัตว์' },
-    { id: 22, label: 'อนุญาตให้สูบบุหรี่ในห้องพัก' },
-
-    // Add more options as needed
-  ];
 
   //Checkbox
+  const [facilities, setFacilities] = useState([]);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+
+  useEffect(() => {
+    fetch('/dormitorys/getOptions')
+      .then(response => response.json())
+      .then(data => setFacilities(data))
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
+
   const handleCheckboxChange = (optionId) => {
     const isSelected = selectedOptions.includes(optionId);
 
@@ -205,39 +192,34 @@ export default function Formdorm() {
     }
   };
 
+  //สถานะหอพัก (เปิด-ปิด) 
+  const [isToggled, setIsToggled] = useState(false);
+  const [dormitoryId, setDormitoryId] = useState();
 
-  //Alert
-  const [tname, setTname] = useState('')
-  const [ename, setEname] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [line, setLine] = useState('')
-  const [no, setNo] = useState('')
-  const [road, setRoad] = useState('')
-  const [street, setStreet] = useState('')
-  const [district, setDistrict] = useState('')
-  const [subdistrict, setSubdistrict] = useState('')
-  const [province, setProvince] = useState('')
-  const [code, setCode] = useState('')
-  const [descript, setDescript] = useState('')
+  const handleToggle = async () => {
+    try {
+      // Make a request to your server to save the isToggled value
+      const response = await axios.post(`/dormitorys/${dormitoryId}/save-status`, {
+        isToggled: !isToggled,
+      });
 
-  const [isValidTname, setIsValidTname] = useState(true);
-  const [isValidEname, setIsValidEname] = useState(true);
-  const [isValidEmail, setIsValidEmail] = useState(true);
-  const [isValidPhone, setIsValidPhone] = useState(true);
-  const [isValidLine, setIsValidLine] = useState(true);
-  const [isValidNo, setIsValidNo] = useState(true);
-  const [isValidStreet, setIsValidStreet] = useState(true);
-  const [isValidRoad, setIsValidRoad] = useState(true);
-  const [isValidDistrict, setIsValidDistrict] = useState(true);
-  const [isValidSubdistrict, setIsValidSubdistrict] = useState(true);
-  const [isValidProvince, setIsValidProvince] = useState(true);
-  const [isValidCode, setIsValidCode] = useState(true);
-  const [isValidDesript, setIsValidDescript] = useState(true);
+      // Update the state based on the response from the server
+      setIsToggled(response.data.isToggled);
+    } catch (error) {
+      console.error('Error saving to the database:', error);
+    }
+  };
 
-  const [showAlert, setShowAlert] = useState(false);
+  //เพิ่มประเภทหอพัก
+  const [showModal, setShowModal] = useState(false);
 
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
 
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
 
   return (
     <div>
@@ -260,12 +242,10 @@ export default function Formdorm() {
                     type="text"
                     placeholder="Name"
                     id="tname"
-                    className={isValidEname ? 'form-control' : 'form-control is-invalid'}
-                    required
+                    className='form-control'
                     onChange={handleChange}
                     value={formData.tname}
                   />
-
                 </Col>
               </Form.Group>
 
@@ -278,8 +258,7 @@ export default function Formdorm() {
                     type="text"
                     placeholder="Name"
                     id="ename"
-                    className={isValidEname ? 'form-control' : 'form-control is-invalid'}
-                    required
+                    className='form-control'
                     onChange={handleChange}
                     value={formData.ename}
                   />
@@ -295,8 +274,7 @@ export default function Formdorm() {
                     type="text"
                     placeholder="Email"
                     id="email"
-                    className={isValidEmail ? 'form-control' : 'form-control is-invalid'}
-                    required
+                    className='form-control'
                     onChange={handleChange}
                     value={formData.email}
                   />
@@ -312,8 +290,7 @@ export default function Formdorm() {
                     type="text"
                     placeholder="Phone"
                     id="phone"
-                    className={isValidPhone ? 'form-control' : 'form-control is-invalid'}
-                    required
+                    className='form-control'
                     onChange={handleChange}
                     value={formData.phone}
                   />
@@ -329,8 +306,7 @@ export default function Formdorm() {
                     type="text"
                     placeholder="Line"
                     id="line"
-                    className={isValidLine ? 'form-control' : 'form-control is-invalid'}
-                    required
+                    className='form-control'
                     onChange={handleChange}
                     value={formData.line}
                   />
@@ -352,8 +328,7 @@ export default function Formdorm() {
                           placeholder="No."
                           id="no"
                           style={{ width: '20vh' }}
-                          className={isValidNo ? 'form-control' : 'form-control is-invalid'}
-                          required
+                          className='form-control'
                           onChange={handleChange}
                           value={formData.no}
                         />
@@ -368,8 +343,7 @@ export default function Formdorm() {
                           placeholder="Road."
                           id="road"
                           style={{ width: '20vh' }}
-                          className={isValidRoad ? 'form-control' : 'form-control is-invalid'}
-                          required
+                          className='form-control'
                           onChange={handleChange}
                           value={formData.road}
                         />
@@ -384,8 +358,7 @@ export default function Formdorm() {
                           placeholder="Street."
                           id="street"
                           style={{ width: '20vh' }}
-                          className={isValidStreet ? 'form-control' : 'form-control is-invalid'}
-                          required
+                          className='form-control'
                           onChange={handleChange}
                           value={formData.street}
                         />
@@ -403,8 +376,7 @@ export default function Formdorm() {
                           placeholder="Sub-district."
                           id="subdistrict"
                           style={{ width: '20vh' }}
-                          className={isValidSubdistrict ? 'form-control' : 'form-control is-invalid'}
-                          required
+                          className='form-control'
                           onChange={handleChange}
                           value={formData.subdistrict}
                         />
@@ -417,8 +389,7 @@ export default function Formdorm() {
                           placeholder="District."
                           id="district"
                           style={{ width: '20vh' }}
-                          className={isValidDistrict ? 'form-control' : 'form-control is-invalid'}
-                          required
+                          className='form-control'
                           onChange={handleChange}
                           value={formData.district}
                         />
@@ -430,8 +401,7 @@ export default function Formdorm() {
                           placeholder="Province."
                           id="province"
                           style={{ width: '20vh' }}
-                          className={isValidProvince ? 'form-control' : 'form-control is-invalid'}
-                          required
+                          className='form-control'
                           onChange={handleChange}
                           value={formData.province}
                         />
@@ -443,8 +413,7 @@ export default function Formdorm() {
                           placeholder="Postal code."
                           id="code"
                           style={{ width: '20vh' }}
-                          className={isValidCode ? 'form-control' : 'form-control is-invalid'}
-                          required
+                          className='form-control'
                           onChange={handleChange}
                           value={formData.code}
                         />
@@ -453,159 +422,290 @@ export default function Formdorm() {
                   </Form.Group>
                   < br /> < br />
 
+                  <Form>
+                    <Form.Group>
+                      <Form.Label column sm={3} style={{ width: '30vh', padding: '5px', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
+                        สิ่งอำนวยความสะดวก
+                      </Form.Label>
+                      <Row>
+                        <Col xs="auto" className="my-1">
+                          {facilities.slice(0, Math.ceil(facilities.length / 2)).map((facility) => (
+                            <Form.Check
+                              key={facility._id}
+                              type="checkbox"
+                              id={`checkbox-${facility._id}`}
+                              label={facility.facilities_name}
+                              checked={selectedOptions.includes(facility._id)}
+                              onChange={() => handleCheckboxChange(facility._id)}
+                            />
+                          ))}
+                        </Col>
+                        <Col xs="auto" className="my-1">
+                          {facilities.slice(Math.ceil(facilities.length / 2)).map((facility) => (
+                            <Form.Check
+                              key={facility._id}
+                              type="checkbox"
+                              id={`checkbox-${facility._id}`}
+                              label={facility.facilities_name}
+                              checked={selectedOptions.includes(facility._id)}
+                              onChange={() => handleCheckboxChange(facility._id)}
+                            />
+                          ))}
+                        </Col>
+                      </Row>
+                    </Form.Group>
+                  </Form>
 
-                  <Form.Group>
-                    <Form.Label column sm={3} style={{ width: '30vh', padding: '5px', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
-                      สิ่งอำนวยความสะดวก
-                    </Form.Label>
-                    <Col xs="auto" className="my-1">
-                      {options.map((option) => (
-                        <Form.Check
-                          key={option.id}
-                          type="checkbox"
-                          id={`checkbox-${option.id}`}
-                          label={option.label}
-                          checked={selectedOptions.includes(option.id)}
-                          onChange={() => handleCheckboxChange(option.id)}
-                        />
-                      ))}
-                    </Col>
-                  </Form.Group>
                   < br />
 
                   <Form.Label column sm={5} style={{ width: '20vh', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
                     ประเภทห้องพัก
                   </Form.Label>
+                  <Card>
+                    <Card.Body>
+                      <Form>
+                        <table style={{ width: '100%' }}>
+                          <thead>
+                            <tr style={{ color: '#000000', fontWeight: 'inherit' }}>
+                              <th style={{ fontSize: '16px' }}>รูปแบบห้องพัก</th>
+                              <th style={{ fontSize: '16px', padding: '15px' }}>ขนาดห้องพัก</th>
+                              <th style={{ fontSize: '16px', padding: '15px' }}>ห้องพักรายวัน (บาท/วัน)</th>
+                              <th style={{ fontSize: '16px', padding: '15px' }}>ห้องพักรายเดือน (บาท/เดือน)</th>
+                            </tr>
+                          </thead>
 
-                  <table size="m">
-                    <thead>
-                      <tr style={{ color: '#000000', fontWeight: 'inherit' }}>
-                        <th style={{ fontSize: '16px' }}>รูปแบบห้องพัก</th>
-                        <th style={{ fontSize: '16px', padding: '15px' }}>ขนาดห้องพัก</th>
-                        <th style={{ fontSize: '16px', padding: '15px' }}>ห้องพักรายวัน (บาท/วัน)</th>
-                        <th style={{ fontSize: '16px', padding: '15px' }}>ห้องพักรายเดือน (บาท/เดือน)</th>
-                      </tr>
-                    </thead>
+                          <tbody>
+                            <tr>
+                              <td>
+                                <InputGroup className="mb-4">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    id="typeRooms"
+                                    className="form-control"
+                                    onChange={handleChange}
+                                    value={formData.typeRooms}
+                                  />
+                                </InputGroup>
+                              </td>
+                              <td>
+                                <InputGroup className="mb-4 p-3">
+                                  <input
+                                    type="text"
+                                    id="sizeRooms"
+                                    placeholder=""
+                                    aria-label=""
+                                    aria-describedby="basic-addon2"
+                                    className="form-control"
+                                    onChange={handleChange}
+                                    value={formData.sizeRooms}
+                                  />
+                                  <InputGroup.Text id="basic-addon2">ตร.ม</InputGroup.Text>
+                                </InputGroup>
+                              </td>
 
-                    <tbody>
-                      <tr>
-                        <td>
-                          <InputGroup style={{ width: '20vh' }} className="mb-2">
-                            <input
-                              type="text"
-                              placeholder=""
-                              id="typeRooms"
-                              style={{ width: '20vh' }}
-                              className={isValidCode ? 'form-control' : 'form-control is-invalid'}
-                              required
-                              onChange={handleChange}
-                              value={formData.typeRooms}
-                            />
-                          </InputGroup>
-                        </td>
-                        <td>
-                          <InputGroup style={{ width: '25vh' }} className="mb-2 p-3">
-                            <input
-                              type='text'
-                              id="sizeRooms"
-                              placeholder=""
-                              aria-label=""
-                              aria-describedby="basic-addon2"
-                              className='form-control'
-                              required
-                              onChange={handleChange}
-                              value={formData.sizeRooms}
-                            />
-                            <InputGroup.Text id="basic-addon2">ตร.ม</InputGroup.Text>
-                          </InputGroup>
-                        </td>
+                              <td>
+                                <InputGroup className="mb-4 p-3">
+                                  <input
+                                    type="number"
+                                    id="minDaily"
+                                    placeholder="ราคาเริ่มต้น"
+                                    aria-label="ราคาเริ่มต้น"
+                                    aria-describedby="basic-addon2"
+                                    className="form-control"
+                                    onChange={handleChange}
+                                    value={formData.minDaily}
+                                  />
+                                  <InputGroup.Text id="basic-addon2">บาท/วัน</InputGroup.Text>
+                                </InputGroup>
+                              </td>
 
-                        <td>
-                          <InputGroup style={{ width: '30vh' }} className="mb-2 p-3">
-                            <input
-                              type='number'
-                              id="minDaily"
-                              placeholder="เริ่มต้น"
-                              aria-label="เริ่มต้น"
-                              aria-describedby="basic-addon2"
-                              className='form-control'
-                              required
-                              onChange={handleChange}
-                              value={formData.minDaily}
-                            />
-                            <InputGroup.Text id="basic-addon2">บาท/วัน</InputGroup.Text>
-                          </InputGroup>
-                        </td>
+                              <td>
+                                <InputGroup className="mb-4 p-3">
+                                  <input
+                                    type="number"
+                                    id="minMonthly"
+                                    placeholder="ราคาเริ่มต้น"
+                                    aria-label="ราคาเริ่มต้น"
+                                    aria-describedby="basic-addon2"
+                                    className="form-control"
+                                    onChange={handleChange}
+                                    value={formData.minMonthly}
+                                  />
+                                  <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
+                                </InputGroup>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan="2"></td>
 
-                        <td>
-                          <InputGroup style={{ width: '30vh' }} className="mb-7 p-3">
-                            <input
-                              type='number'
-                              id="minMonthly"
-                              placeholder="เริ่มต้น"
-                              aria-label="เริ่มต้น"
-                              aria-describedby="basic-addon2"
-                              className='form-control'
-                              required
-                              onChange={handleChange}
-                              value={formData.minMonthly}
-                            />
-                            <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
-                          </InputGroup>
-                        </td>
-                      </tr>
+                              <td>
+                                <InputGroup className="mb-1 p-3">
+                                  <input
+                                    type="number"
+                                    id="maxDaily"
+                                    placeholder="ราคาสูงสุด"
+                                    aria-label="ราคาสูงสุด"
+                                    aria-describedby="basic-addon2"
+                                    className="form-control"
+                                    onChange={handleChange}
+                                    value={formData.maxDaily}
+                                  />
+                                  <InputGroup.Text id="basic-addon2">บาท/วัน</InputGroup.Text>
+                                </InputGroup>
+                              </td>
 
-                      <tr>
-                        <td colSpan="2"></td>
+                              <td>
+                                <InputGroup className="mb-1 p-3 h-4">
+                                  <input
+                                    type="number"
+                                    id="maxMonthly"
+                                    placeholder="ราคาสูงสุด"
+                                    aria-label="ราคาสูงสุด"
+                                    aria-describedby="basic-addon2"
+                                    className="form-control"
+                                    onChange={handleChange}
+                                    value={formData.maxMonthly}
+                                  />
+                                  <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
+                                </InputGroup>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </Form>
 
-                        <td>
-                          <InputGroup style={{ width: '30vh' }} className="mb-7 p-3">
-                            <input
-                              type='number'
-                              id="maxDaily"
-                              placeholder="สูงสุด"
-                              aria-label="สูงสุด"
-                              aria-describedby="basic-addon2"
-                              className='form-control'
-                              required
-                              onChange={handleChange}
-                              value={formData.maxDaily}
-                            />
-                            <InputGroup.Text id="basic-addon2">บาท/วัน</InputGroup.Text>
-                          </InputGroup>
-                        </td>
+                      <div>
+                        <Form.Label column sm={5} style={{ width: '20vh', fontWeight: 'normal', fontSize: '20px' }}>
+                          สถานะหอพัก
+                        </Form.Label>
+                        <Form.Check
+                          type="switch"
+                          id="custom-switch"
+                          style={{ margin: '15px' }}
+                          label="กรุณาเลือกสถานะห้องพัก"
+                          checked={isToggled}
+                          onChange={handleToggle}
+                        />
+                        <p style={{ display: 'inline-block', marginLeft: '10px' }}>{isToggled ? 'ห้องว่าง' : 'ห้องไม่ว่าง'}</p>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                  <br /><br />
 
-                        <td>
-                          <InputGroup style={{ width: '30vh' }} className="mb-7 p-3">
-                            <input
-                              type='number'
-                              id="maxMonthly"
-                              placeholder="สูงสุด"
-                              aria-label="สูงสุด"
-                              aria-describedby="basic-addon2"
-                              className='form-control'
-                              required
-                              onChange={handleChange}
-                              value={formData.maxMonthly}
-                            />
-                            <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
-                          </InputGroup>
-                        </td>
-                      </tr>
+                  {/* เพิ่มประเภทห้องพัก */}
+                  <div>
+                    <Button onClick={handleShowModal}>เพิ่มประเภทห้องพัก</Button>
+                    <Modal show={showModal} onHide={handleCloseModal}>
+                      <Modal.Header closeButton>
+                        <Modal.Title>เพิ่มประเภทห้องพัก</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        {/* Your form elements go here */}
+                        <Form>
+                          {/* Example: */}
+                          <Form.Group controlId="formRoomType">
+                            <Form.Label>รูปเเบบห้องพัก</Form.Label>
+                            <InputGroup className="mb-2 p-3">
+                              <input
+                                type="text"
+                                placeholder=""
+                                id="typeRooms"
+                                className="form-control"
+                                onChange={handleChange}
+                                value={formData.typeRooms}
+                              />
+                            </InputGroup>
+                          </Form.Group>
+                          <Form.Group controlId="formSizeRoom">
+                            <Form.Label>ขนาดห้องพัก</Form.Label>
+                            <InputGroup className="mb-2 p-3">
+                              <input
+                                type="text"
+                                id="sizeRooms"
+                                placeholder=""
+                                aria-label=""
+                                aria-describedby="basic-addon2"
+                                className="form-control"
+                                onChange={handleChange}
+                                value={formData.sizeRooms}
+                              />
+                              <InputGroup.Text id="basic-addon2">ตร.ม</InputGroup.Text>
+                            </InputGroup>
 
-                      {/* Uncomment the following lines if needed */}
-                      {/* <tr>
-      <td colSpan="4">
-        <FormControlLabel
-          control={<Switch checked={state.full === 1} name="full" />}
-          label="สถานะห้อง : ว่าง"
-        />
-      </td>
-    </tr> */}
-                    </tbody>
-                  </table>
+                            <Form.Group controlId="formPriceDaily">
+                              <Form.Label>ราคาห้องพักรายวัน</Form.Label>
+                              <InputGroup className="mb-4 p-3">
+                                <input
+                                  type="number"
+                                  id="minDaily"
+                                  placeholder="ราคาเริ่มต้น"
+                                  aria-label="ราคาเริ่มต้น"
+                                  aria-describedby="basic-addon2"
+                                  className="form-control"
+                                  onChange={handleChange}
+                                  value={formData.minDaily}
+                                />
+                                <InputGroup.Text id="basic-addon2">บาท/วัน</InputGroup.Text>
+                              </InputGroup>
+                            </Form.Group>
 
+                            <InputGroup className="mb-4 p-3">
+                              <input
+                                type="number"
+                                id="maxDaily"
+                                placeholder="ราคาสูงสุด"
+                                aria-label="ราคาสูงสุด"
+                                aria-describedby="basic-addon2"
+                                className="form-control"
+                                onChange={handleChange}
+                                value={formData.minDaily}
+                              />
+                              <InputGroup.Text id="basic-addon2">บาท/วัน</InputGroup.Text>
+                            </InputGroup>
 
+                            <Form.Group controlId="formPriceMonthly">
+                              <Form.Label>ราคาห้องพักรายเดือน</Form.Label>
+                              <InputGroup className="mb-1 p-3 h-4">
+                                <input
+                                  type="number"
+                                  id="minMonthly"
+                                  placeholder="ราคาเริ่มต้น"
+                                  aria-label="ราคาเริ่มต้น"
+                                  aria-describedby="basic-addon2"
+                                  className="form-control"
+                                  onChange={handleChange}
+                                  value={formData.maxMonthly}
+                                />
+                                <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
+                              </InputGroup>
+                              <InputGroup className="mb-1 p-3 h-4">
+                                <input
+                                  type="number"
+                                  id="maxMonthly"
+                                  placeholder="ราคาสูงสุด"
+                                  aria-label="ราคาสูงสุด"
+                                  aria-describedby="basic-addon2"
+                                  className="form-control"
+                                  onChange={handleChange}
+                                  value={formData.maxMonthly}
+                                />
+                                <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
+                              </InputGroup>
+                            </Form.Group>
+                          </Form.Group>
+                        </Form>
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button variant="secondary" onClick={handleCloseModal}>
+                          ปิด
+                        </Button>
+                        <Button variant="primary">
+                          บันทึก
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
+                  </div>
 
                   <br /><br />
 
@@ -623,7 +723,6 @@ export default function Formdorm() {
                         id="billWater"
                         aria-describedby="basic-addon2"
                         className='form-control'
-                        required
                         onChange={handleChange}
                         value={formData.billWater}
                       />
@@ -644,7 +743,6 @@ export default function Formdorm() {
                         id="billElectrict"
                         aria-describedby="basic-addon2"
                         className='form-control'
-                        required
                         onChange={handleChange}
                         value={formData.billElectrict}
                       />
@@ -672,7 +770,6 @@ export default function Formdorm() {
                           id="advance"
                           aria-describedby="basic-addon2"
                           className='form-control'
-                          required
                           onChange={handleChange}
                           value={formData.advance}
                         />
@@ -693,7 +790,6 @@ export default function Formdorm() {
                           id="insurance"
                           aria-describedby="basic-addon2"
                           className='form-control'
-                          required
                           onChange={handleChange}
                           value={formData.insurance}
                         />
@@ -711,7 +807,6 @@ export default function Formdorm() {
                           id="service"
                           aria-describedby="basic-addon2"
                           className='form-control'
-                          required
                           onChange={handleChange}
                           value={formData.service}
                         />
@@ -732,7 +827,6 @@ export default function Formdorm() {
                           id="billTelephone"
                           aria-describedby="basic-addon2"
                           className='form-control'
-                          required
                           onChange={handleChange}
                           value={formData.billTelephone}
                         />
@@ -750,7 +844,6 @@ export default function Formdorm() {
                           id="billInternet"
                           aria-describedby="basic-addon2"
                           className='form-control'
-                          required
                           onChange={handleChange}
                           value={formData.billInternet}
                         />
@@ -841,7 +934,6 @@ export default function Formdorm() {
                         placeholder='รายละเอียดหอพัก...'
                         className='border p-3 rounded-lg w-100 h-100'
                         id='description'
-                        required
                         onChange={handleChange}
                         value={formData.description}
                       />

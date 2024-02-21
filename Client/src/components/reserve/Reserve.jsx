@@ -1,18 +1,18 @@
 import { faEdit, faFileCirclePlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Navbar from '../navbar/Navbar';
 import { Link } from 'react-router-dom';
 import Table from 'react-bootstrap/Table';
 import { Tab, Nav, Button } from 'react-bootstrap';
+import axios from 'axios';
 
 
 function Reserve() {
 
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
-
   const [showListingError, setShowListingError] = useState(false);
   const [userListings, setUserListings] = useState([]);
 
@@ -42,13 +42,12 @@ function Reserve() {
         console.log(data.message);
         return;
       }
-      setUserListings((prev) =>
-        prev.filter((list) => list._id !== listingId)
-      );
+      setUserListings((prev) => prev.filter((list) => list._id !== listingId));
     } catch (error) {
       console.log(error.message);
     }
   };
+
 
 
   return (
@@ -57,9 +56,9 @@ function Reserve() {
       <div style={{ flexDirection: 'column', gap: '2px', paddingLeft: '35vh', marginTop: '5vh' }}>
         <span style={{ fontSize: '1.5rem', fontWeight: '600' }}>ลงประกาศหอพัก</span>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column'}}>
-      <Tab.Container defaultActiveKey="tab1">
-          <Nav variant="tabs" style={{marginLeft: '35vh', padding: '5px'}}>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <Tab.Container defaultActiveKey="tab1">
+          <Nav variant="tabs" style={{ marginLeft: '35vh', padding: '5px' }}>
             <Nav.Item>
               <Nav.Link href='/'>
                 Home
@@ -71,13 +70,6 @@ function Reserve() {
               </Nav.Link>
             </Nav.Item>
           </Nav>
-          {/* Sliding content panel */}
-          <Tab.Content>
-            <Tab.Pane eventKey="tab1">
-              {/* Your content for the first tab */}
-            </Tab.Pane>
-            {/* Add more Tab.Pane components for additional tabs */}
-          </Tab.Content>
         </Tab.Container>
         <br />
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -94,26 +86,27 @@ function Reserve() {
                 <th>ไลน์</th>
               </tr>
             </thead> */}
+
             <tbody>
               {userListings && userListings.length > 0 && userListings.map((listing) => (
                 <tr key={listing._id}>
-                    <td>
-                      <Link
-                        style={{
-                          color: '#374151',
-                          fontWeight: '300',
-                          textDecoration: 'none',
-                          cursor: 'pointer',
-                          display: 'block',
-                          margin: '3vh',
-                          textAlign: 'center',
-                        }}
-                        to={`/listing/${listing._id}`}
-                      >
-                        {listing._id}
-                      </Link>
-                    </td>
-                 
+                  <td>
+                    <Link
+                      style={{
+                        color: '#0d6efd',
+                        fontWeight: 'san-serif', 
+                        textDecoration: 'none',
+                        cursor: 'pointer',
+                        display: 'block',
+                        margin: '3vh',
+                        textAlign: 'center',
+                      }}
+                      to={`/reservation/reserve/owner/${listing._id}`}
+                    >
+                      รายการจองของลูกค้า
+                    </Link>
+                  </td>
+
                   <td>
                     <Link
                       style={{
@@ -225,9 +218,9 @@ function Reserve() {
 
       {/* เเจ้ง error */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-        <p style={{ color: 'red' }}>{showListingError ? 'Error showing listing' : ''}</p>
+        <p style={{ color: 'red' }}>{showListingError ? 'คุณไม่มีรายการประกาศในขณะนี้' : ''}</p>
       </div>
-      
+
     </div>
 
   );

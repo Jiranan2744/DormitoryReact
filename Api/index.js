@@ -2,19 +2,19 @@ import express from "express"
 import dotenv from "dotenv"
 import mongoose from "mongoose"
 import authRoute from "./routes/auth.js"
-import roomsRoute from "./routes/rooms.js"
 import usersRoute from "./routes/users.js"
 import doritorysRoute from "./routes/dormitorys.js"
 import cookieParser from "cookie-parser"
 import cors from "cors"
 
-import reserveRoute from "./routes/rooms.js"
+import reservationRoute from "./routes/reservation.js"
+import adminRouter from "./routes/admin.js";
 
 const app = express();
 
 dotenv.config();
 
-//http://localhost:8080
+
 app.get('/', (req, res) => {
     try {
         Image.find({}).then(data => {
@@ -29,12 +29,17 @@ app.get('/', (req, res) => {
 
 const connect = async () => {
     try {
-        await mongoose.connect(process.env.MONGO);
+        await mongoose.connect(process.env.MONGO, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
         console.log("Connected to MongoDB.")
     } catch (error) {
+        console.error("Error connecting to MongoDB:", error);
         throw error;
     }
 };
+
 
 mongoose.connection.on("disconnected", () => {
     console.log("mongoDB disconnected!")
@@ -50,13 +55,14 @@ app.use(cookieParser())
 app.use(express.json())
 
 app.use("/api/auth", authRoute);
-app.use("/api/rooms", roomsRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/dormitorys", doritorysRoute);
-app.use("/api/reserve", reserveRoute)
+app.use("/api/reservation", reservationRoute);
 
+app.use("/api/admin", adminRouter);
 
 app.use((err, req, res, next) => {
+    console.error("Error:", err);
     const statusCode = err.statusCode || 500;
     const message = err.message || "Internal Server Error!"
     return res.status(statusCode).json({
@@ -64,10 +70,11 @@ app.use((err, req, res, next) => {
         message,
         statusCode,
     });
-
 });
 
-app.listen(8800, () => {
-    connect()
-    console.log("Connected to backend.");
+
+const PORT = process.env.PORT || 8800;
+app.listen(PORT, () => {
+    connect();
+    console.log(`Server is running on port ${PORT}`);
 });

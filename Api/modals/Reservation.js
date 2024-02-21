@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
-const ReserveSchema = new mongoose.Schema({
+const reservationSchema = new mongoose.Schema({
     dormitoryId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Dormitory", // Reference to the Dormitory model
+        ref: "Dormitory",
         required: true,
     },
     userId: [{
@@ -12,9 +12,10 @@ const ReserveSchema = new mongoose.Schema({
         required: true,
     }],
     imagePayment: {
-        type: String, // Assuming you store the URL or path to the image in Firebase
-        required: true,
+        type: Array,
+        required: true
     },
-});
 
-export default mongoose.model("Reserve", ReserveSchema);
+}, { timestamps: true });
+
+export default mongoose.model("Reserve", reservationSchema);

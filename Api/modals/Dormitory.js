@@ -4,118 +4,128 @@ const DormitorySchema = new mongoose.Schema({
 
     tname: {
         type: String,
-        required:true
+        required: false,
     },
     ename: {
         type: String,
-        required:true
+        required: false,
     },
     email: {
         type: String,
-        required:false
+        required: false,
     },
     phone: {
         type: String,
-        required:true
+        required: false,
     },
     line: {
         type: String,
-        required:true
+        required: false,
     },
     no: {
         type: String,
-        required:true
+        required: false,
     },
     street: {
         type: String,
-        required:true
+        required: false,
     },
     road: {
         type: String,
-        required:true
+        required: false,
     },
     district: {
         type: String,
-        required:true
+        required: false,
     },
     subdistrict: {
         type: String,
-        required:true
+        required: false,
     },
     province: {
         type: String,
-        required:true
+        required: false,
     },
     code: {
         type: String,
-        required:true
+        required: false,
     },
     image: {
         type: Array,
-        required: true,
+        required: false,
     },
     description: {
         type: String,
-        required: true,
+        required: false,
     },
     typeRooms: {
         type: String,
-        required: true,
+        required: false,
     },
     sizeRooms: {
         type: Number,
-        required: true,
+        required: false,
     },
     minDaily: {
         type: Number,
-        required: true,
+        required: false,
     },
     maxDaily: {
         type: Number,
-        required: true,
+        required: false,
     },
     minMonthly: {
         type: Number,
-        required: true,
+        required: false,
     },
     maxMonthly: {
         type: Number,
-        required: true,
+        required: false,
     },
     billWater: {
         type: Number,
-        required: true,
+        required: false,
     },
     billElectrict: {
         type: Number,
-        required: true,
+        required: false,
     },
     insurance: {
         type: Number,
-        required: true,
+        required: false,
     },
     advance: {
         type: Number,
-        required: true,
+        required: false,
     },
     billInternet: {
         type: Number,
-        required: true,
+        required: false,
     },
     billTelephone: {
         type: Number,
-        required: true,
+        required: false,
     },
     service: {
         type: Number,
-        required: true,
+        required: false,
     },
+    facilities: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Facility",
+    }],
+
     userRef: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // Reference to the User model
-        required: true,
+        ref: "User",
+        required: false,
     },
-   
+
+    isReservationEnabled: {
+        type: Boolean,
+        default: true, // Set the default value to true or false based on your requirement
+    },
+
 });
 
 export default mongoose.model("Dormitory", DormitorySchema)

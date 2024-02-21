@@ -28,11 +28,11 @@ router.delete("/:id", verifyToken, deleteUser);
 //GET
 router.get("/getuser", verifyUser, getUser);
 
-//GET USER+DORMITORY+ROOM
+
+//GET id user ดูว่ามีหอพัก(เจ้าของหอ) เจ้าของหอ ดูหอพักตัวเอง
 router.get('/listing/:id', verifyToken, getUserListings);
 
 //GET ALL
 router.get("/", verifyAdmin, getallUser);
-
 
 export default router

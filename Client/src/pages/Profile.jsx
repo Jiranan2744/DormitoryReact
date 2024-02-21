@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { updateUserStart, updateUserSuccess, updateUserFailure, deleteUserFailure, deleteUserStart, deleteUserSuccess, signoutUserStart } from "../redux/user/userSlice"
 import { useDispatch } from "react-redux"
 import Navbar from '../components/navbar/Navbar';
@@ -81,6 +81,10 @@ export default function Profile() {
         }
     };
 
+   
+      
+
+
     return (
         <>
             <Navbar />
@@ -88,11 +92,12 @@ export default function Profile() {
                 <div className='p-3 max-w-lg mx-auto'>
                     <h1 className='text-3xl font-semibold text-center my-4'>Profile</h1>
                     <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
-
                         <span style={{ padding: '5px', textAlign: 'left' }} >สถานะผู้ใช้งาน:</span>
                         <p style={{ color: 'green', padding: '5px' }}>{currentUser.role}</p>
 
                     </div>
+
+                  
                     <form onSubmit={handleSubmit} className="mb-3" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <input
                             type='text'

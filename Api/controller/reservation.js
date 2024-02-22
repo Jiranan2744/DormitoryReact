@@ -4,50 +4,55 @@ import User from "../modals/User.js";
 
 export const createReservation = async (req, res, next) => {
   try {
-      const { userId, dormitoryId, imagePayment, ...reservationData } = req.body;
+    const { userId, dormitoryId, imagePayment, ...reservationData } = req.body;
 
-      // Retrieve Dormitory and User information
-      const dormitory = await Dormitory.findById(dormitoryId);
-      const user = await User.findById(userId);
+    // Retrieve Dormitory and User information
+    const dormitory = await Dormitory.findById(dormitoryId);
+    const user = await User.findById(userId);
 
-      if (!dormitory || !user) {
-          return res.status(404).json({ success: false, error: 'Dormitory or User not found.' });
-      }
+    if (!dormitory || !user) {
+      return res.status(404).json({ success: false, error: 'Dormitory or User not found.' });
+    }
 
-      // Check if imagePayment is attached
-      if (!imagePayment || imagePayment.length === 0) {
-          return res.status(400).json({ success: false, error: 'ImagePayment is required.' });
-      }
+    // Check if the dormitory is closed
+    if (!dormitory.active) {
+      return res.status(400).json({ success: false, error: 'Dormitory is closed. Reservation not allowed.' });
+    }
 
-      // Set Customer ID and change user role to 'customer'
-      user.role = 'customer';
-      await user.save();
+    // Check if imagePayment is attached
+    if (!imagePayment || imagePayment.length === 0) {
+      return res.status(400).json({ success: false, error: 'ImagePayment is required.' });
+    }
 
-      // Create a new reservation using the Reserve model
-      const reserve = new Reserve({
-          userId,
-          dormitoryId,
-          imagePayment,
-          ...reservationData,
-      });
+    // Set Customer ID and change user role to 'customer'
+    user.role = 'customer';
+    await user.save();
 
-      // Save the reservation to the database
-      await reserve.save();
+    // Create a new reservation using the Reserve model
+    const reserve = new Reserve({
+      userId,
+      dormitoryId,
+      imagePayment,
+      ...reservationData,
+    });
 
-      // Include dormitory name and username in the response
-      const response = {
-          dormitoryName: dormitory.tname, // Modify this based on your dormitory schema
-          username: `${user.firstname} ${user.lastname}`,
-          imagePayment,
-          ...reservationData,
-          message: "Reservation created successfully. User is marked as a customer.",
-      };
+    // Save the reservation to the database
+    await reserve.save();
 
-      // Respond with the created reservation details
-      return res.status(200).json(response);
+    // Include dormitory name and username in the response
+    const response = {
+      dormitoryName: dormitory.tname, // Modify this based on your dormitory schema
+      username: `${user.firstname} ${user.lastname}`,
+      imagePayment,
+      ...reservationData,
+      message: "Reservation created successfully. User is marked as a customer.",
+    };
+
+    // Respond with the created reservation details
+    return res.status(200).json(response);
   } catch (error) {
-      console.error('Error in handling reservation request:', error);
-      res.status(500).json({ success: false, error: 'Internal Server Error' });
+    console.error('Error in handling reservation request:', error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 };
 

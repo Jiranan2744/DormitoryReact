@@ -55,7 +55,7 @@ const Booking = () => {
     setStep(1)
     setShow(false)
   };
-  const handleShow = () => setShow(true);
+  const handleShows = () => setShow(true);
 
   const { currentUser } = useSelector((state) => state.user);
 
@@ -246,6 +246,37 @@ const Booking = () => {
   }, [dormitoryId]);
 
 
+  const [isDormitoryOpen, setIsDormitoryOpen] = useState(true);
+
+  const handleShow = () => {
+    if (isDormitoryOpen) {
+      // Dormitory is open, handle the logic for showing the reservation details or navigating to the reservation page
+      // You can replace this with your actual logic
+      console.log('Redirecting to reservation page...');
+      // Add logic to show the modal if needed
+      setShow(true);
+    } else {
+      // Dormitory is closed, display a message to the user
+      alert('The dormitory is currently closed or full. Reservations are not available.');
+    }
+  };
+
+
+  useEffect(() => {
+    const fetchDormitoryStatus = async () => {
+      try {
+        const response = await fetch(`/dormitorys/${params.id}/save-status`);
+        const dormitoryStatus = await response.json();
+        setIsDormitoryOpen(dormitoryStatus.active && dormitoryStatus.isReservationEnabled);
+      } catch (error) {
+        console.error('Error fetching dormitory status:', error);
+      }
+    };
+
+    fetchDormitoryStatus();
+  }, [dormitoryId]);
+
+
   return (
     <div>
       <Navbar />
@@ -295,7 +326,7 @@ const Booking = () => {
             </div>
 
 
-            <br />
+            <br /> <br />
             {/* Image */}
             <div className="hotelImages">
               {data.image?.map((images, i) => (
@@ -314,7 +345,7 @@ const Booking = () => {
               <div className="hotelDetailsTexts">
                 <div>
                   <table className="table table-hover">
-                    <thead className="table-light" style={{textAlign: 'center'}}>
+                    <thead className="table-light" style={{ textAlign: 'center' }}>
                       <tr>
                         <th>ประเภทห้อง</th>
                         <th>ขนาดห้องพัก</th>
@@ -322,7 +353,7 @@ const Booking = () => {
                         <th>ค่าเช่ารายเดือน</th>
                       </tr>
                     </thead>
-                    <tbody style={{textAlign: 'center'}}>
+                    <tbody style={{ textAlign: 'center' }}>
                       <tr>
                         <td>{data.typeRooms}</td>
                         <td>{data.sizeRooms}</td>
@@ -347,7 +378,7 @@ const Booking = () => {
                           {facility.facilities_name === 'โทรศัพท์สายตรง' && <FontAwesomeIcon icon={faTv} />}
                           {facility.facilities_name === 'อินเทอร์เน็ตไร้สาย (WIFI)' && <FontAwesomeIcon icon={faTv} />}
                           {facility.facilities_name === 'เครื่องทำน้ำอุ่น' && <FontAwesomeIcon icon={faTemperatureArrowUp} />}
-                          {facility.facilities_name === 'มีระบบรักษาความปลอดภัย (คีย์การ์ด)' &&  <FontAwesomeIcon icon={faWifi} />}
+                          {facility.facilities_name === 'มีระบบรักษาความปลอดภัย (คีย์การ์ด)' && <FontAwesomeIcon icon={faWifi} />}
                           {facility.facilities_name === 'มีระบบรักษาความปลอดภัย (สเเกนลายนิ้วมือ)' && <FontAwesomeIcon icon={faWifi} />}
                           {facility.facilities_name === 'กล้องวงจรปิด (CCTV)' && <FontAwesomeIcon icon={faWifi} />}
                           {facility.facilities_name === 'รปภ.' && <FontAwesomeIcon icon={faWifi} />}
@@ -408,9 +439,17 @@ const Booking = () => {
                 </table>
 
 
-                <Button style={{ backgroundColor: '#003580' }} onClick={handleShow}>
-                  จองหอพัก
-                </Button>
+                <Button
+  style={{
+    backgroundColor: isDormitoryOpen ? '#003580' : '#003580',
+    color: 'white', // Set the text color to white for better visibility
+  }}
+  onClick={handleShow}
+  disabled={!isDormitoryOpen}
+>
+  {isDormitoryOpen ? 'กดจองหอพัก' : 'หอพักเต็ม'}
+</Button>
+
 
                 <Modal show={show} onHide={handleClose}>
                   <Modal.Header closeButton>

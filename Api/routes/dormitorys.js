@@ -1,5 +1,5 @@
 import express from "express";
-import {  createDormitory, deleteDormitory, getDormitory, getOptionSelect, getOptions, getallDormitory, saveOptions, saveStatus, updateDormitory, updateStatus } from "../controller/dormitory.js";
+import {  createDormitory, deleteDormitory, getDormitory, getOptionSelect, getOptions, getallDormitory, saveOptions, saveStatus, updateDormitory } from "../controller/dormitory.js";
 import { verifyToken } from "../utils/verifyToken.js";
 
 const router = express.Router();
@@ -29,8 +29,7 @@ router.get("/optionselect/:dormitoryId", verifyToken, getOptionSelect);
 router.post("/saveOptions/:id", verifyToken, saveOptions);
 
 //Post saveStatus
-router.post('/:dormitoryId/save-status', verifyToken, saveStatus);
+router.get('/:dormitoryId/save-status', verifyToken, saveStatus);
 
-//Put updateStatus
-router.put("/:dormitoryId/update-status", verifyToken, updateStatus)
+
 export default router

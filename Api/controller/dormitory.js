@@ -155,10 +155,9 @@ export const saveStatus = async (req, res, next) => {
     const { isReservationEnabled } = req.body;
 
     try {
-
         const updatedDormitory = await Dormitory.findByIdAndUpdate(
             dormitoryId,
-            { isReservationEnabled },
+            { $set: { isReservationEnabled } }, // Use $set to update the specific field
             { new: true }
         );
 
@@ -173,21 +172,52 @@ export const saveStatus = async (req, res, next) => {
     }
 };
 
+
+
 export const updateStatus = async (req, res, next) => {
-    const { id } = req.params;
-    const { isReservationEnabled } = req.body;
-
     try {
-        const dormitory = await Dormitory.findByIdAndUpdate(
-            id,
-            { isReservationEnabled },
-            { new: true }
-        );
-
-        // Respond with the updated room data
-        res.status(200).json(dormitory);
+      const { userId, dormitoryId, status } = req.body;
+  
+      const dormitory = await Dormitory.findById(dormitoryId);
+  
+      if (!dormitory) {
+        return res.status(404).json({ message: 'Dormitory not found' });
+      }
+  
+      // Check if the user is the owner of the dormitory
+      if (dormitory.ownerId !== userId) {
+        return res.status  (403).json({ message: 'Permission denied' });
+      }
+  
+      // Check if the requested status is valid ('open' or 'close')
+      if (!['open', 'close'].includes(status)) {
+        return res.status(400).json({ message: 'Invalid status value' });
+      }
+  
+      // Update the dormitory status only if the status is changing
+      if (dormitory.status !== status) {
+        // If closing the dormitory, prevent reservations
+        if (status === 'close') {
+          // Set the flag to indicate reservations are not allowed
+          dormitory.isReservationEnabled = false;
+        } else {
+          // If opening the dormitory, allow reservations
+          dormitory.isReservationEnabled = true;
+        }
+  
+        dormitory.status = status;
+        await dormitory.save();
+      }
+  
+      // If the dormitory is closed, inform customers that reservations are not allowed
+      if (status === 'close') {
+        return res.status(200).json({ message: 'Dormitory closed. Reservations are not allowed. The dormitory is full.' });
+      }
+  
+      res.status(200).json({ message: 'Dormitory status updated successfully' });
     } catch (error) {
-        console.error('Error updating dormitory status:', error);
-        res.status(500).json({ error: 'Internal server error' });
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error' });
     }
-};
+  };
+  

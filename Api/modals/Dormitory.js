@@ -118,13 +118,19 @@ const DormitorySchema = new mongoose.Schema({
     userRef: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: false,
+        required: true,
     },
 
     isReservationEnabled: {
         type: Boolean,
         default: true, // Set the default value to true or false based on your requirement
     },
+
+    active: { 
+        type: Boolean, 
+        default: true 
+    }, // Added 'active' field
+
 
 });
 

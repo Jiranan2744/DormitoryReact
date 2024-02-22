@@ -3,11 +3,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Navbar from '../navbar/Navbar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Table from 'react-bootstrap/Table';
 import { Tab, Nav, Button } from 'react-bootstrap';
-import axios from 'axios';
+import { Form } from 'react-bootstrap';
 
+import axios from 'axios';
 
 function Reserve() {
 
@@ -48,6 +49,42 @@ function Reserve() {
     }
   };
 
+  //open-close หอพัก
+  const [dormitoryId, setDormitoryId] = useState(null);
+  const [reservationOpen, setReservationOpen] = useState(false);
+  const [listings, setListings] = useState([]);
+  const navigate = useNavigate(); // Use the useNavigate hook instead of useHistory
+
+  useEffect(() => {
+    // Fetch dormitory listings when the component mounts
+    const fetchListings = async () => {
+      try {
+        const response = await axios.get('/dormitorys');
+        setListings(response.data);
+      } catch (error) {
+        console.error('Error fetching dormitory listings:', error);
+      }
+    };
+
+    fetchListings();
+  }, []);
+
+  const handleToggleReservations = async (dormitoryId) => {
+    try {
+      // Toggle the reservations status for the specific dormitory
+      await axios.put(`/users/dormitorys/${dormitoryId}/toggle-status`);
+      // Additional actions for toggling reservations for the specific dormitoryId
+      setListings((prevListings) =>
+        prevListings.map((dormitory) =>
+          dormitory._id === dormitoryId
+            ? { ...dormitory, active: !dormitory.active }
+            : dormitory
+        )
+      );
+    } catch (error) {
+      console.error('Error toggling dormitory status:', error);
+    }
+  };
 
 
   return (
@@ -94,7 +131,7 @@ function Reserve() {
                     <Link
                       style={{
                         color: '#0d6efd',
-                        fontWeight: 'san-serif', 
+                        fontWeight: 'san-serif',
                         textDecoration: 'none',
                         cursor: 'pointer',
                         display: 'block',
@@ -187,11 +224,27 @@ function Reserve() {
                       {listing.line}
                     </Link>
                   </td>
-                  <td style={{ textAlign: 'center' }}>
-                    <Button onClick={() => handleListDelete(listing._id)} style={{ color: 'red', borderRadius: '5px', margin: '1vh', backgroundColor: '#ff7f7f', border: 'none', padding: '8px 16px' }}>
-                      <FontAwesomeIcon icon={faTrash} style={{ marginRight: '8px' }} /> Delete
-                    </Button>
 
+                  <td>
+                    <div style={{ textAlign: 'center' }}>
+                      {listings.map((dormitory) => (
+                        <div key={dormitory._id}>
+                          <p>หอพัก: {dormitory.active ? 'เปิด' : 'ปิด'}</p>
+                          <Form.Check
+                            type="switch"
+                            id={`custom-switch-${dormitory._id}`}
+                            label=""
+                            style={{ display: 'flex', justifyContent: 'center' }}
+                            checked={dormitory.active}
+                            onChange={() => handleToggleReservations(dormitory._id)}
+                          />
+                          
+                        </div>
+                      ))}
+                    </div>
+                  </td>
+
+                  <td style={{ textAlign: 'center' }}>
                     <Link
                       to={`/update/${listing._id}`}
                       style={{
@@ -207,13 +260,17 @@ function Reserve() {
                     >
                       <FontAwesomeIcon icon={faEdit} style={{ marginRight: '8px' }} /> Edit
                     </Link>
+                    <Button onClick={() => handleListDelete(listing._id)} style={{ color: 'red', borderRadius: '5px', margin: '1vh', backgroundColor: '#ff7f7f', border: 'none', padding: '8px 16px' }}>
+                      <FontAwesomeIcon icon={faTrash} style={{ marginRight: '8px' }} /> Delete
+                    </Button>
+
+
                   </td>
                 </tr>
               ))}
             </tbody>
           </Table>
         </div>
-
       </div>
 
       {/* เเจ้ง error */}

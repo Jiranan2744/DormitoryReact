@@ -117,6 +117,7 @@ const Admin = () => {
     };
 
 
+    //ภาพรวมระบบ
     const [memberCount, setMemberCount] = useState(0);
 
     useEffect(() => {
@@ -169,11 +170,6 @@ const Admin = () => {
                             <Nav.Link eventKey={4}>
                                 ภาพรวมระบบ
                             </Nav.Link>
-                            <br />
-
-
-
-
                         </Nav.Item>
                         <Nav.Item>
                             <Nav.Link eventKey={1} onClick={handleShowListUser}>
@@ -196,12 +192,12 @@ const Admin = () => {
             <br />
 
 
-          
+
             <div style={{ textAlign: 'center' }}>
                 <p>จำนวนสมาชิกทั้งหมด: {memberCount} | จำนวนหอพักทั้งหมด: {dormitoryCount}</p>
             </div>
 
-           
+
 
             {activeTab === "1" && (
                 <div style={{ textAlign: 'center' }}>

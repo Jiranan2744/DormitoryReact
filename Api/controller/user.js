@@ -71,6 +71,30 @@ export const getUserListings = async (req, res, next) => {
 };
 
 
+export const toggleDormitoryStatus = async (req, res, next) => {
+    try {
+        const dormitory = await Dormitory.findById(req.params.dormitoryId);
+
+        if (!dormitory) {
+            return next(createError(404, 'Dormitory not found!'));
+        }
+
+        // Toggle the 'active' field
+        dormitory.active = !dormitory.active;
+
+        // Toggle the 'isReservationEnabled' field
+        dormitory.isReservationEnabled = !dormitory.isReservationEnabled;
+
+        // Save the updated dormitory
+        await dormitory.save();
+
+        res.status(200).json({ message: 'Dormitory status updated successfully.' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 export const getallUser = async (req, res, next) => {
     try {
         const users = await User.find();

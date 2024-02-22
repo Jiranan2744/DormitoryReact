@@ -1,5 +1,5 @@
 import express from "express";
-import { deleteUser, updatedUser, getallUser, getUser, getUserListings } from "../controller/user.js";
+import { deleteUser, updatedUser, getallUser, getUser, getUserListings, toggleDormitoryStatus } from "../controller/user.js";
 import { verifyAdmin, verifyToken, verifyUser } from "../utils/verifyToken.js";
 
 const router = express.Router();
@@ -34,5 +34,9 @@ router.get('/listing/:id', verifyToken, getUserListings);
 
 //GET ALL
 router.get("/", verifyAdmin, getallUser);
+
+//open-close
+router.put('/dormitorys/:dormitoryId/toggle-status', toggleDormitoryStatus);
+
 
 export default router

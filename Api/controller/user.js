@@ -70,7 +70,7 @@ export const getUserListings = async (req, res, next) => {
     }
 };
 
-
+//เจ้าของหอพัก เปิด-ปิด สถานะหอพัก
 export const toggleDormitoryStatus = async (req, res, next) => {
     try {
         const dormitory = await Dormitory.findById(req.params.dormitoryId);
@@ -79,13 +79,10 @@ export const toggleDormitoryStatus = async (req, res, next) => {
             return next(createError(404, 'Dormitory not found!'));
         }
 
-        // Toggle the 'active' field
         dormitory.active = !dormitory.active;
 
-        // Toggle the 'isReservationEnabled' field
         dormitory.isReservationEnabled = !dormitory.isReservationEnabled;
 
-        // Save the updated dormitory
         await dormitory.save();
 
         res.status(200).json({ message: 'Dormitory status updated successfully.' });
@@ -94,7 +91,7 @@ export const toggleDormitoryStatus = async (req, res, next) => {
     }
 };
 
-
+//ดูผู้ใช้งานทั้งหมด
 export const getallUser = async (req, res, next) => {
     try {
         const users = await User.find();

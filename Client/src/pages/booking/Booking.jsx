@@ -438,17 +438,16 @@ const Booking = () => {
                   </tbody>
                 </table>
 
-
                 <Button
-  style={{
-    backgroundColor: isDormitoryOpen ? '#003580' : '#003580',
-    color: 'white', // Set the text color to white for better visibility
-  }}
-  onClick={handleShow}
-  disabled={!isDormitoryOpen}
->
-  {isDormitoryOpen ? 'กดจองหอพัก' : 'หอพักเต็ม'}
-</Button>
+                  style={{
+                    backgroundColor: isDormitoryOpen ? '#003580' : '#003580',
+                    color: 'white', // Set the text color to white for better visibility
+                  }}
+                  onClick={handleShow}
+                  disabled={!isDormitoryOpen}
+                >
+                  {isDormitoryOpen ? 'กดจองหอพัก' : 'หอพักเต็ม'}
+                </Button>
 
 
                 <Modal show={show} onHide={handleClose}>

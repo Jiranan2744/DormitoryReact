@@ -26,7 +26,7 @@ export default function Mybooking() {
         // Assume you have an authentication system that provides the user's ID
         const userId = 'user_id_placeholder'; // Replace with the actual user ID
 
-        const response = await axios.get(`/reservation/reserve/customer//${userId}`);
+        const response = await axios.get(`/reservation/reserve/customer/${userId}`);
         setBookings(response.data);
         setLoading(false);
       } catch (error) {
@@ -38,9 +38,6 @@ export default function Mybooking() {
     fetchBookings();
   }, []);
 
-
-
-
   return (
     <div>
       <Navbar />
@@ -50,35 +47,54 @@ export default function Mybooking() {
         ) : (
           <div>
             {bookings.length === 0 ? (
-             <p style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100vh',
-              margin: 0
-            }}>ไม่พบการจองของคุณ</p>
+              <p style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+                margin: 0
+              }}>ไม่พบการจองของคุณ</p>
             ) : (
               <ul>
                 {bookings.map((booking) => (
-                  <li key={booking.reservation._id} style={{
-                    listStyleType: 'none', /* เอาไว้ลบ bullet point ของ <li> */
-                    textAlign: 'left', /* จัดให้ข้อมูลตรงกลาง */
-                    border: '1px solid #ccc', /* เพิ่มกรอบสีเทารอบข้อมูล */
-                    padding: '20px', /* เพิ่มระยะห่างรอบข้อมูล */
-                    margin: '5%', /* เพิ่มระยะห่างระหว่างข้อมูล */
-
+                  <li key={booking.reservation._id} 
+                  style={{
+                    listStyleType: 'none',
+                    borderRadius: '10px',
+                    textAlign: 'left',
+                    border: '1px solid #ccc',
+                    width: '65%',
+                    padding: '20px',
+                    marginTop: '40px',
+                    marginLeft: '35vh',
                   }}>
-                    <h3>หอพัก: {booking.dormitoryInfo.name}</h3>
-                    <p>Address: {booking.dormitoryInfo.address}</p>
-                    <p>Check-in Date: {new Date(booking.reservation.createdAt).toLocaleDateString()}</p>
-                    <p>Check-in Time: {new Date(booking.reservation.createdAt).toLocaleTimeString()}</p>
+
+                    <h3>{booking.dormitoryInfo.name}</h3>
+                    <p>ที่อยู่หอพัก: {booking.dormitoryInfo.address}</p>
+                    <p>วันที่จอง: {new Date(booking.reservation.createdAt).toLocaleDateString()}</p>
+                    <p>เวลาที่จอง: {new Date(booking.reservation.createdAt).toLocaleTimeString()}</p>
                     {/* Add more details as needed */}
+
+                    {/* Delete button */}
+                    <Button
+                      style={{
+                        backgroundColor: 'red',
+                        color: 'white',
+                        padding: '10px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        marginTop: '10px',
+                      }}
+                      onClick={() => (booking.reservation._id)}
+                    >
+                      ยกเลิกการจอง
+                    </Button>
                   </li>
-                  
                 ))}
               </ul>
             )}
           </div>
+
         )}
       </div>
     </div>

@@ -1,66 +1,121 @@
-import React, { useState, useEffect } from 'react';
+import { faEdit, faFileCirclePlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import Table from 'react-bootstrap/Table';
+import { Tab, Nav, Button } from 'react-bootstrap';
 import Navbar from '../components/navbar/Navbar';
-import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
-const CustomerReserve = () => {
-    const { dormitoryId } = useParams();
-    const [dormitory, setDormitory] = useState({});
-    const [customers, setCustomers] = useState([]);
-    const [noReservations, setNoReservations] = useState(false);
+export default function CustomerReserve() {
+    const dispatch = useDispatch();
+    const { currentUser } = useSelector((state) => state.user);
+
+    const [showListingError, setShowListingError] = useState(false);
+    const [userListings, setUserListings] = useState([]);
+
+
+    const [bookings, setBookings] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchCustomersAndDormitory = async () => {
+        const fetchBookings = async () => {
             try {
-                // Fetch customer and dormitory information
-                const response = await fetch(`/reservation/reserve/owner/${dormitoryId}`);
-                const data = await response.json();
+                // Assume you have an authentication system that provides the user's ID
+                const userId = 'user_id_placeholder'; // Replace with the actual user ID
 
-                // Set dormitory details
-                setDormitory(data.dormitory);
-
-                // Set customer details
-                setCustomers(data.customers);
-
-                // Set noReservations state based on the length of customers array
-                setNoReservations(data.customers.length === 0);
+                const response = await axios.get(`/reservation/reserve/customer/${userId}`);
+                setBookings(response.data);
+                setLoading(false);
             } catch (error) {
-                console.error('Error fetching customers and dormitory:', error);
+                console.error('Error fetching customer bookings:', error);
+                setLoading(false);
             }
         };
 
-        fetchCustomersAndDormitory();
-    }, [dormitoryId]);
+        fetchBookings();
+    }, []);
 
     return (
         <div>
             <Navbar />
-            <br />
             <div>
-                {noReservations ? (
-                    <p style={{ textAlign: 'center', color: '#FF4B54' }}>ไม่พบการจองหอพักนี้</p>
+                {loading ? (
+                    <p>Loading...</p>
                 ) : (
-                    customers.map((customer) => (
-                        <div key={customer._id} style={{
-                            border: '1px solid #e2e8f0',
-                            borderRadius: '8px',
-                            padding: '16px',
-                            marginBottom: '20px', // Adjust the margin-bottom to add spacing
-                            boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-                            backgroundColor: 'white',
-                            maxWidth: '500px',
-                            margin: '0 auto',
-                        }}>
-                            <p>ชื่อ: {customer.firstname} นามสกุล: {customer.lastname} </p>
-                            <p>เบอร์โทร: 0{customer.phone}</p>
-                            <p>อีเมล์: {customer.email}</p>
-                            <p>Check-in Date: {customer.createAt ? new Date(customer.createAt).toLocaleDateString() : 'N/A'}</p>
-                            <p>Check-in Time: {customer.createAt ? new Date(customer.createAt).toLocaleTimeString() : 'N/A'}</p>
-                        </div>
-                    ))
+                    <div>
+                        {bookings.length === 0 ? (
+                            <p
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    height: '100vh',
+                                    margin: 0,
+                                }}
+                            >
+                                ไม่พบการจองของคุณ
+                            </p>
+                        ) : (
+                            <ul>
+                                {bookings.map((booking) => (
+                                    <li
+                                        key={booking.reservation._id}
+                                        style={{
+                                            listStyleType: 'none',
+                                            borderRadius: '10px',
+                                            textAlign: 'left',
+                                            border: '1px solid #ccc',
+                                            width: '65%',
+                                            padding: '20px',
+                                            marginTop: '40px',
+                                            marginLeft: '35vh',
+                                        }}
+                                    >
+                                        {/* Display customer information */}
+                                        <p>ชื่อ - นามสกุล: {booking.customerInfo && `${booking.customerInfo.firstname} ${booking.customerInfo.lastname}`}</p>
+                                        <p>เบอร์โทร: 0{booking.customerInfo.phone}</p>
+                                        <p>อีเมล: {booking.customerInfo.email}</p>
+                                        {/* <h3>{booking.dormitoryInfo.name}</h3> */}
+                                        {/* <p>ที่อยู่หอพัก: {booking.dormitoryInfo.address}</p> */}
+                                        <p>วันที่จอง: {new Date(booking.reservation.createdAt).toLocaleDateString()}</p>
+                                        <p>เวลาที่จอง: {new Date(booking.reservation.createdAt).toLocaleTimeString()}</p>
+
+                                        {/* Display imagePayment (assuming it's an array) */}
+                                        {booking.customerInfo.imagePayment && booking.customerInfo.imagePayment.length > 0 && (
+                                            <div>
+                                                <p>หลักฐานการชำระเงิน:</p>
+                                                {booking.customerInfo.imagePayment.map((image, index) => (
+                                                    <li key={index}>
+                                                        <img src={image} alt={`Payment ${index + 1}`} style={{ maxWidth: '40vh', maxHeight: '40vh' }} />
+                                                    </li>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Delete button */}
+                                        <Button
+                                            style={{
+                                                backgroundColor: 'red',
+                                                color: 'white',
+                                                padding: '10px',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                marginTop: '10px',
+                                            }}
+                                            onClick={() => (booking.reservation._id)}
+                                        >
+                                            ลบการจอง
+                                        </Button>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
                 )}
             </div>
         </div>
     );
 };
 
-export default CustomerReserve;

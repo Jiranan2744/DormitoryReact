@@ -73,74 +73,83 @@ export const viewReservation = async (req, res, next) => {
 
 export const getDormitoryCustomers = async (req, res, next) => {
   try {
-      const { dormitoryId } = req.params;
+    const { dormitoryId } = req.params;
 
-      // Find reservations for the specified dormitory
-      const reservations = await Reserve.find({ dormitoryId });
+    // Find reservations for the specified dormitory
+    const reservations = await Reserve.find({ dormitoryId }).populate('userId', 'firstname lastname email phone imagePayment');
 
-      // Extract unique user IDs from reservations
-      const customerIds = Array.from(new Set(reservations.map(reservation => reservation.userId)));
+    // Extract unique user IDs from reservations
+    const customerIds = Array.from(new Set(reservations.map(reservation => reservation.userId)));
 
-      // Fetch user details and reservation date for each customer ID
-      const customers = await Promise.all(customerIds.map(async (customerId) => {
-          const user = await User.findById(customerId);
-          const reservation = reservations.find(reservation => reservation.userId === customerId);
+    // Fetch user details, imagePayment, and reservation date for each customer ID
+    const customers = await Promise.all(customerIds.map(async (customerId) => {
+      const user = await User.findById(customerId);
+      const reservation = reservations.find(reservation => reservation.userId === customerId);
 
-          return {
-              _id: user._id,
-              firstname: user.firstname,
-              lastname: user.lastname,
-              phone: user.phone,
-              email: user.email,
-              role: user.role,
-              createAt: reservation ? reservation.createdAt : null,
-          };
-      }));
+      return {
+        _id: user._id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        phone: user.phone,
+        email: user.email,
+        role: user.role,
+        createAt: reservation ? reservation.createdAt : null,
+        imagePayment: user.imagePayment, // Include imagePayment in the response
+      };
+    }));
 
-      // Respond with the customer details
-      return res.status(200).json({ success: true, customers });
+    // Respond with the customer details
+    return res.status(200).json({ success: true, customers });
   } catch (error) {
-      console.error('Error in fetching dormitory customers:', error);
-      res.status(500).json({ success: false, error: 'Internal Server Error' });
+    console.error('Error in fetching dormitory customers:', error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 };
 
 
-
-
 export const getCustomerBooking = async (req, res, next) => {
-    try {
+  try {
       const userId = req.user.id;
-  
+
       // Find reservations for the customer with the specified userId
       const reservations = await Reserve.find({ userId });
-  
+
       // If there are reservations, fetch dormitory information for each reservation
       if (reservations && reservations.length > 0) {
-        const bookingsWithDormInfo = await Promise.all(
-          reservations.map(async (reservation) => {
-            const dormitory = await Dormitory.findById(reservation.dormitoryId);
-            return {
-              reservation,
-              dormitoryInfo: {
-                id: dormitory._id,
-                name: dormitory.tname,
-                address: `${dormitory.no} ${dormitory.street}, ${dormitory.district}, ${dormitory.province} ${dormitory.code}`,
-              },
-            };
-          })
-        );
-  
-        return res.status(200).json(bookingsWithDormInfo);
+          const bookingsWithDormInfo = await Promise.all(
+              reservations.map(async (reservation) => {
+                  const dormitory = await Dormitory.findById(reservation.dormitoryId);
+                  const customer = await User.findById(reservation.userId);
+
+                  return {
+                      reservation,
+                      dormitoryInfo: {
+                          id: dormitory._id,
+                          name: `${dormitory.tname} ${dormitory.ename}`,
+                          address: `${dormitory.no} ${dormitory.street} ${dormitory.district} ${dormitory.province} ${dormitory.code}`,
+                      },
+                      customerInfo: {
+                          firstname: customer.firstname,
+                          lastname: customer.lastname,
+                          email: customer.email,
+                          phone: customer.phone,
+                          imagePayment: customer.imagePayment, // Assuming imagePayment is an array in your User model
+                      },
+                  };
+              })
+          );
+
+          return res.status(200).json(bookingsWithDormInfo);
       } else {
-        // No reservations found for the customer
-        return res.status(404).json({ success: false, message: 'No reservations found for the customer.' });
+          // No reservations found for the customer
+          return res.status(404).json({ success: false, message: 'No reservations found for the customer.' });
       }
-    } catch (error) {
+  } catch (error) {
       console.error('Error in getCustomerBooking:', error);
       next(error);
-    }
-  };
+  }
+};
+
   
 
   export const deleteMember = async (req, res, next) => {

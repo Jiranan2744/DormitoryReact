@@ -82,7 +82,7 @@ export default function Formdorm() {
         setUploading(false);
       });
     } else {
-      setImageUploadError('คุณสามารถอัปโหลดได้เพียง 6 ภาพต่อรายการ')
+      setImageUploadError('คุณสามารถอัปโหลดได้สูงสุด 6 ภาพต่อรายการ')
       setUploading(false);
     }
   };
@@ -140,7 +140,6 @@ export default function Formdorm() {
       setLoading(true);
       setError(false);
 
-      // Assuming selectedOptions contains the IDs of selected facilities
       const selectedFacilities = selectedOptions.map((facilityId) => ({ _id: facilityId }));
 
       const res = await fetch('/dormitorys', {
@@ -151,7 +150,7 @@ export default function Formdorm() {
         body: JSON.stringify({
           ...formData,
           userRef: currentUser._id,
-          facilities: selectedFacilities, // Include the selected facilities in the request
+          facilities: selectedFacilities,
         }),
       });
 
@@ -198,12 +197,10 @@ export default function Formdorm() {
 
   const handleToggle = async () => {
     try {
-      // Make a request to your server to save the isToggled value
       const response = await axios.post(`/dormitorys/${dormitoryId}/save-status`, {
         isToggled: !isToggled,
       });
 
-      // Update the state based on the response from the server
       setIsToggled(response.data.isToggled);
     } catch (error) {
       console.error('Error saving to the database:', error);
@@ -221,6 +218,9 @@ export default function Formdorm() {
     setShowModal(false);
   };
 
+
+
+
   return (
     <div>
       <Navbar />
@@ -233,14 +233,14 @@ export default function Formdorm() {
                 ลงประกาศหอพักฟรี
               </Form.Label>
 
-              <Form.Group as={Row} className="mb-1" style={{ margin: '10px' }} controlId="formHorizontalEmail">
+              <Form.Group as={Row} className="mb-1" style={{ margin: '10px' }} controlId="formHorizontalTname">
                 <Form.Label column sm={5} style={{ width: '30vh', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
                   ชื่อที่พัก
                 </Form.Label>
                 <Col sm={6} style={{ width: '50vh' }}>
                   <input
                     type="text"
-                    placeholder="Name"
+                    placeholder="ชื่อ (ภาษาไทย)"
                     id="tname"
                     className='form-control'
                     onChange={handleChange}
@@ -249,14 +249,14 @@ export default function Formdorm() {
                 </Col>
               </Form.Group>
 
-              <Form.Group as={Row} className="mb-1" style={{ margin: '10px' }} controlId="formHorizontalEmail">
+              <Form.Group as={Row} className="mb-1" style={{ margin: '10px' }} controlId="formHorizontalEname">
                 <Form.Label codvlumn sm={5} style={{ display: 'flex', width: '30vh', height: '', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
                   ชื่อที่พัก (English)
                 </Form.Label>
                 <Col sm={6} style={{ width: '50vh' }}>
                   <input
                     type="text"
-                    placeholder="Name"
+                    placeholder="ชื่อ (ภาษาอังกฤษ)"
                     id="ename"
                     className='form-control'
                     onChange={handleChange}
@@ -267,12 +267,12 @@ export default function Formdorm() {
 
               <Form.Group as={Row} className="mb-1" style={{ margin: '10px' }} controlId="formHorizontalEmail">
                 <Form.Label column sm={5} style={{ display: 'flex', width: '30vh', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
-                  อีเมล์
+                  อีเมล
                 </Form.Label>
                 <Col sm={6} style={{ width: '50vh' }}>
                   <input
                     type="text"
-                    placeholder="Email"
+                    placeholder="อีเมล"
                     id="email"
                     className='form-control'
                     onChange={handleChange}
@@ -288,7 +288,7 @@ export default function Formdorm() {
                 <Col sm={6} style={{ width: '50vh' }}>
                   <input
                     type="text"
-                    placeholder="Phone"
+                    placeholder="เบอร์โทร"
                     id="phone"
                     className='form-control'
                     onChange={handleChange}
@@ -304,7 +304,7 @@ export default function Formdorm() {
                 <Col sm={6} style={{ width: '50vh' }}>
                   <input
                     type="text"
-                    placeholder="Line"
+                    placeholder="ไลน์"
                     id="line"
                     className='form-control'
                     onChange={handleChange}
@@ -325,7 +325,7 @@ export default function Formdorm() {
                       <Form.Group as={Col} controlId="formGridNumber">
                         <input
                           type="text"
-                          placeholder="No."
+                          placeholder="เลขที่/หมู่."
                           id="no"
                           style={{ width: '20vh' }}
                           className='form-control'
@@ -340,7 +340,7 @@ export default function Formdorm() {
                       <Form.Group as={Col} controlId="formGridNumber">
                         <input
                           type="text"
-                          placeholder="Road."
+                          placeholder="ถนน."
                           id="road"
                           style={{ width: '20vh' }}
                           className='form-control'
@@ -355,7 +355,7 @@ export default function Formdorm() {
                       <Form.Group as={Col} controlId="formGridNumber">
                         <input
                           type="text"
-                          placeholder="Street."
+                          placeholder="ซอย."
                           id="street"
                           style={{ width: '20vh' }}
                           className='form-control'
@@ -373,7 +373,7 @@ export default function Formdorm() {
                         <Form.Label>ตำบล/แขวง</Form.Label>
                         <input
                           type="text"
-                          placeholder="Sub-district."
+                          placeholder="ตำบล/แขวง."
                           id="subdistrict"
                           style={{ width: '20vh' }}
                           className='form-control'
@@ -386,7 +386,7 @@ export default function Formdorm() {
                         <Form.Label>อำเภอ/เขต</Form.Label>
                         <input
                           type="text"
-                          placeholder="District."
+                          placeholder="อำเภอ/เขต."
                           id="district"
                           style={{ width: '20vh' }}
                           className='form-control'
@@ -398,7 +398,7 @@ export default function Formdorm() {
                         <Form.Label>จังหวัด</Form.Label>
                         <input
                           type="text"
-                          placeholder="Province."
+                          placeholder="จังหวัด."
                           id="province"
                           style={{ width: '20vh' }}
                           className='form-control'
@@ -410,7 +410,7 @@ export default function Formdorm() {
                         <Form.Label>รหัสไปรษณีย์</Form.Label>
                         <input
                           type="text"
-                          placeholder="Postal code."
+                          placeholder="รหัสไปรษณีย์."
                           id="code"
                           style={{ width: '20vh' }}
                           className='form-control'
@@ -427,8 +427,8 @@ export default function Formdorm() {
                       <Form.Label column sm={3} style={{ width: '30vh', padding: '5px', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
                         สิ่งอำนวยความสะดวก
                       </Form.Label>
-                      <Row>
-                        <Col xs="auto" className="my-1">
+                      <Row style={{ padding: '5px' }}>
+                        <Col xs="4" className="my-1">
                           {facilities.slice(0, Math.ceil(facilities.length / 2)).map((facility) => (
                             <Form.Check
                               key={facility._id}
@@ -461,7 +461,8 @@ export default function Formdorm() {
                   <Form.Label column sm={5} style={{ width: '20vh', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
                     ประเภทห้องพัก
                   </Form.Label>
-                  <Card>
+
+                  <Card style={{ width: '149vh' }} >
                     <Card.Body>
                       <Form>
                         <table style={{ width: '100%' }}>
@@ -574,26 +575,11 @@ export default function Formdorm() {
                           </tbody>
                         </table>
                       </Form>
-
-                      <div>
-                        <Form.Label column sm={5} style={{ width: '20vh', fontWeight: 'normal', fontSize: '20px' }}>
-                          สถานะหอพัก
-                        </Form.Label>
-                        <Form.Check
-                          type="switch"
-                          id="custom-switch"
-                          style={{ margin: '15px' }}
-                          label="กรุณาเลือกสถานะห้องพัก"
-                          checked={isToggled}
-                          onChange={handleToggle}
-                        />
-                        <p style={{ display: 'inline-block', marginLeft: '10px' }}>{isToggled ? 'ห้องว่าง' : 'ห้องไม่ว่าง'}</p>
-                      </div>
                     </Card.Body>
                   </Card>
                   <br /><br />
 
-                  {/* เพิ่มประเภทห้องพัก */}
+                  {/* เพิ่มประเภทห้องพัก
                   <div>
                     <Button onClick={handleShowModal}>เพิ่มประเภทห้องพัก</Button>
                     <Modal show={showModal} onHide={handleCloseModal}>
@@ -601,12 +587,10 @@ export default function Formdorm() {
                         <Modal.Title>เพิ่มประเภทห้องพัก</Modal.Title>
                       </Modal.Header>
                       <Modal.Body>
-                        {/* Your form elements go here */}
                         <Form>
-                          {/* Example: */}
                           <Form.Group controlId="formRoomType">
                             <Form.Label>รูปเเบบห้องพัก</Form.Label>
-                            <InputGroup className="mb-2 p-3">
+                            <InputGroup style={{ width: '200px' }}>
                               <input
                                 type="text"
                                 placeholder=""
@@ -617,14 +601,14 @@ export default function Formdorm() {
                               />
                             </InputGroup>
                           </Form.Group>
+
                           <Form.Group controlId="formSizeRoom">
                             <Form.Label>ขนาดห้องพัก</Form.Label>
-                            <InputGroup className="mb-2 p-3">
+                            <InputGroup style={{ width: '200px' }}>
                               <input
                                 type="text"
                                 id="sizeRooms"
                                 placeholder=""
-                                aria-label=""
                                 aria-describedby="basic-addon2"
                                 className="form-control"
                                 onChange={handleChange}
@@ -633,9 +617,10 @@ export default function Formdorm() {
                               <InputGroup.Text id="basic-addon2">ตร.ม</InputGroup.Text>
                             </InputGroup>
 
+
                             <Form.Group controlId="formPriceDaily">
                               <Form.Label>ราคาห้องพักรายวัน</Form.Label>
-                              <InputGroup className="mb-4 p-3">
+                              <InputGroup className="mb-2" style={{ width: '400px' }}>
                                 <input
                                   type="number"
                                   id="minDaily"
@@ -647,26 +632,24 @@ export default function Formdorm() {
                                   value={formData.minDaily}
                                 />
                                 <InputGroup.Text id="basic-addon2">บาท/วัน</InputGroup.Text>
+
+                                <input
+                                  type="number"
+                                  id="maxDaily"
+                                  placeholder="ราคาสูงสุด"
+                                  aria-label="ราคาสูงสุด"
+                                  aria-describedby="basic-addon2"
+                                  className="form-control"
+
+                                  onChange={handleChange}
+                                  value={formData.maxDaily}
+                                />
+                                <InputGroup.Text id="basic-addon2">บาท/วัน</InputGroup.Text>
                               </InputGroup>
                             </Form.Group>
-
-                            <InputGroup className="mb-4 p-3">
-                              <input
-                                type="number"
-                                id="maxDaily"
-                                placeholder="ราคาสูงสุด"
-                                aria-label="ราคาสูงสุด"
-                                aria-describedby="basic-addon2"
-                                className="form-control"
-                                onChange={handleChange}
-                                value={formData.minDaily}
-                              />
-                              <InputGroup.Text id="basic-addon2">บาท/วัน</InputGroup.Text>
-                            </InputGroup>
-
                             <Form.Group controlId="formPriceMonthly">
                               <Form.Label>ราคาห้องพักรายเดือน</Form.Label>
-                              <InputGroup className="mb-1 p-3 h-4">
+                              <InputGroup className="mb-2 " style={{ width: '400px' }}>
                                 <input
                                   type="number"
                                   id="minMonthly"
@@ -675,11 +658,10 @@ export default function Formdorm() {
                                   aria-describedby="basic-addon2"
                                   className="form-control"
                                   onChange={handleChange}
-                                  value={formData.maxMonthly}
+                                  value={formData.minMonthly}
                                 />
                                 <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
-                              </InputGroup>
-                              <InputGroup className="mb-1 p-3 h-4">
+
                                 <input
                                   type="number"
                                   id="maxMonthly"
@@ -705,7 +687,7 @@ export default function Formdorm() {
                         </Button>
                       </Modal.Footer>
                     </Modal>
-                  </div>
+                  </div> */}
 
                   <br /><br />
 
@@ -776,7 +758,7 @@ export default function Formdorm() {
                         <InputGroup.Text id="basic-addon2">บาท</InputGroup.Text>
                       </InputGroup>
                       <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
-                        กรณีหากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
+                        หากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
                       </Form.Label>
                     </Form.Group>
 
@@ -795,6 +777,9 @@ export default function Formdorm() {
                         />
                         <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                       </InputGroup>
+                      <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
+                        หากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
+                      </Form.Label>
                     </Form.Group>
 
                     <Form.Group as={Row} className="m-2" controlId="formHorizontalEmail">
@@ -832,6 +817,9 @@ export default function Formdorm() {
                         />
                         <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                       </InputGroup>
+                      <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
+                        หากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
+                      </Form.Label>
                     </Form.Group>
 
                     <Form.Group as={Row} className="m-2" controlId="formHorizontalEmail">
@@ -849,6 +837,9 @@ export default function Formdorm() {
                         />
                         <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                       </InputGroup>
+                      <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
+                        หากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
+                      </Form.Label>
                     </Form.Group>
 
 
@@ -873,7 +864,7 @@ export default function Formdorm() {
                               <img src="https://bcdn.renthub.in.th/assets/renthub/empty-pictures-affed04adf0912d00564dc652267ca1e.svg" className="css-1u1zie3" alt="Empty Pictures" />
                             </div>
                           </div>
-                          <span>ลากรูปภาพมาวางบริเวณนี้เพื่ออัพโหลด หรือ</span>
+                          <span>ลากรูปภาพมาวางบริเวณนี้เพื่ออัพโหลด</span>
                         </div>
                         <p style={{ fontWeight: 'bold' }}>
                           ภาพหน้าปก:

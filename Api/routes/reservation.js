@@ -13,7 +13,7 @@ router.get("/viewreservation", verifyToken, viewReservation);
 //GET ลูกค้าดูหอพักที่ตัวเองกดจอง
 router.get("/reserve/customer/:userId", verifyToken, getCustomerBooking);
 
-//GET ใช้ไอดีหอพัก ว่ามีลูกค้า
+//GET หอพักดูว่ามีลูกค้า
 router.get("/reserve/owner/:dormitoryId", verifyToken, getDormitoryCustomers);
 
 //DELETE ลบลูกค้าออกจากหอพัก

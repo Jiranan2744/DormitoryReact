@@ -91,7 +91,7 @@ export default function UpdateDormitory() {
                 setUploading(false);
             });
         } else {
-            setImageUploadError('คุณสามารถอัปโหลดได้เพียง 6 ภาพต่อรายการ')
+            setImageUploadError('คุณสามารถอัปโหลดได้สูงสุด 6 ภาพต่อรายการ')
             setUploading(false);
         }
     };
@@ -212,18 +212,18 @@ export default function UpdateDormitory() {
     const [isToggled, setIsToggled] = useState(true);
 
     const handleToggleStatus = async () => {
-      try {
-        const response = await axios.put(`/dormitorys/${dormitoryId}/update-status`, {
-          isReservationEnabled: !isToggled,
-        });
+        try {
+            const response = await axios.put(`/dormitorys/${dormitoryId}/update-status`, {
+                isReservationEnabled: !isToggled,
+            });
 
-        const updatedDormitory = response.data;
-        setIsToggled(updatedDormitory.isReservationEnabled);
-      } catch (error) {
-        console.error('Error updating dormitory status:', error);
-      }
+            const updatedDormitory = response.data;
+            setIsToggled(updatedDormitory.isReservationEnabled);
+        } catch (error) {
+            console.error('Error updating dormitory status:', error);
+        }
     };
-  
+
 
 
 
@@ -259,7 +259,7 @@ export default function UpdateDormitory() {
                                 <Col sm={6} style={{ width: '50vh' }}>
                                     <input
                                         type="text"
-                                        placeholder="Name"
+                                        placeholder="ชื่อ (ภาษาไทย)"
                                         id="tname"
                                         className='form-control'
                                         onChange={handleChange}
@@ -275,7 +275,7 @@ export default function UpdateDormitory() {
                                 <Col sm={6} style={{ width: '50vh' }}>
                                     <input
                                         type="text"
-                                        placeholder="Name"
+                                        placeholder="ชื่อ (ภาษาอังกฤษ)"
                                         id="ename"
                                         className='form-control'
                                         onChange={handleChange}
@@ -286,12 +286,12 @@ export default function UpdateDormitory() {
 
                             <Form.Group as={Row} className="mb-1" style={{ margin: '10px' }} controlId="formHorizontalEmail">
                                 <Form.Label column sm={5} style={{ display: 'flex', width: '30vh', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
-                                    อีเมล์
+                                    อีเมล
                                 </Form.Label>
                                 <Col sm={6} style={{ width: '50vh' }}>
                                     <input
                                         type="text"
-                                        placeholder="Email"
+                                        placeholder="อีเมล"
                                         id="email"
                                         className='form-control'
                                         onChange={handleChange}
@@ -307,7 +307,7 @@ export default function UpdateDormitory() {
                                 <Col sm={6} style={{ width: '50vh' }}>
                                     <input
                                         type="text"
-                                        placeholder="Phone"
+                                        placeholder="เบอร์โทร"
                                         id="phone"
                                         className='form-control'
                                         onChange={handleChange}
@@ -323,7 +323,7 @@ export default function UpdateDormitory() {
                                 <Col sm={6} style={{ width: '50vh' }}>
                                     <input
                                         type="text"
-                                        placeholder="Line"
+                                        placeholder="ไลน์"
                                         id="line"
                                         className='form-control'
                                         onChange={handleChange}
@@ -344,7 +344,7 @@ export default function UpdateDormitory() {
                                             <Form.Group as={Col} controlId="formGridNumber">
                                                 <input
                                                     type="text"
-                                                    placeholder="No."
+                                                    placeholder="เลขที่/หมู่."
                                                     id="no"
                                                     style={{ width: '20vh' }}
                                                     className='form-control'
@@ -359,7 +359,7 @@ export default function UpdateDormitory() {
                                             <Form.Group as={Col} controlId="formGridNumber">
                                                 <input
                                                     type="text"
-                                                    placeholder="Road."
+                                                    placeholder="ถนน."
                                                     id="road"
                                                     style={{ width: '20vh' }}
                                                     className='form-control'
@@ -374,7 +374,7 @@ export default function UpdateDormitory() {
                                             <Form.Group as={Col} controlId="formGridNumber">
                                                 <input
                                                     type="text"
-                                                    placeholder="Street."
+                                                    placeholder="ซอย."
                                                     id="street"
                                                     style={{ width: '20vh' }}
                                                     className='form-control'
@@ -392,7 +392,7 @@ export default function UpdateDormitory() {
                                                 <Form.Label>ตำบล/แขวง</Form.Label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Sub-district."
+                                                    placeholder="ตำบล/แขวง."
                                                     id="subdistrict"
                                                     style={{ width: '20vh' }}
                                                     className='form-control'
@@ -405,7 +405,7 @@ export default function UpdateDormitory() {
                                                 <Form.Label>อำเภอ/เขต</Form.Label>
                                                 <input
                                                     type="text"
-                                                    placeholder="District."
+                                                    placeholder="อำเภอ/เขต."
                                                     id="district"
                                                     style={{ width: '20vh' }}
                                                     className='form-control'
@@ -417,7 +417,7 @@ export default function UpdateDormitory() {
                                                 <Form.Label>จังหวัด</Form.Label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Province."
+                                                    placeholder="จังหวัด."
                                                     id="province"
                                                     style={{ width: '20vh' }}
                                                     className='form-control'
@@ -429,7 +429,7 @@ export default function UpdateDormitory() {
                                                 <Form.Label>รหัสไปรษณีย์</Form.Label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Postal code."
+                                                    placeholder="รหัสไปรษณีย์."
                                                     id="code"
                                                     style={{ width: '20vh' }}
                                                     className='form-control'
@@ -447,8 +447,8 @@ export default function UpdateDormitory() {
                                             <Form.Label column sm={3} style={{ width: '30vh', padding: '5px', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
                                                 สิ่งอำนวยความสะดวก
                                             </Form.Label>
-                                            <Row>
-                                                <Col xs="auto" className="my-1">
+                                            <Row style={{ padding: '5px' }}>
+                                                <Col xs="4" className="my-1">
                                                     {facilities.slice(0, Math.ceil(facilities.length / 2)).map((facility) => (
                                                         <Form.Check
                                                             key={facility._id}
@@ -480,7 +480,8 @@ export default function UpdateDormitory() {
                                     <Form.Label column sm={5} style={{ width: '20vh', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
                                         ประเภทห้องพัก
                                     </Form.Label>
-                                    <Card>
+
+                                    <Card style={{ width: '149vh' }} >
                                         <Card.Body>
                                             <Form>
                                                 <table style={{ width: '100%' }}>
@@ -593,21 +594,6 @@ export default function UpdateDormitory() {
                                                     </tbody>
                                                 </table>
                                             </Form>
-
-                                            <div>
-                                                <Form.Label column sm={5} style={{ width: '20vh', fontWeight: 'normal', fontSize: '20px' }}>
-                                                    สถานะหอพัก
-                                                </Form.Label>
-                                                <Form.Check
-                                                    type="switch"
-                                                    id="custom-switch"
-                                                    style={{ margin: '15px' }}
-                                                    label="กรุณาเลือกสถานะห้องพัก"
-                                                    checked={isToggled}
-                                                    onChange={handleToggleStatus}
-                                                />
-                                                <p style={{ display: 'inline-block', marginLeft: '10px' }}>{isToggled ? 'ห้องว่าง' : 'ห้องไม่ว่าง'}</p>
-                                            </div>
                                         </Card.Body>
                                     </Card>
                                     <br /><br />
@@ -796,7 +782,7 @@ export default function UpdateDormitory() {
                                                 <InputGroup.Text id="basic-addon2">บาท</InputGroup.Text>
                                             </InputGroup>
                                             <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
-                                                กรณีหากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
+                                                หากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
                                             </Form.Label>
                                         </Form.Group>
 
@@ -815,6 +801,9 @@ export default function UpdateDormitory() {
                                                 />
                                                 <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                                             </InputGroup>
+                                            <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
+                                                หากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
+                                            </Form.Label>
                                         </Form.Group>
 
                                         <Form.Group as={Row} className="m-2" controlId="formHorizontalEmail">
@@ -832,6 +821,9 @@ export default function UpdateDormitory() {
                                                 />
                                                 <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                                             </InputGroup>
+                                            <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
+                                                หากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
+                                            </Form.Label>
                                         </Form.Group>
 
                                         <Form.Group as={Row} className="m-2" controlId="formHorizontalEmail">
@@ -849,6 +841,9 @@ export default function UpdateDormitory() {
                                                 />
                                                 <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                                             </InputGroup>
+                                            <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
+                                                หากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
+                                            </Form.Label>
                                         </Form.Group>
 
 
@@ -871,7 +866,7 @@ export default function UpdateDormitory() {
                                                             <img src="https://bcdn.renthub.in.th/assets/renthub/empty-pictures-affed04adf0912d00564dc652267ca1e.svg" className="css-1u1zie3" alt="Empty Pictures" />
                                                         </div>
                                                     </div>
-                                                    <span>ลากรูปภาพมาวางบริเวณนี้เพื่ออัพโหลด หรือ</span>
+                                                    <span>ลากรูปภาพมาวางบริเวณนี้เพื่ออัพโหลด</span>
                                                 </div>
                                                 <p style={{ fontWeight: 'bold' }}>
                                                     ภาพหน้าปก:

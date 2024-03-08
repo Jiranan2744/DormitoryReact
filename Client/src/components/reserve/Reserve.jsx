@@ -20,17 +20,20 @@ function Reserve() {
   const handleShowList = async () => {
     try {
       setShowListingError(false);
+  
       const res = await fetch(`/users/listing/${currentUser._id}`);
+      
       const data = await res.json();
-      if (data.success === false) {
+        if (data.success === false) {
         setShowListingError(true);
         return;
       }
-      setUserListings(data);
+        setUserListings(data);
     } catch (error) {
       setShowListingError(true);
     }
   };
+  
 
   const handleListDelete = async (listingId) => {
     try {
@@ -87,6 +90,7 @@ function Reserve() {
   };
 
 
+
   return (
     <div>
       <Navbar />
@@ -98,17 +102,52 @@ function Reserve() {
           <Nav variant="tabs" style={{ marginLeft: '35vh', padding: '5px' }}>
             <Nav.Item>
               <Nav.Link href='/'>
-                Home
+                กลับหน้าหลัก
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link eventKey="tab2" onClick={handleShowList}>
-                My Dormitory
+              <Nav.Link eventKey="tab1" onClick={handleShowList}>
+                หอพักของฉัน
               </Nav.Link>
             </Nav.Item>
           </Nav>
         </Tab.Container>
         <br />
+
+        {/* แจ้ง error */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          {showListingError ? (
+            <p style={{ color: 'red', textAlign: 'center', height: '100%' }}>ไม่พบหอพักของคุณ</p>
+          ) : (
+            <div style={{ textAlign: 'center', height: '50%' }}>
+              <p>ในกรณีที่ท่านยังไม่ลงประกาศหอพัก สามารถเข้าไปประกาศหอพักของท่าน ได้ที่นี่</p>
+              <br />
+              <a
+                href="/formdorm"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textDecoration: 'none',
+                  color: 'black',
+                  height: '50%',
+                }}
+              >
+                <FontAwesomeIcon icon={faFileCirclePlus} style={{ marginBottom: '5px', height: '10vh' }} />
+              </a>
+              <br />
+              <Nav.Item>
+                <Nav.Link eventKey="tab1" onClick={handleShowList}>
+                  คลิกที่นี่ เพื่อดูรายการประกาศหอพัก
+                </Nav.Link>
+              </Nav.Item>
+
+
+            </div>
+          )}
+        </div>
+
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <br />
           <Table striped bordered style={{ width: '100%' }}>
@@ -145,101 +184,173 @@ function Reserve() {
                   </td>
 
                   <td>
-                    <Link
-                      style={{
-                        color: '#374151',
-                        fontWeight: '300',
-                        textDecoration: 'none',
-                        cursor: 'pointer',
-                        display: 'block',
-                        margin: '3vh',
-                        textAlign: 'center',
-                      }}
-                      to={`/listing/${listing._id}`}
-                    >
-                      {listing.tname}
-                    </Link>
-                  </td>
-                  <td>
-                    <Link
-                      style={{
-                        color: '#374151',
-                        fontWeight: '300',
-                        textDecoration: 'none',
-                        cursor: 'pointer',
-                        display: 'block',
-                        margin: '3vh',
-                        textAlign: 'center',
-                      }}
-                      to={`/listing/${listing._id}`}
-                    >
-                      {listing.ename}
-                    </Link>
-                  </td>
-                  <td>
-                    <Link
-                      style={{
-                        color: '#374151',
-                        fontWeight: '300',
-                        textDecoration: 'none',
-                        cursor: 'pointer',
-                        display: 'block',
-                        margin: '3vh',
-                        textAlign: 'center',
-                      }}
-                      to={`/listing/${listing._id}`}
-                    >
-                      {listing.email}
-                    </Link>
-                  </td>
-                  <td>
-                    <Link
-                      style={{
-                        color: '#374151',
-                        fontWeight: '300',
-                        textDecoration: 'none',
-                        cursor: 'pointer',
-                        display: 'block',
-                        margin: '3vh',
-                        textAlign: 'center',
-                      }}
-                      to={`/listing/${listing._id}`}
-                    >
-                      {listing.phone}
-                    </Link>
-                  </td>
-                  <td>
-                    <Link
-                      style={{
-                        color: '#374151',
-                        fontWeight: '300',
-                        textDecoration: 'none',
-                        cursor: 'pointer',
-                        display: 'block',
-                        margin: '3vh',
-                        textAlign: 'center',
-                      }}
-                      to={`/listing/${listing._id}`}
-                    >
-                      {listing.line}
-                    </Link>
+                    {listing.tname ? (
+                      <span
+                        style={{
+                          color: '#374151',
+                          fontWeight: '300',
+                          textDecoration: 'none',
+                          display: 'block',
+                          margin: '3vh',
+                          textAlign: 'center',
+                        }}
+                      >
+                        {listing.tname}
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          color: '#374151',
+                          fontWeight: '300',
+                          textDecoration: 'none',
+                          display: 'block',
+                          margin: '3vh',
+                          textAlign: 'center',
+                        }}
+                      >
+                        ไม่พบข้อมูล
+                      </span>
+                    )}
                   </td>
 
                   <td>
-                    <div style={{ textAlign: 'center' }}>
+                    {listing.ename ? (
+                      <span
+                        style={{
+                          color: '#374151',
+                          fontWeight: '300',
+                          textDecoration: 'none',
+                          display: 'block',
+                          margin: '3vh',
+                          textAlign: 'center',
+                        }}
+                      >
+                        {listing.ename}
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          color: '#374151',
+                          fontWeight: '300',
+                          textDecoration: 'none',
+                          display: 'block',
+                          margin: '3vh',
+                          textAlign: 'center',
+                        }}
+                      >
+                        ไม่พบข้อมูล
+                      </span>
+                    )}
+                  </td>
+
+                  <td>
+                    {listing.email ? (
+                      <span
+                        style={{
+                          color: '#374151',
+                          fontWeight: '300',
+                          textDecoration: 'none',
+                          display: 'block',
+                          margin: '3vh',
+                          textAlign: 'center',
+                        }}
+                      >
+                        {listing.email}
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          color: '#374151',
+                          fontWeight: '300',
+                          textDecoration: 'none',
+                          display: 'block',
+                          margin: '3vh',
+                          textAlign: 'center',
+                        }}
+                      >
+                        ไม่พบข้อมูล
+                      </span>
+                    )}
+                  </td>
+
+                  <td>
+                    {listing.phone ? (
+                      <span
+                        style={{
+                          color: '#374151',
+                          fontWeight: '300',
+                          textDecoration: 'none',
+                          display: 'block',
+                          margin: '3vh',
+                          textAlign: 'center',
+                        }}
+                      >
+                        {listing.phone}
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          color: '#374151',
+                          fontWeight: '300',
+                          textDecoration: 'none',
+                          display: 'block',
+                          margin: '3vh',
+                          textAlign: 'center',
+                        }}
+                      >
+                        ไม่พบข้อมูล
+                      </span>
+                    )}
+                  </td>
+
+                  <td>
+                    {listing.line ? (
+                      <span
+                        style={{
+                          color: '#374151',
+                          fontWeight: '300',
+                          textDecoration: 'none',
+                          display: 'block',
+                          margin: '3vh',
+                          textAlign: 'center',
+                        }}
+                      >
+                        {listing.line}
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          color: '#374151',
+                          fontWeight: '300',
+                          textDecoration: 'none',
+                          display: 'block',
+                          margin: '3vh',
+                          textAlign: 'center',
+                        }}
+                      >
+                        ไม่พบข้อมูล
+                      </span>
+                    )}
+                  </td>
+
+                  <td style={{ textAlign: 'center' }}>
+                    <div>
                       {listings.map((dormitory) => (
-                        <div key={dormitory._id}>
-                          <p>หอพัก: {dormitory.active ? 'เปิด' : 'ปิด'}</p>
-                          <Form.Check
-                            type="switch"
-                            id={`custom-switch-${dormitory._id}`}
-                            label=""
-                            style={{ display: 'flex', justifyContent: 'center' }}
-                            checked={dormitory.active}
-                            onChange={() => handleToggleReservations(dormitory._id)}
-                          />
-                          
-                        </div>
+                        <tr key={dormitory._id}>
+                          <td style={{ textAlign: 'center' }}>
+                            <p style={{ textAlign: 'center' }}>สถานะหอพัก: {dormitory.active ? 'เปิด' : 'ปิด'}</p>
+                          </td>
+                          <td style={{ textAlign: 'center', padding: '1px' }}>
+                            <Form.Check
+                              type="switch"
+                              id={`custom-switch-${dormitory._id}`}
+                              label=""
+                              style={{ display: 'flex', justifyContent: 'center', padding: '20px', marginLeft: '25px' }}
+                              checked={dormitory.active}
+                              onChange={() => handleToggleReservations(dormitory._id)}
+                            />
+                          </td>
+                        </tr>
                       ))}
                     </div>
                   </td>
@@ -263,8 +374,6 @@ function Reserve() {
                     <Button onClick={() => handleListDelete(listing._id)} style={{ color: 'red', borderRadius: '5px', margin: '1vh', backgroundColor: '#ff7f7f', border: 'none', padding: '8px 16px' }}>
                       <FontAwesomeIcon icon={faTrash} style={{ marginRight: '8px' }} /> Delete
                     </Button>
-
-
                   </td>
                 </tr>
               ))}
@@ -272,14 +381,7 @@ function Reserve() {
           </Table>
         </div>
       </div>
-
-      {/* เเจ้ง error */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-        <p style={{ color: 'red' }}>{showListingError ? 'คุณไม่มีรายการประกาศในขณะนี้' : ''}</p>
-      </div>
-
     </div>
-
   );
 }
 

@@ -25,6 +25,11 @@ const UserSchema = new mongoose.Schema({
     role: {
         type: String,
     },
+    imagePayment: {
+        type: Array,
+        required: true
+    },
+    
 }, {
     timestamps: true,
 });

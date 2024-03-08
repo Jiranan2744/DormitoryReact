@@ -11,6 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { logInStart, logInSuccess, logInFailure } from '../redux/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import Navbar from '../components/navbar/Navbar';
 
 const defaultTheme = createTheme();
 
@@ -62,7 +63,9 @@ const Login = () => {
   };
   
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <div>
+      <Navbar />
+      <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -74,7 +77,7 @@ const Login = () => {
           }}
         >
           <Typography component="h1" variant="h5">
-            Sign in
+            ยินดีต้อนรับ เข้าสู่ระบบ
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <TextField
@@ -82,7 +85,7 @@ const Login = () => {
               required
               fullWidth
               id="email"
-              label="Email Address"
+              label="อีเมล"
               name="email"
               autoComplete="email"
               autoFocus
@@ -93,7 +96,7 @@ const Login = () => {
               required
               fullWidth
               name="password"
-              label="Password"
+              label="รหัสผ่าน"
               type="password"
               id="password"
               autoComplete="current-password"
@@ -109,20 +112,20 @@ const Login = () => {
               sx={{ mt: 3, mb: 2 }}
               
             >
-             {loading ? 'Loading...' : 'Sign In'}
+             {loading ? 'Loading...' : 'เข้าสู่ระบบ'}
             </Button>
 
             <Grid container>
               <Grid item>
                 <div className="col">
                   <p>
-                    Don't have an account?{' '}
+                    ไม่มีบัญชีผู้ใช้ ใช่หรือไม่?{' '}
                     <Link to="/signup" style={{ color: '#4169E1', textDecoration: 'none' }}>
-                      Sign up
+                     สมัครสมาชิก
                     </Link>
                   </p>
                 </div>
-                <span style={{ color: '#FF2300' }}>{error && 'Something went wrong!'}</span>
+                <span style={{ color: '#FF2300' }}>{error && 'เกิดข้อผิดพลาด!'}</span>
 
               </Grid>
             </Grid>
@@ -130,6 +133,8 @@ const Login = () => {
         </Box>
       </Container>
     </ThemeProvider>
+    </div>
+    
   );
 }
 

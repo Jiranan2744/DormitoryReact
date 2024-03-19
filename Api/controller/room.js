@@ -1,94 +1,35 @@
-import Room from "../modals/Room.js"
-import Dormitory from "../modals/Dormitory.js"
-import { createError } from "../utils/error.js";
-
-
-// export const createRoom = async (req, res, next) => {
-//     const dormitoryId = req.params.dormitoryid;
-//     const newRoom = new Room(req.body);
-//     try {
-//         const savedRoom = await newRoom.save();
-//         try {
-//             await Dormitory.findByIdAndUpdate(dormitoryId, {
-//                 $push: { rooms: savedRoom._id },
-//             });
-//         } catch (err) {
-//             next(err);
-//         }
-//         res.status(200).json(savedRoom);
-//     } catch (err) {
-//         next(err);
-//     }
-// };
-
+import Room from "../modals/Room";
 
 export const createNewRoom = async (req, res, next) => {
     try {
-        const room = await Room.create(req.body);
-        return res.status(200).json(room);
+      // Create a new room
+      const room = await Room.create(req.body);
+  
+      // Assuming you have a Dormitory model and you want to associate the room with a dormitory
+      const { dormitoryId } = req.body;
+      
+      // Find the dormitory by ID
+      const dormitory = await Dormitory.findById(dormitoryId);
+  
+      if (!dormitory) {
+        return res.status(404).json({ success: false, message: 'Dormitory not found' });
+      }
+  
+      // Add the new room to the dormitory's roomTypes array
+      dormitory.roomTypes.push({
+        typeRooms: room.typeRooms,
+        minDaily: room.minDaily,
+        maxDaily: room.maxDaily,
+        minMonthly: room.minMonthly,
+        maxMonthly: room.maxMonthly,
+      });
+  
+      // Save the dormitory with the updated roomTypes
+      await dormitory.save();
+  
+      return res.status(200).json({ success: true, message: 'Room created and associated with dormitory successfully', room });
     } catch (err) {
-        next(err);
+      next(err);
     }
-}
-
-export const updatedRoom = async (req, res, next) => {
-    
-    const room = await Room.findById(req.params.id);
-
-    if(!room){
-        return next(createError(404, 'Room not found!'));
-    }
-    if(req.user.id !== room.userRoom){
-        return next(createError(401, 'You can only update your own listing!'));
-    }
-    try {
-        const updatedRoom = await Room.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true }
-        );
-        res.status(200).json(updatedRoom);
-
-    } catch (error) {
-        next(error);
-    }
-}
-
-export const deleteRoom = async (req, res, next) => {
-    const dormitoryId = req.params.dormitoryid;
-
-    try {
-        await Room.findByIdAndDelete(req.params.id)
-        try {
-            await Dormitory.findByIdAndUpdate(dormitoryId, {
-                $pull: { rooms: req.params.id },
-            });
-        } catch (err) {
-            next(err);
-        }
-        res.status(200).json("Room has been deleted.")
-
-    } catch (err) {
-        next(err);
-    }
-}
-
-export const getRoom = async (req, res, next) => {
-    try {
-        const room = await Room.findById(req.params.id)
-        res.status(200).json(room)
-
-    } catch (err) {
-        next(err);
-    }
-}
-
-export const getallRoom = async (req, res, next) => {
-    try {
-        const rooms = await Room.find();
-        res.status(200).json(rooms);
-    } catch (err) {
-        next(err);
-    }
-}
+  };
 

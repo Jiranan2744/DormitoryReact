@@ -55,7 +55,7 @@ const Login = () => {
       } else if (data.role === 'owner' || data.role === 'customer') {
         navigate('/');
       } else {
-        navigate('/admin-dashboard');
+        navigate('/');
       }
     } catch (error) {
       dispatch(logInFailure(error));

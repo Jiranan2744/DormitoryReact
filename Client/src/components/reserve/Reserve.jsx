@@ -369,10 +369,10 @@ function Reserve() {
                         margin: '2vh',
                       }}
                     >
-                      <FontAwesomeIcon icon={faEdit} style={{ marginRight: '8px' }} /> Edit
+                      <FontAwesomeIcon icon={faEdit} style={{ marginRight: '8px' }} /> เเก้ไข
                     </Link>
                     <Button onClick={() => handleListDelete(listing._id)} style={{ color: 'red', borderRadius: '5px', margin: '1vh', backgroundColor: '#ff7f7f', border: 'none', padding: '8px 16px' }}>
-                      <FontAwesomeIcon icon={faTrash} style={{ marginRight: '8px' }} /> Delete
+                      <FontAwesomeIcon icon={faTrash} style={{ marginRight: '8px' }} /> ลบ
                     </Button>
                   </td>
                 </tr>

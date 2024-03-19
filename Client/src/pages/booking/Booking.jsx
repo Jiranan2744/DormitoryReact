@@ -4,20 +4,39 @@ import useFetch from '../../hooks/useFetch';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCamera,
   faChair,
   faCircleArrowLeft,
   faCircleArrowRight,
   faCircleXmark,
+  faComment,
+  faCut,
   faDumbbell,
   faElevator,
   faFan,
+  faFingerprint,
   faLocationDot,
+  faLock,
+  faMotorcycle,
+  faPaw,
+  faPhone,
+  faShoppingCart,
+  faSmoking,
   faSquareParking,
+  faSwimmingPool,
   faTemperatureArrowUp,
   faTrashCan,
+  faTshirt,
   faTv,
+  faUtensils,
   faWifi,
 } from "@fortawesome/free-solid-svg-icons";
+
+import { CgSmartHomeRefrigerator } from "react-icons/cg";
+import { TbAirConditioning } from "react-icons/tb";
+import { GrUserPolice } from "react-icons/gr";
+import { GiKeyCard } from "react-icons/gi";
+
 import Navbar from "../../components/navbar/Navbar";
 
 import Button from 'react-bootstrap/Button';
@@ -27,6 +46,9 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import axios from 'axios';
 import QRCode from 'qrcode.react';
+
+import { FaPhone } from 'react-icons/fa'; // Importing the phone icon from react-icons library
+
 
 import { app } from '../../firebase';
 import {
@@ -141,6 +163,28 @@ const Booking = () => {
   };
 
 
+  //เพิ่มประเภทห้องพัก
+  const [roomTypesList, setRoomTypesList] = useState([]);
+
+  useEffect(() => {
+    const fetchRoomTypes = async () => {
+      try {
+        const response = await fetch(`/dormitorys/viewRoomType/${dormitoryId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setRoomTypesList(data.roomTypes);
+        } else {
+          console.error('Failed to fetch room types');
+        }
+      } catch (error) {
+        console.error('Error fetching room types:', error);
+      }
+    };
+
+    fetchRoomTypes();
+  }, []);
+
+
   const storeImage = async (file) => {
     return new Promise((resolve, reject) => {
       const storage = getStorage(app);
@@ -180,23 +224,31 @@ const Booking = () => {
     return dormId;
   };
 
-  // Function to handle reservation success
+  // ยืนยันการจอง
+
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const handleCloseModal = () => setShow(false);
+  const handleCloseSuccessPopup = () => setShowSuccessPopup(false);
+  const nextProcessModal = () => setStep(step + 1);
+
   const handleReservationSuccess = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
       setError(false);
 
-      // If there are no images, set imagePayment to null
-      const imagePayment = formData.imagePayment.length > 0 ? formData.imagePayment : null;
+      if (formData.imagePayment.length === 0) {
+        alert("Please attach a payment picture before confirming the reservation.");
+        setLoading(false);
+        return;
+      }
 
-      // Retrieve dormitory ID from the current page or component
+      const imagePayment = formData.imagePayment;
+
       const dormId = getDormitoryId();
 
-      // Retrieve user ID from your authentication system (assuming currentUser is correctly set)
       const userId = currentUser._id;
 
-      // Send a POST request to the server
       const res = await fetch(`/reservation/reserve`, {
         method: 'POST',
         headers: {
@@ -206,20 +258,18 @@ const Booking = () => {
           dormitoryId: dormId,
           userId: userId,
           imagePayment,
-          // ... other fields
         }),
       });
 
-      // Parse the response from the server
       const responseData = await res.json();
       setLoading(false);
 
-      // Handle the response
       if (responseData.success === false) {
         setError(responseData.message);
       } else {
-        // Reservation created successfully
-        // Navigate to the desired page (adjust as needed)
+        // Close the QR code page and show the success modal
+        setShow(false); // Closing QR code page
+        setShowSuccessPopup(true); // Show the success modal
       }
     } catch (error) {
       console.error("Error in handleReservationSuccess:", error);
@@ -276,6 +326,7 @@ const Booking = () => {
     fetchDormitoryStatus();
   }, [dormitoryId]);
 
+  //#FEBA02
 
   return (
     <div>
@@ -285,48 +336,45 @@ const Booking = () => {
       ) : error ? (
         "Error loading data"
       ) : (
-
         <div className="hotelContainer">
-          {open && (
-            <div className="slider">
-              <FontAwesomeIcon
-                icon={faCircleXmark}
-                className="close"
-                onClick={() => setOpen(false)}
-              />
-              <FontAwesomeIcon
-                icon={faCircleArrowLeft}
-                className="arrow"
-                onClick={() => handleMove("l")}
-              />
-              <div className="slideWrapper">
-                <img
-                  src="{data.image[slideNumber]"
-                  alt=""
-                  className="sliderImg"
-                />
-              </div>
-              <FontAwesomeIcon
-                icon={faCircleArrowRight}
-                className="arrow"
-                onClick={() => handleMove("r")}
-              />
-            </div>
-          )}
-
           <div className="hotelWrapper">
-            <Button className="bookPhone" style={{ backgroundColor: '#FEBA02' }} disabled>Tel: {data.phone}</Button>
-            <Button className="bookLine" style={{ backgroundColor: '#FEBA02' }} disabled>Line ID: {data.line}</Button>
-
-            <h1 className="hotelTitle">{data.tname} {data.ename} {data.title}</h1>
-
+            <h1 style={{ color: '#003580', fontWeight: 'bold' }}>{data.tname} {data.ename} {data.title}</h1>
             <div className="hotelAddress">
-              <FontAwesomeIcon icon={faLocationDot} />
-              <span>{data.no} {data.street} {data.road} {data.district} {data.subdistrict} {data.province} {data.code}</span>
+              <FontAwesomeIcon size='20px' icon={faLocationDot} />
+              <span style={{ fontSize: '18px' }}>{data.no} {data.street} {data.road} {data.district} {data.subdistrict} {data.province} {data.code}</span>
+              <br /><br />
+
+              <div className="buttonContact">
+                <Button className="bookPhone" style={{ backgroundColor: '#008E08', marginLeft: '10px' }} disabled>
+                  <FontAwesomeIcon icon={faPhone} style={{ marginRight: '5px' }} /> {data.phone}
+                </Button>
+
+                <Button className="bookLine" style={{ backgroundColor: '#DFF0D8', color: '#008E08', marginLeft: '10px' }} disabled>
+                  <FontAwesomeIcon icon={faComment} style={{ marginRight: '5px' }} /> {data.line}
+                </Button>
+              </div>
+
+              {/* <div className="priceRoom">
+                รายวัน: {
+                  (data.minDaily !== null && data.minDaily !== undefined && data.maxDaily !== null && data.maxDaily !== undefined)
+                    ? `${data.minDaily} - ${data.maxDaily}`
+                    : (data.minDaily !== undefined || data.maxDaily !== undefined)
+                      ? `${data.minDaily || ''}   ${data.maxDaily || ''}`
+                      : "-"
+                }
+                รายเดือน: {
+                  (data.minMonthly !== null && data.minMonthly !== undefined && data.maxMonthly !== null && data.maxMonthly !== undefined)
+                    ? `${data.minMonthly} - ${data.maxMonthly}`
+                    : (data.minMonthly !== undefined || data.maxMonthly !== undefined)
+                      ? `${data.minMonthly || ''}  ${data.maxMonthly || ''}`
+                      : ""
+                }
+              </div> */}
             </div>
 
 
-            <br /> <br />
+
+            <br />
             {/* Image */}
             <div className="hotelImages">
               {data.image?.map((images, i) => (
@@ -348,55 +396,89 @@ const Booking = () => {
                     <thead className="table-light" style={{ textAlign: 'center' }}>
                       <tr>
                         <th>ประเภทห้อง</th>
-                        <th>ขนาดห้องพัก</th>
+                        <th>ขนาดห้องพัก (ตร.ม)</th>
                         <th>ค่าเช่ารายวัน</th>
                         <th>ค่าเช่ารายเดือน</th>
                       </tr>
                     </thead>
                     <tbody style={{ textAlign: 'center' }}>
                       <tr>
-                        <td>{data.typeRooms}</td>
-                        <td>{data.sizeRooms}</td>
-                        <td>{data.minDaily} - {data.maxDaily}</td>
-                        <td>{data.minMonthly} - {data.maxMonthly}</td>
+                        <td>{data.typeRooms !== null && data.typeRooms !== undefined ? data.typeRooms : "-"}</td>
+                        <td>{data.sizeRooms !== null && data.sizeRooms !== undefined ? data.sizeRooms : "-"}</td>
+                        <td>
+                          {
+                            (data.minDaily !== null && data.minDaily !== undefined && data.maxDaily !== null && data.maxDaily !== undefined)
+                              ? `${data.minDaily} - ${data.maxDaily}`
+                              : (data.minDaily !== undefined || data.maxDaily !== undefined)
+                                ? `${data.minDaily || ''}   ${data.maxDaily || ''}`
+                                : "-"
+                          }
+                        </td>
+
+                        <td>
+                          {
+                            (data.minMonthly !== null && data.minMonthly !== undefined && data.maxMonthly !== null && data.maxMonthly !== undefined)
+                              ? `${data.minMonthly} - ${data.maxMonthly}`
+                              : (data.minMonthly !== undefined || data.maxMonthly !== undefined)
+                                ? `${data.minMonthly || ''}  ${data.maxMonthly || ''}`
+                                : ""
+                          }
+                        </td>
                       </tr>
                     </tbody>
+
+                    <tbody style={{ textAlign: 'center' }}>
+                      {roomTypesList.map((data, index) => (
+                        <tr key={index}>
+                          <td>{data.typeRooms !== null && data.typeRooms !== undefined ? data.typeRooms : "-"}</td>
+                          <td>{data.sizeRooms !== null && data.sizeRooms !== undefined ? data.sizeRooms : "-"}</td>
+                          <td>{data.minDaily !== null && data.minDaily !== undefined && data.maxDaily !== null && data.maxDaily !== undefined ? `${data.minDaily} - ${data.maxDaily}` : "-"}</td>
+                          <td>{data.minMonthly !== null && data.minMonthly !== undefined && data.maxMonthly !== null && data.maxMonthly !== undefined ? `${data.minMonthly} - ${data.maxMonthly}` : "-"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
                   </table>
+
                   <br />  <br />
 
-                  <div style={{ width: '100vh', height: '30vh', alignItems: 'left', justifyContent: 'center' }}>
+                  <div style={{ height: '30vh', alignItems: 'left', justifyContent: 'center' }}>
                     <h1>สิ่งอำนวยความสะดวก</h1>
-                    <div className="icon-container" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', padding: '20px' }}>
+                    <div className="icon-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px', padding: '20px' }}>
                       {facilities.map(facility => (
-                        <div key={facility._id} className="icon" style={{ textAlign: 'center', margin: '10px' }}>
+                        <div key={facility._id} className="icon" style={{ textAlign: 'center', fontSize: '16px', width: '200%' }}>
                           {/* Use the appropriate icon based on your facility data */}
-                          {facility.facilities_name === 'ลิฟต์' && <FontAwesomeIcon icon={faElevator} />}
-                          {facility.facilities_name === 'เครื่องปรับอากาศ' && <FontAwesomeIcon icon={faFan} />}
-                          {facility.facilities_name === 'เฟอร์นิเจอร์-ตู้-เตียง' && <FontAwesomeIcon icon={faChair} />}
-                          {facility.facilities_name === 'พัดลม' && <FontAwesomeIcon icon={faFan} />}
-                          {facility.facilities_name === 'TV' && <FontAwesomeIcon icon={faTv} />}
-                          {facility.facilities_name === 'โทรศัพท์สายตรง' && <FontAwesomeIcon icon={faTv} />}
-                          {facility.facilities_name === 'อินเทอร์เน็ตไร้สาย (WIFI)' && <FontAwesomeIcon icon={faTv} />}
-                          {facility.facilities_name === 'เครื่องทำน้ำอุ่น' && <FontAwesomeIcon icon={faTemperatureArrowUp} />}
-                          {facility.facilities_name === 'มีระบบรักษาความปลอดภัย (คีย์การ์ด)' && <FontAwesomeIcon icon={faWifi} />}
-                          {facility.facilities_name === 'มีระบบรักษาความปลอดภัย (สเเกนลายนิ้วมือ)' && <FontAwesomeIcon icon={faWifi} />}
-                          {facility.facilities_name === 'กล้องวงจรปิด (CCTV)' && <FontAwesomeIcon icon={faWifi} />}
-                          {facility.facilities_name === 'รปภ.' && <FontAwesomeIcon icon={faWifi} />}
-                          {facility.facilities_name === 'ที่จอดรถ' && <FontAwesomeIcon icon={faSquareParking} />}
-                          {facility.facilities_name === 'ที่จอดรถมอเตอร์ไซต์/จักรยาน' && <FontAwesomeIcon icon={faSquareParking} />}
-                          {facility.facilities_name === 'สระว่ายน้ำ' && <FontAwesomeIcon icon={faWifi} />}
-                          {facility.facilities_name === 'ฟิตเนส' && <FontAwesomeIcon icon={faDumbbell} />}
-                          {facility.facilities_name === 'ร้านขายอาหาร' && <FontAwesomeIcon icon={faWifi} />}
-                          {facility.facilities_name === 'ร้านค้า สะดวกซื้อ' && <FontAwesomeIcon icon={faWifi} />}
-                          {facility.facilities_name === 'ร้านซัก-รีด' && <FontAwesomeIcon icon={faWifi} />}
-                          {facility.facilities_name === 'ร้านทำผม-เสริมสวย' && <FontAwesomeIcon icon={faWifi} />}
-                          {facility.facilities_name === 'อนุญาติให้สูบบุหรี่ในห้องพัก' && <FontAwesomeIcon icon={faWifi} />}
-                          {facility.facilities_name === 'อนุญาติให้เลี้ยงสัตว์' && <FontAwesomeIcon icon={faWifi} />}
-
-                          {facility.facilities_name && <span>{facility.facilities_name}</span>}
+                          {facility.facilities_name && (
+                            <>
+                              {facility.facilities_name === 'ลิฟต์' && <FontAwesomeIcon icon={faElevator} />}
+                              {facility.facilities_name === 'เครื่องปรับอากาศ' && <TbAirConditioning size={20} />}
+                              {facility.facilities_name === 'เฟอร์นิเจอร์-ตู้-เตียง' && <FontAwesomeIcon icon={faChair} />}
+                              {facility.facilities_name === 'พัดลม' && <FontAwesomeIcon icon={faFan} />}
+                              {facility.facilities_name === 'TV' && <FontAwesomeIcon icon={faTv} />}
+                              {facility.facilities_name === 'ตู้เย็น' && <CgSmartHomeRefrigerator size={22} />}
+                              {facility.facilities_name === 'โทรศัพท์สายตรง' && <FontAwesomeIcon icon={faPhone} />}
+                              {facility.facilities_name === 'อินเทอร์เน็ตไร้สาย (WIFI)' && <FontAwesomeIcon icon={faWifi} />}
+                              {facility.facilities_name === 'เครื่องทำน้ำอุ่น' && <FontAwesomeIcon icon={faTemperatureArrowUp} />}
+                              {facility.facilities_name === 'มีระบบคีย์การ์ด' && <GiKeyCard size={22} />}
+                              {facility.facilities_name === 'มีระบบสเเกนลายนิ้วมือ' && <FontAwesomeIcon icon={faFingerprint} />}
+                              {facility.facilities_name === 'กล้องวงจรปิด (CCTV)' && <FontAwesomeIcon icon={faCamera} />}
+                              {facility.facilities_name === 'รปภ.' && <GrUserPolice />}
+                              {facility.facilities_name === 'ที่จอดรถยนต์' && <FontAwesomeIcon icon={faSquareParking} />}
+                              {facility.facilities_name === 'ที่จอดรถมอเตอร์ไซต์/จักรยาน' && <FontAwesomeIcon icon={faMotorcycle} />}
+                              {facility.facilities_name === 'สระว่ายน้ำ' && <FontAwesomeIcon icon={faSwimmingPool} />}
+                              {facility.facilities_name === 'ฟิตเนส' && <FontAwesomeIcon icon={faDumbbell} />}
+                              {facility.facilities_name === 'ร้านขายอาหาร' && <FontAwesomeIcon icon={faUtensils} />}
+                              {facility.facilities_name === 'ร้านค้า ร้านสะดวกซื้อ' && <FontAwesomeIcon icon={faShoppingCart} />}
+                              {facility.facilities_name === 'ร้านซัก-รีด' && <FontAwesomeIcon icon={faTshirt} />}
+                              {facility.facilities_name === 'ร้านทำผม-เสริมสวย' && <FontAwesomeIcon icon={faCut} />}
+                              {facility.facilities_name === 'อนุญาติให้สูบบุหรี่ในห้องพัก' && <FontAwesomeIcon icon={faSmoking} />}
+                              {facility.facilities_name === 'อนุญาติให้เลี้ยงสัตว์' && <FontAwesomeIcon icon={faPaw} />}
+                              <span>{facility.facilities_name}</span>
+                            </>
+                          )}
                         </div>
                       ))}
                     </div>
+
 
                     <div className="" style={{ margin: '10px', padding: '10px', border: '1px solid #ccc', borderRadius: '8px' }}>
                       <h1 style={{ fontSize: '24px', marginBottom: '10px' }}>รายละเอียด</h1>
@@ -408,32 +490,37 @@ const Booking = () => {
 
               <div className="hotelDetailsPrice">
                 <h1 style={{ fontWeight: 'bold' }}> รายละเอียดหอพัก </h1>
-
                 <table className="table table-hover">
-
                   <tbody>
                     <tr>
-                      <td>ค่าน้ำ: {data.billWater} บาท/ยูนิต</td>
+                      <td>ค่าน้ำ: {data.billWater !== null && data.billWater !== undefined ? `${data.billWater} บาท/ยูนิต` : "ราคาต่อยูนิตตามที่การประปากำหนด"}</td>
                     </tr>
                     <tr>
-                      <td>ค่าไฟ: {data.billElectrict} บาท/ยูนิต</td>
+                      <td>ค่าไฟ: {data.billElectrict !== null && data.billElectrict !== undefined ? `${data.billElectrict} บาท/ยูนิต` : "ราคาต่อยูนิตตามที่การไฟฟ้ากำหนด"}</td>
                     </tr>
                     <tr>
-                      <td>เงินประกัน: {data.insurance} บาท</td>
+                      <td>เงินประกัน: {data.insurance !== null && data.insurance !== undefined ? `${data.insurance} บาท` : "โทรสอบถาม"}</td>
                     </tr>
                     <tr>
-                      <td>ค่ามัดจำ: {data.advance} บาท
-                        <p>ล่วงหน้า 1 เดือน</p>
+                      <td>
+                        ค่ามัดจำ: {data.advance !== null && data.advance !== undefined ? (
+                          <div>
+                            {data.advance} บาท
+                            {data.advance !== null && data.advance !== undefined && <p>ล่วงหน้า 1 เดือน</p>}
+                          </div>
+                        ) : (
+                          "โทรสอบถาม"
+                        )}
                       </td>
                     </tr>
                     <tr>
-                      <td>ค่าส่วนกลาง: {data.service} บาท</td>
+                      <td>ค่าส่วนกลาง: {data.service !== null && data.service !== undefined ? `${data.service} บาท` : "โทรสอบถาม"}</td>
                     </tr>
                     <tr>
-                      <td>ค่าโทรศัพท์: {data.billInternet} บาท</td>
+                      <td>ค่าโทรศัพท์: {data.billInternet !== null && data.billInternet !== undefined ? `${data.billInternet} บาท` : "โทรสอบถาม"} </td>
                     </tr>
                     <tr>
-                      <td>ค่าอินเทอร์เน็ต: {data.billTelephone} บาท</td>
+                      <td>ค่าอินเทอร์เน็ต: {data.billTelephone !== null && data.billTelephone !== undefined ? `${data.billTelephone} บาท` : "โทรสอบถาม"}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -473,27 +560,29 @@ const Booking = () => {
                               <Form.Control
                                 type="text"
                                 style={{ marginLeft: '10px', width: '30%', height: '5vh' }}
-                                placeholder={`ห้องพัก: ${data.typeRooms}`}
+                                placeholder={`ห้องพัก: ${data.typeRooms !== null && data.typeRooms !== undefined ? data.typeRooms : "-"}`}
                                 aria-label="Disabled input example"
                                 disabled
                                 readOnly
                               />
+
                               <Col>
                                 <Form.Control
                                   type="text"
                                   style={{ marginLeft: '20px', width: '55%', height: '5vh' }}
-                                  placeholder={`ขนาดห้องพัก: ${data.sizeRooms}`}
+                                  placeholder={`ขนาดห้องพัก: ${data.sizeRooms !== null && data.sizeRooms !== undefined ? data.sizeRooms : "-"}`}
                                   aria-label="Disabled input example"
                                   disabled
                                   readOnly
                                 />
+
                               </Col>
                               <br /><br />
                               <Row>
                                 <Form.Control
                                   type="text"
                                   style={{ marginLeft: '10px', width: '32%', height: '5vh' }}
-                                  placeholder={`ค่ามัดจำ: ${data.advance}`}
+                                  placeholder={`ค่ามัดจำ: ${data.advance !== null && data.advance !== undefined ? data.advance : "-"}`}
                                   aria-label="Disabled input example"
                                   disabled
                                   readOnly
@@ -530,7 +619,7 @@ const Booking = () => {
                                 style={{ color: 'white' }}
                                 onClick={handleImageSubmit}
                               >
-                                {uploading ? 'Uploading...' : 'Upload'}
+                                {uploading ? 'Uploading...' : 'อัพโหลด'}
                               </button>
                               <p style={{ color: 'red' }}>{imageUploadError && imageUploadError}</p>
                               {
@@ -547,7 +636,7 @@ const Booking = () => {
                                       style={{ backgroundColor: 'transparent', color: 'red' }}
                                     >
                                       <FontAwesomeIcon icon={faTrashCan} style={{ marginRight: '8px' }} />
-                                      Delete
+                                      ลบรูปภาพ
                                     </div>
                                   </div>
                                 ))
@@ -578,6 +667,21 @@ const Booking = () => {
                   </Modal.Body>
                 </Modal>
               </div>
+
+              <Modal show={showSuccessPopup} onHide={handleCloseSuccessPopup} centered>
+                <Modal.Header closeButton>
+                  <Modal.Title>Success</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  การจองสำเร็จแล้ว
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={handleCloseSuccessPopup}>
+                    ปิด
+                  </Button>
+                </Modal.Footer>
+              </Modal>
+
             </div>
           </div>
         </div>

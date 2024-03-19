@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -46,7 +45,7 @@ export default function SignUp() {
       }
     } catch (error) {
       setError(false);
-      alert('Successfully registered!'); // Display an alert
+      alert('สมัครสมาชิกสำเร็จ'); // Display an alert
       navigate("/login")
     } finally {
       setLoading(false);
@@ -157,16 +156,13 @@ export default function SignUp() {
                       </Link>
                     </p>
                   </div>
-
                 </Grid>
                 <span style={{ color: '#FF2300' }}>{error && 'Something went wrong!'}</span>
-
               </Grid>
             </Box>
           </Box>
         </Container>
       </ThemeProvider>
     </div>
-
   );
 }

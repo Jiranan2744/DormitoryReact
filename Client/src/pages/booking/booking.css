@@ -10,38 +10,27 @@
     max-width: 1024px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
     position: relative;
   }
 
-  .bookPhone {
-    position: absolute;
-    top: 60px;
-    right: 0;
+  .buttonContact {
+    display: flex;
+  }
+  
+  .bookPhone, .bookLine {
+    margin-left: 10px;
     border: none;
     padding: 10px 20px;
-    background-color: #FEBA02;
-    color: white;
     font-size: 18px;
-    border-radius: 5px;
+    border-radius: 20px;
     cursor: pointer;
-
   }
-
-  .bookLine {
-    position: absolute;
-    top: 60px;
-    right: 0;
-    border: none;
-    padding: 10px 20px;
-    margin-right: 20%;
-    background-color: #FEBA02;
-    color: white;
-    font-size: 18px;
-    border-radius: 5px;
-    cursor: pointer;
-
+  
+  .bookPhone:hover, .bookLine:hover {
+    background-color: #FFA500; /* Change color on hover */
   }
+  
 
   .statusRoom{
     display: flex;
@@ -61,7 +50,6 @@
   .hotelAddress {
     color: #0071c2;
     font-size: 14px;
-    display: flex;
     align-items: center;
     gap: 10px;
   }
@@ -183,3 +171,9 @@
     font-size: 18px;
     gap: 10px;
   }
+
+  .priceRoom {
+    text-align: right;
+    
+  }
+  

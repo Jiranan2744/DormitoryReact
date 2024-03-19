@@ -1,20 +1,33 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const RoomSchema = new mongoose.Schema({
 
-    dormitoryId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Dormitory", // Reference to the Dormitory model
-        required: true,
-    },
-    userId: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // Reference to the User model
-        required: true,
-    }],
+  typeRooms: {
+    type: String,
+    required: true,
+  },
 
-    // roomNumbers: [{ number: Number, unavailableDates: { type: [Date] } }],
+  sizeRooms: {
+    type: String,
+    required: true,
+  },
+  minDaily: {
+    type: Number,
+    required: true,
+  },
+  maxDaily: {
+    type: Number,
+    required: true,
+  },
+  minMonthly: {
+    type: Number,
+    required: true,
+  },
+  maxMonthly: {
+    type: Number,
+    required: true,
+  },
+
 }, { timestamps: true });
 
-
-export default mongoose.model("Room", RoomSchema)
+export default mongoose.model('Room', RoomSchema);

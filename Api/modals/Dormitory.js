@@ -131,7 +131,12 @@ const DormitorySchema = new mongoose.Schema({
         default: true 
     }, // Added 'active' field
 
+    roomTypes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'RoomType',
+    }],
 
-});
+}, { timestamps: true });
+
 
 export default mongoose.model("Dormitory", DormitorySchema)

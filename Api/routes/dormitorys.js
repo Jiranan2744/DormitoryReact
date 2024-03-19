@@ -1,11 +1,15 @@
 import express from "express";
-import {  createDormitory, deleteDormitory, getDormitory, getOptionSelect, getOptions, getallDormitory, saveOptions, saveStatus, updateDormitory } from "../controller/dormitory.js";
+import {  createDormitory, createNewRoom, deleteDormitory, getDormitory, getOptionSelect, getOptions, getRoomType, getallDormitory, saveOptions, saveStatus, updateDormitory } from "../controller/dormitory.js";
 import { verifyToken } from "../utils/verifyToken.js";
 
 const router = express.Router();
 
 //CREATE
 router.post("/", verifyToken, createDormitory);
+
+router.post("/newroom", verifyToken, createNewRoom);
+
+router.get("/viewRoomType/:dormitoryId", verifyToken, getRoomType);
 
 //UPDATE
 router.put("/update/:id", verifyToken, updateDormitory);

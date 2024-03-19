@@ -21,7 +21,7 @@ const Admin = () => {
     const { currentUser } = useSelector((state) => state.user);
     const [showModal, setShowModal] = useState(false);
     const [userId, setUserId] = useState(null);
-    const [currentRole, setCurrentRole] = useState(''); // You need to manage the current role state based on your application logic
+    const [currentRole, setCurrentRole] = useState(''); 
     const [newRole, setNewRole] = useState('');
 
     //รายการผู้ใช้งาน
@@ -55,23 +55,6 @@ const Admin = () => {
             // Display dormitory information
             setUsers([]);
             setDormitorys(data);
-        } catch (error) {
-            setShowListingError(true);
-        }
-    };
-
-    //รายการจอง
-    const handleShowListReserve = async () => {
-        try {
-            setShowListingError(false);
-            const res = await fetch(`/reservation/viewreservation`);
-            const data = await res.json();
-            if (data.success === false) {
-                setShowListingError(true);
-                return;
-            }
-            // Display reservation information
-            setReservations(data); // Assuming data contains reservations, set it to the appropriate state variable.
         } catch (error) {
             setShowListingError(true);
         }
@@ -178,11 +161,7 @@ const Admin = () => {
                                 ข้อมูลหอพัก
                             </Nav.Link>
                         </Nav.Item>
-                        <Nav.Item>
-                            <Nav.Link eventKey={3} onClick={handleShowListReserve}>
-                                ข้อมูลผู้จอง
-                            </Nav.Link>
-                        </Nav.Item>
+
                     </Nav>
                 </Tab.Container>
             </div>
@@ -252,18 +231,15 @@ const Admin = () => {
                                             <td>{user.firstname || 'ไม่พบข้อมูล'}</td>
                                             <td>{user.lastname || 'ไม่พบข้อมูล'}</td>
                                             <td>{user.email || 'ไม่พบข้อมูล'}</td>
-                                            <td>{user.phone || 'ไม่พบข้อมูล'}</td>
+                                            <td>0{user.phone || 'ไม่พบข้อมูล'}</td>
                                             <td>{user.role || 'ไม่พบข้อมูล'}</td>
                                             <td style={{ textAlign: 'center' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    <Button>
-                                                        <FontAwesomeIcon icon={faEdit} />
-                                                        แก้ไขบทบาท
-                                                    </Button>
-                                                    <Button variant="danger" onClick={() => handleDeleteUser(user._id)} style={{ marginLeft: '10px' }}>
-                                                        <FontAwesomeIcon icon={faTrash} />
-                                                        ลบผู้ใช้งาน
-                                                    </Button>
+                                                    <FontAwesomeIcon
+                                                        icon={faTrash}
+                                                        style={{ color: 'red', cursor: 'pointer', display: 'flex', justifyContent: 'center' }}
+                                                        onClick={() => handleDeleteUser(user._id)}
+                                                    />
                                                 </div>
                                             </td>
                                         </tr>
@@ -386,44 +362,9 @@ const Admin = () => {
                         />
                     </label>
                     <br />
-                    {reservations.length > 0 && (
-                        <Table striped bordered hover size="sm" style={{ backgroundColor: '#F2F6FA', maxWidth: '68%', margin: 'auto', textAlign: 'center' }}>
-                            <thead>
-                                <tr style={{ color: '#003580' }}>
-                                    <th>ชื่อหอพัก</th>
-                                    <th>ชื่อผู้จอง</th>
-                                    <th>อีเมล</th>
-                                    <th>เบอร์โทร</th>
-                                    <th>วันที่ - เวลา ที่จอง</th>
-                                    <th>หลักฐานการชำระเงิน</th>
-                                    {/* Add other reservation fields as needed */}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {reservations
-                                    .filter((reservation) =>
-                                        reservation.userId[0].firstname.toLowerCase().includes(reservationSearchTerm.toLowerCase()) ||
-                                        reservation.userId[0].lastname.toLowerCase().includes(reservationSearchTerm.toLowerCase())
-                                    )
-                                    .map((reservation) => (
-                                        <tr key={reservation._id}>
-                                            <td style={{ padding: '4vh' }}>{reservation.dormitoryId && `${reservation.dormitoryId.tname} ${reservation.dormitoryId.ename}`}</td>
-                                            <td style={{ padding: '4vh' }}>{reservation.userId && `${reservation.userId[0].firstname} ${reservation.userId[0].lastname}`}</td>
-                                            <td style={{ padding: '4vh' }}>{reservation.userId && reservation.userId[0].email ? reservation.userId[0].email : 'ไม่พบข้อมูล'}</td>
-                                            <td style={{ padding: '4vh' }}>{reservation.userId && reservation.userId[0].phone ? reservation.userId[0].phone : 'ไม่พบข้อมูล'}</td>
-                                            <td style={{ padding: '4vh' }}>{new Date(reservation.createdAt).toLocaleString()}</td>
-                                            <td>
-                                                {reservation.imagePayment && reservation.imagePayment.map((image, index) => (
-                                                    <a key={index} href={image} target="_blank" rel="noopener noreferrer">
-                                                        <img src={image} alt={`Payment ${index + 1}`} style={{ maxWidth: '100px', maxHeight: '100px', margin: '5px' }} />
-                                                    </a>
-                                                ))}
-                                            </td>
-                                        </tr>
-                                    ))}
-                            </tbody>
-                        </Table>
-                    )}
+
+
+
                 </div>
             )}
 

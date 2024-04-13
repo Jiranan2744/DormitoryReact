@@ -9,6 +9,7 @@ import { Tab, Nav, Button } from 'react-bootstrap';
 import { Form } from 'react-bootstrap';
 
 import axios from 'axios';
+import CustomerReserve from '../../pages/CustomerReserve';
 
 function Reserve() {
 
@@ -167,10 +168,11 @@ function Reserve() {
                         margin: '3vh',
                         textAlign: 'center',
                       }}
-                      to={`/reservation/reserve/owner/${listing._id}`}
+                      to={`/customerreserve/${listing._id}`}
                     >
                       รายการจองของลูกค้า
                     </Link>
+
                   </td>
 
                   <td>

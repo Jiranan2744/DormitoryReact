@@ -1,5 +1,5 @@
 import express from "express";
-import {  createDormitory, createNewRoom, deleteDormitory, getDormitory, getOptionSelect, getOptions, getRoomType, getallDormitory, saveOptions, saveStatus, updateDormitory } from "../controller/dormitory.js";
+import { createDormitory, createNewRoom, deleteDormitory, getDormitory, getDormitoryReserve, getDormitoryReserveDelete, getOptionSelect, getOptions, getRoomType, getallDormitory, saveOptions, saveStatus, updateDormitory } from "../controller/dormitory.js";
 import { verifyToken } from "../utils/verifyToken.js";
 
 const router = express.Router();
@@ -9,7 +9,6 @@ router.post("/", verifyToken, createDormitory);
 
 //สร้างประเภทห้องพัก
 router.post("/newroom", verifyToken, createNewRoom);
-
 
 router.get("/viewRoomType", verifyToken, getRoomType);
 
@@ -21,6 +20,13 @@ router.delete("/delete/:id", verifyToken, deleteDormitory);
 
 //GET ID
 router.get("/find/:id", getDormitory);
+
+//หอพัก ดูไอดีการจอง
+router.get("/find/reserve/:id", getDormitoryReserve);
+
+//ลบลูกค้าออกจากหอพัก
+router.delete("/find/reserve/:id", getDormitoryReserveDelete);
+
 
 //GET ALL
 router.get("/", getallDormitory);

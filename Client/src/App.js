@@ -38,7 +38,7 @@ function App() {
 
           <Route path='/mybooking' element={<Mybooking />} />
 
-          <Route path="/reservation/reserve/owner/:dormitoryId" element={<CustomerReserve />} />
+          <Route path="/customerreserve/:id" element={<CustomerReserve />} />
 
           <Route path="/admin-dashboard" element={<Admin /> } />
 

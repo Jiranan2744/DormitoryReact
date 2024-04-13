@@ -3,7 +3,7 @@ import User from "../modals/User.js";
 import RoomType from "../modals/RoomType.js";
 import Facility from "../modals/Facility.js";
 import { createError } from "../utils/error.js";
-
+import Reservation from "../modals/Reservation.js";
 
 
 export const createDormitory = async (req, res, next) => {
@@ -52,7 +52,7 @@ export const createDormitory = async (req, res, next) => {
 
 export const createNewRoom = async (req, res, next) => {
   try {
-    const userId = req.user.id; 
+    const userId = req.user.id;
     const { dormitoryId, ...roomTypeData } = req.body;
 
     if (!dormitoryId) {
@@ -66,7 +66,7 @@ export const createNewRoom = async (req, res, next) => {
 
     return res.status(201).json({ success: true, message: 'Room type created successfully', roomType });
   } catch (err) {
-    next(err); 
+    next(err);
   }
 };
 
@@ -152,7 +152,6 @@ export const getDormitory = async (req, res, next) => {
     next(err);
   }
 };
-
 
 export const getallDormitory = async (req, res, next) => {
   try {
@@ -291,5 +290,53 @@ export const updateStatus = async (req, res, next) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+
+
+export const getDormitoryReserve = async (req, res, next) => {
+  try {
+    const dormitory = await Dormitory.findById(req.params.id);
+    if (!dormitory) {
+      return res.status(404).json({ message: "Dormitory not found" });
+    }
+
+    // Fetch reservations for the dormitory and populate user details including phoneNumber
+    const reservations = await Reservation.find({ dormitoryId: dormitory._id }).populate('userId', 'firstname lastname phone');
+
+    // Format the response to include user's name (first and last), phone number, reservation date, time, imagePayment, and booking ID
+    const formattedReservations = reservations.map(reservation => ({      
+      reservationId: reservation._id,
+      firstName: reservation.userId[0].firstname,
+      lastName: reservation.userId[0].lastname,
+      phoneNumber: reservation.userId[0].phone,      
+      imagePayment: reservation.imagePayment,
+      date: new Date(reservation.createdAt).toLocaleDateString(),
+      time: new Date(reservation.createdAt).toLocaleTimeString(),
+    }));
+
+    res.status(200).json(formattedReservations);
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+
+export const getDormitoryReserveDelete = async (req, res, next) => {
+  try {
+    const bookingId = req.params.bookingId;
+
+    // Find the reservation by booking ID
+    const reservation = await Reservation.findOneAndDelete({ bookingId });
+
+    if (!reservation) {
+      return res.status(404).json({ message: "Reservation not found" });
+    }
+
+    res.status(200).json({ success: true, message: "Reservation deleted successfully" });
+  } catch (err) {
+    next(err);
   }
 };

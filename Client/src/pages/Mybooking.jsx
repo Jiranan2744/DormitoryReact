@@ -140,7 +140,6 @@ export default function Mybooking() {
           </Button>
         </Modal.Footer>
       </Modal>
-
     </div>
   );
 };

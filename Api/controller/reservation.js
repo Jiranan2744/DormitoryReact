@@ -102,45 +102,12 @@ export const deleteReservationById = async (req, res, next) => {
     if (!deletedReservation) {
       return res.status(404).json({ success: false, message: 'Reservation not found' });
     }
-    
+
     res.status(200).json({ success: true, message: 'Reservation deleted successfully' });
   } catch (error) {
     next(error);
   }
 };
-
-
-
-export const getDormitoryCustomers = async (req, res, next) => {
-  try {
-    const { dormitoryId } = req.params;
-
-    // Fetch reservations for the specified dormitory
-    const reservations = await Reserve.find({ dormitoryId });
-
-    // Extract unique user IDs from reservations
-    const customerIds = Array.from(new Set(reservations.map(reservation => reservation.userId)));
-
-    // Fetch user details including firstname and lastname for each customer
-    const customers = await Promise.all(customerIds.map(async (userId) => {
-      const user = await User.findById(userId).select('firstname lastname');
-      return {
-        userId,
-        dormitoryId,
-        firstname: user.firstname,
-        lastname: user.lastname
-      };
-    }));
-
-    // Respond with the list of users, their firstname, lastname, and corresponding dormitory IDs
-    return res.status(200).json({ success: true, customers });
-  } catch (error) {
-    console.error('Error in fetching dormitory customers:', error);
-    res.status(500).json({ success: false, error: 'Internal Server Error' });
-  }
-};
-
-
 
 
 
@@ -197,5 +164,51 @@ export const getCustomerBooking = async (req, res, next) => {
   } catch (error) {
     console.error('Error in getCustomerBooking:', error);
     next(error);
+  }
+};
+
+
+
+export const getDormitoryCustomers = async (req, res, next) => {
+  try {
+    const { dormitoryId } = req.params;
+
+    // Fetch reservations for the specified dormitory
+    const reservations = await Reserve.find({ dormitoryId });
+
+    // Extract unique user IDs from reservations
+    const customerIds = Array.from(new Set(reservations.map(reservation => reservation.userId)));
+
+    // Fetch user details including firstname and lastname for each customer
+    const customers = await Promise.all(customerIds.map(async (userId) => {
+      const user = await User.findById(userId).select('firstname lastname');
+
+      // Filter reservations for the current user
+      const userReservations = reservations.filter(reservation => reservation.userId === userId);
+
+      // Extract reservation details and dormitory name from each reservation
+      const reservationDetails = await Promise.all(userReservations.map(async (reservation) => {
+        const dormitory = await Dormitory.findById(reservation.dormitoryId).select('name');
+        return {
+          dormitoryName: dormitory.tname,
+          reservationId: reservation._id,
+          bookingDate: reservation.createdAt,
+          bookingTime: reservation.updatedAt
+        };
+      }));
+
+      return {
+        userId,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        reservations: reservationDetails
+      };
+    }));
+
+    // Respond with the list of users, their firstname, lastname, and reservation details including dormitory name
+    return res.status(200).json({ success: true, customers });
+  } catch (error) {
+    console.error('Error in fetching dormitory customers:', error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 };

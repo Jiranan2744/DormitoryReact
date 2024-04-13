@@ -3,6 +3,8 @@ import { createError } from '../utils/error.js';
 import User from "../modals/User.js";
 import Dormitory from "../modals/Dormitory.js";
 import RoomType from '../modals/RoomType.js';
+import Reservation from '../modals/Reservation.js';
+
 
 //เเก้ไขข้อมูลผู้ใช้ (/)
 export const updatedUser = async (req, res, next) => {
@@ -78,6 +80,9 @@ export const getUserListings = async (req, res, next) => {
         next(error);
     }
 };
+
+
+
 
 
 //เจ้าของหอพัก ดูประเภทห้องพักของตัวเอง

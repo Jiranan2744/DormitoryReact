@@ -1,40 +1,38 @@
-import { faEdit, faFileCirclePlus, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import Table from 'react-bootstrap/Table';
-import { Tab, Nav, Button, Modal } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 import Navbar from '../components/navbar/Navbar';
 import axios from 'axios';
+import useFetch from '../hooks/useFetch';
+import { useLocation } from 'react-router-dom';
 
 export default function CustomerReserve() {
-
-    const [bookings, setBookings] = useState([]);
+    const [reservations, setReservations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [reservationIdToDelete, setReservationIdToDelete] = useState(null);
+    const location = useLocation();
+    const id = location.pathname.split("/")[2]; // Get id from URL path
+
+    const { data: dormitoryData } = useFetch(`/dormitorys/find/${id}`); // Fetch dormitory data using id
 
     useEffect(() => {
-        const fetchBookings = async () => {
+        const fetchReservations = async () => {
             try {
-                // Assume you have an authentication system that provides the user's ID
-                const userId = 'user_id_placeholder'; // Replace with the actual user ID
-
-                const response = await axios.get(`/reservation/reserve/customer/${userId}`);
-                setBookings(response.data);
+                const response = await axios.get(`/dormitorys/find/reserve/${id}`);
+                setReservations(response.data);
                 setLoading(false);
             } catch (error) {
-                console.error('Error fetching customer bookings:', error);
+                console.error('Error fetching dormitory reservations:', error);
                 setLoading(false);
             }
         };
 
-        fetchBookings();
-    }, []);
+        if (id) {
+            fetchReservations();
+        }
+    }, [id]);
 
     const handleDelete = async (reservationId) => {
-        // Set the reservation ID to delete and show the modal
         setReservationIdToDelete(reservationId);
         setShowModal(true);
     };
@@ -45,82 +43,61 @@ export default function CustomerReserve() {
                 console.error('Reservation ID to delete is not defined.');
                 return;
             }
-
-            // Send DELETE request to delete the reservation
-            const response = await axios.delete(`/reservation/reservations/${reservationIdToDelete}`);
+    
+            const response = await axios.delete(`/dormitorys/find/reserve/${reservationIdToDelete}`);
             if (response.data.success) {
-                // If successful, remove the deleted reservation from the state
-                setBookings(prevBookings => prevBookings.filter(item => item.reservation._id !== reservationIdToDelete));
+                console.log('Reservation deleted successfully:', reservationIdToDelete);
+                // Optionally update state or refetch reservations
             } else {
-                // Handle error response
                 console.error('Failed to delete reservation:', response.data.message);
             }
         } catch (error) {
-            // Handle network or other errors
             console.error('Error deleting reservation:', error);
         } finally {
-            // Close the modal
-            setShowModal(false);
+            setShowModal(false); // Hide the modal regardless of success or failure
         }
     };
-
-
+    
+    
+    
 
     return (
         <div>
             <Navbar />
-            <div>
+            <div style={{ padding: '20px' }}>
                 {loading ? (
                     <p>Loading...</p>
                 ) : (
                     <div>
-                        {bookings.length === 0 ? (
-                            <p style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                height: '100vh',
-                                margin: 0
-                            }}>ไม่พบการจองของคุณ</p>
-                        ) : (
+                        {reservations.length === 0 ? (
+                            <div style={{ textAlign: 'center', marginTop: '20%' }}>
+                                <p>ไม่พบการจอง</p>
+                            </div>                        ) : (
                             <ul>
-                                {bookings.map((booking) => (
-                                    <li key={booking.reservationId}
-                                        style={{
-                                            listStyleType: 'none',
-                                            borderRadius: '10px',
-                                            textAlign: 'left',
-                                            border: '1px solid #ccc',
-                                            width: '65%',
-                                            padding: '20px',
-                                            marginTop: '40px',
-                                            marginLeft: '35vh',
-                                        }}>
-
-                                        {booking && booking.dormitoryInfo ? (
-                                            <>
-                                                <h3>{booking.dormitoryInfo.name}</h3>
-                                                <p>ที่อยู่หอพัก: {booking.dormitoryInfo.address}</p>
-                                                <p>วันที่จอง: {booking.date}</p>
-                                                <p>เวลาที่จอง: {booking.time}</p>
-                                            </>
-                                        ) : (
-                                            <p>ไม่พบข้อมูลหอพัก</p>
-                                        )}
-                                        {/* Delete button */}
-                                        <Button
-                                            style={{
-                                                backgroundColor: 'red',
-                                                color: 'white',
-                                                padding: '10px',
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                marginTop: '10px',
-                                            }}
-                                            onClick={() => handleDelete(booking.reservationId)} // Pass reservation ID to handleDelete
-                                        >
-                                            ยกเลิกการจอง
-                                        </Button>
+                                {reservations.map((reservation) => (
+                                    <li key={reservation._id} style={{ marginBottom: '20px' }}>
+                                        <div style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px' }}>
+                                            <p>ชื่อ: {reservation.firstName} นามสกุล: {reservation.lastName}</p>
+                                            <p>เบอร์โทร: 0{reservation.phoneNumber}</p>
+                                            <p>วันที่จอง: {reservation.date}</p>
+                                            <p>เวลาที่จอง: {reservation.time}</p>
+                                            <img src={reservation.imagePayment} alt="User Payment" style={{ maxWidth: '200px', maxHeight: '200px' }} />
+                                            <div>
+                                                <Button
+                                                    style={{
+                                                        backgroundColor: 'red',
+                                                        color: 'white',
+                                                        padding: '10px',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        marginTop: '10px',
+                                                    }}
+                                                    onClick={() => handleDelete(reservation.reservationId)} // Pass reservation ID to handleDelete
+                                                >
+                                                    ลบการจอง
+                                                </Button>
+                                            </div>
+                                        </div>
                                     </li>
                                 ))}
                             </ul>
@@ -146,8 +123,6 @@ export default function CustomerReserve() {
                     </Button>
                 </Modal.Footer>
             </Modal>
-
         </div>
     );
-};
-
+}

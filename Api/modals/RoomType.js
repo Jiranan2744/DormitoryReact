@@ -1,34 +1,37 @@
 import mongoose from 'mongoose';
 
 const RoomTypeSchema = new mongoose.Schema({
- 
+
   typeRooms: {
     type: String,
     required: false,
   },
-
   sizeRooms: {
     type: String,
     required: false,
   },
-  minDaily: {
+  minDailys: {
     type: Number,
     required: false,
   },
-  maxDaily: {
+  maxDailys: {
     type: Number,
     required: false,
   },
-  minMonthly: {
+  minMonthlys: {
     type: Number,
     required: false,
   },
-  maxMonthly: {
+  maxMonthlys: {
     type: Number,
     required: false,
   },
 
+  userRef: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+},
 }, { timestamps: true });
-
 
 export default mongoose.model('RoomType', RoomTypeSchema);

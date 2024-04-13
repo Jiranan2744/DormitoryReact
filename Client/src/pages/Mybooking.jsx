@@ -4,21 +4,16 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Table from 'react-bootstrap/Table';
-import { Tab, Nav, Button } from 'react-bootstrap';
+import { Tab, Nav, Button, Modal } from 'react-bootstrap';
 import Navbar from '../components/navbar/Navbar';
 import axios from 'axios';
 
 export default function Mybooking() {
 
-  const dispatch = useDispatch();
-  const { currentUser } = useSelector((state) => state.user);
-
-  const [showListingError, setShowListingError] = useState(false);
-  const [userListings, setUserListings] = useState([]);
-
-
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [reservationIdToDelete, setReservationIdToDelete] = useState(null);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -37,6 +32,33 @@ export default function Mybooking() {
 
     fetchBookings();
   }, []);
+
+  const handleDelete = async (reservationId) => {
+    // Set the reservation ID to delete and show the modal
+    setReservationIdToDelete(reservationId);
+    setShowModal(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      // Send DELETE request to delete the reservation
+      const response = await axios.delete(`/reservation/reservations/${reservationIdToDelete}`);
+      if (response.data.success) {
+        // // If successful, remove the deleted reservation from the state
+        // setBookings(prevBookings => prevBookings.filter(item => item.reservation._id !== reservationIdToDelete));
+      } else {
+        // Handle error response
+        console.error('Failed to delete reservation:', response.data.message);
+      }
+    } catch (error) {
+      // Handle network or other errors
+      console.error('Error deleting reservation:', error);
+    } finally {
+      // Close the modal
+      setShowModal(false);
+    }
+  };
+
 
   return (
     <div>
@@ -57,24 +79,28 @@ export default function Mybooking() {
             ) : (
               <ul>
                 {bookings.map((booking) => (
-                  <li key={booking.reservation._id} 
-                  style={{
-                    listStyleType: 'none',
-                    borderRadius: '10px',
-                    textAlign: 'left',
-                    border: '1px solid #ccc',
-                    width: '65%',
-                    padding: '20px',
-                    marginTop: '40px',
-                    marginLeft: '35vh',
-                  }}>
+                  <li key={booking.reservationId}
+                    style={{
+                      listStyleType: 'none',
+                      borderRadius: '10px',
+                      textAlign: 'left',
+                      border: '1px solid #ccc',
+                      width: '65%',
+                      padding: '20px',
+                      marginTop: '40px',
+                      marginLeft: '35vh',
+                    }}>
 
-                    <h3>{booking.dormitoryInfo.name}</h3>
-                    <p>ที่อยู่หอพัก: {booking.dormitoryInfo.address}</p>
-                    <p>วันที่จอง: {new Date(booking.reservation.createdAt).toLocaleDateString()}</p>
-                    <p>เวลาที่จอง: {new Date(booking.reservation.createdAt).toLocaleTimeString()}</p>
-                    {/* Add more details as needed */}
-
+                    {booking && booking.dormitoryInfo ? (
+                      <>
+                        <h3>{booking.dormitoryInfo.name}</h3>
+                        <p>ที่อยู่หอพัก: {booking.dormitoryInfo.address}</p>
+                        <p>วันที่จอง: {booking.date}</p>
+                        <p>เวลาที่จอง: {booking.time}</p>
+                      </>
+                    ) : (
+                      <p>ไม่พบข้อมูลหอพัก</p>
+                    )}
                     {/* Delete button */}
                     <Button
                       style={{
@@ -85,7 +111,7 @@ export default function Mybooking() {
                         cursor: 'pointer',
                         marginTop: '10px',
                       }}
-                      onClick={() => (booking.reservation._id)}
+                      onClick={() => handleDelete(booking.reservationId)} // Pass reservation ID to handleDelete
                     >
                       ยกเลิกการจอง
                     </Button>
@@ -94,9 +120,27 @@ export default function Mybooking() {
               </ul>
             )}
           </div>
-
         )}
       </div>
+      {/* Modal for confirmation */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>ยกเลิกการจองหอพัก?</Modal.Title>
+
+        </Modal.Header>
+        <Modal.Body>
+          <span>คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการจองนี้? เมื่อยกเลิกเเล้ว โปรดติดต่อเจ้าของหอพัก เพื่อรับเงินค่ามัดจำคืน</span>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            ยกเลิก
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            ยืนยัน
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
     </div>
   );
 };

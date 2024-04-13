@@ -4,6 +4,8 @@ import RoomType from "../modals/RoomType.js";
 import Facility from "../modals/Facility.js";
 import { createError } from "../utils/error.js";
 
+
+
 export const createDormitory = async (req, res, next) => {
   try {
     const { userRef, roomTypes, ...dormitoryData } = req.body;
@@ -12,68 +14,63 @@ export const createDormitory = async (req, res, next) => {
       return res.status(400).json({ error: "userRef is required for dormitory ownership." });
     }
 
+    // Create the dormitory with user reference and other data
     const dormitory = await Dormitory.create({
       userRef,
-      roomTypes: [], // Initialize with an empty array for now
       ...dormitoryData,
     });
 
+    // Update user role to "owner"
     const user = await User.findById(userRef);
     if (user) {
       user.role = "owner";
       await user.save();
     }
 
+    // If roomTypes are provided, associate them with the dormitory
     if (roomTypes && roomTypes.length > 0) {
-      const createdRoomTypes = await Room.create(roomTypes);
+      // Create room types
+      const createdRoomTypes = await Room.create(roomTypes.map(roomType => ({ ...roomType, userRef })));
 
       // Log the created room types
       console.log("Created Room Types:", createdRoomTypes);
 
+      // Map created room types to their IDs and associate them with the dormitory
       dormitory.roomTypes = createdRoomTypes.map(room => room._id);
     }
 
     // Save the updated dormitory with roomTypes
     await dormitory.save();
 
-    return res.status(200).json(dormitory);
+    // Return the saved dormitory
+    return res.status(201).json(dormitory);
   } catch (err) {
     console.error('Error creating dormitory:', err);
     next(err);
   }
 };
 
-
-
 export const createNewRoom = async (req, res, next) => {
   try {
+    const userId = req.user.id; 
+    const { dormitoryId, ...roomTypeData } = req.body;
 
-    // Create a new room type
-    const { dormitoryId, ...roomData } = req.body;
-    const roomType = await RoomType.create({ dormitory: dormitoryId, ...roomData });
-
-    // Example: Assuming you have a criterion to determine the dormitory (replace this with your logic)
-    const { someCriterion } = req.body;
-
-    // Find the dormitory based on the criterion
-    const dormitory = await Dormitory.findOne({ someField: someCriterion });
-
-    if (!dormitory) {
-      return res.status(404).json({ success: false, message: 'Dormitory not found' });
+    if (!dormitoryId) {
+      roomTypeData.dormitory = null;
+    } else {
+      roomTypeData.dormitory = dormitoryId;
     }
 
-    // Add the new room type to the dormitory's roomTypes array
-    dormitory.roomTypes.push(roomType);
+    // Create the new RoomType with the userRef provided
+    const roomType = await RoomType.create({ ...roomTypeData, userRef: userId });
 
-    // Save the dormitory with the updated roomTypes
-    await dormitory.save();
-
-    // Return success response
-    return res.status(200).json({ success: true, message: 'Room created and associated with dormitory successfully', roomType });
+    return res.status(201).json({ success: true, message: 'Room type created successfully', roomType });
   } catch (err) {
-    next(err);
+    next(err); 
   }
 };
+
+
 
 
 export const getRoomType = async (req, res, next) => {
@@ -86,14 +83,14 @@ export const getRoomType = async (req, res, next) => {
 
     if (roomTypes.length > 0) {
       // If there are room types, send the formatted room types as a JSON response
-      const formattedRoomTypes = roomTypes.map(({ _id, typeRooms, sizeRooms, minDaily, maxDaily, minMonthly, maxMonthly }) => ({
+      const formattedRoomTypes = roomTypes.map(({ _id, typeRooms, sizeRooms, minDailys, maxDailys, minMonthlys, maxMonthlys }) => ({
         roomId: _id,
         typeRooms,
         sizeRooms,
-        minDaily,
-        maxDaily,
-        minMonthly,
-        maxMonthly,
+        minDailys,
+        maxDailys,
+        minMonthlys,
+        maxMonthlys,
       }));
       res.status(200).json({ success: true, roomTypes: formattedRoomTypes });
     }
@@ -155,6 +152,7 @@ export const getDormitory = async (req, res, next) => {
     next(err);
   }
 };
+
 
 export const getallDormitory = async (req, res, next) => {
   try {

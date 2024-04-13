@@ -1,5 +1,5 @@
 import express from "express";
-import { deleteUser, updatedUser, getallUser, getUser, getUserListings, toggleDormitoryStatus } from "../controller/user.js";
+import { deleteUser, updatedUser, getallUser, getUser, getUserListings, toggleDormitoryStatus, getUserRoomTypes, getUserDormitoryAndRoomTypeDetails } from "../controller/user.js";
 import { verifyAdmin, verifyToken, verifyUser } from "../utils/verifyToken.js";
 
 const router = express.Router();
@@ -19,24 +19,34 @@ const router = express.Router();
 // })
 
 
-//UPDATE
+//เเก้ไขผู้ใช้งาน
 router.post("/update/:id", verifyToken, updatedUser);
 
-//DELETE
+//ลบผู้ใช้งาน
 router.delete("/:id", verifyToken, deleteUser);
 
-//GET
+//ผู้ใช้งานดูข้อมูลตัวเอง
 router.get("/getuser", verifyUser, getUser);
 
-
-//GET id user ดูว่ามีหอพัก(เจ้าของหอ) เจ้าของหอ ดูหอพักตัวเอง
-router.get('/listing/:id', verifyToken, getUserListings);
-
-//GET ALL
+//ดูผู้ใช้งานทั้งหมด
 router.get("/", verifyAdmin, getallUser);
 
+
+
+
+//เจ้าของหอพัก ดูหอพักของตัวเอง
+router.get('/listing', verifyToken, getUserListings);
+
+//เจ้าของหอพัก ดูประเภทห้องพักของตัวเอง
+router.get('/roomtypes', verifyToken, getUserRoomTypes);
+
+//เเสดงข้อมูลหอพัก-ประเภทห้องพักของตัวเอง
+router.get('/roomtypeDetails', verifyToken, getUserDormitoryAndRoomTypeDetails);
+
+
+
 //open-close
-router.put('/dormitorys/:dormitoryId/toggle-status', toggleDormitoryStatus);
+router.put('/status/:dormitoryId', toggleDormitoryStatus);
 
 
 export default router

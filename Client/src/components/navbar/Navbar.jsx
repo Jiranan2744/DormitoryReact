@@ -42,8 +42,7 @@ const Navbar = () => {
         </Link>
 
         <div className="container">
-          <span className="context">ติดต่อเรา</span>
-          {/* Your other content goes here */}
+          {/* <span className="context">ติดต่อเรา</span> */}
         </div>
 
         <div className="navItems">

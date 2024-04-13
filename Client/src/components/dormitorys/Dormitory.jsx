@@ -14,45 +14,47 @@ function Dormitory() {
         "Loading"
       ) : (
         <div style={{ width: '100%', maxWidth: '1024px' }}> {/* Limit width of content */}
-          {data.map((item, index) => (
-            <Card key={item._id}>
-              <CardBody>
-                <div className="dormitory-details">
-                  <img
-                    src={item.image[0]}
-                    alt=""
-                    className="fpImg"
-                  />
-                  <div style={{ marginLeft: '20px', flex: 1 }}>
-                    <h4 className="fpName" style={{ marginBottom: '10px', marginTop: '0' }}>
-                      <Link to={`/booking/${item._id}`} style={{ color: '#009FE3', fontWeight: 'bold', textDecoration: 'none' }}>{item.tname} {item.ename}</Link> {/* Apply styles inline */}
-                    </h4>
-                    <span className="fpCity" style={{ marginBottom: '5px' }}> {item.street} {item.district} {item.subdistrict} {item.province} {item.code}</span>
+          <div className="dormitory-container"> {/* Container for dormitories */}
+            {data.map((item, index) => (
+              <Card key={item._id} className="dormitory-card"> {/* Set width for each card */}
+                <CardBody>
+                  <div className="dormitory-details">
+                    <img
+                      src={item.image[0]}
+                      alt=""
+                      className="fpImg"
+                    />
+                    <div style={{ marginLeft: '20px', flex: 1 }}>
+                      <h4 className="fpName" style={{ marginBottom: '10px', marginTop: '0' }}>
+                        <Link to={`/booking/${item._id}`} style={{ color: '#009FE3', fontWeight: 'bold', textDecoration: 'none' }}>{item.tname} {item.ename}</Link> {/* Apply styles inline */}
+                      </h4>
+                      <span className="fpCity" style={{ marginBottom: '5px' }}> {item.street} {item.district} {item.subdistrict} {item.province} {item.code}</span>
 
-                    <div className="fpCity">
-                      <span className="fpCity">
-                        รายเดือน:&nbsp;
-                        {item.minMonthly !== null && item.minMonthly !== undefined ? item.minMonthly : "โทรสอบถาม"}
-                        {item.maxMonthly !== null && item.maxMonthly !== undefined ? ` - ${item.maxMonthly}` : ""}
-                      </span>
-                    </div>
+                      <div className="fpCity">
+                        <span className="fpCity">
+                          รายเดือน:&nbsp;
+                          {item.minMonthly !== null && item.minMonthly !== undefined ? item.minMonthly : "โทรสอบถาม"}
+                          {item.maxMonthly !== null && item.maxMonthly !== undefined ? ` - ${item.maxMonthly}` : ""}
+                        </span>
+                      </div>
 
-                    <div>
-                      <span className="fpCity">
-                        วันที่ประกาศ: {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "-"}
-                      </span>
-                    </div>
-                    <br />
-                    <div>
-                      <Link to={`/booking/${item._id}`}>
-                        <button className='btn btn-success'> รายละเอียด </button>
-                      </Link>
+                      <div>
+                        <span className="fpCity">
+                          วันที่ประกาศ: {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "-"}
+                        </span>
+                      </div>
+                      <br />
+                      <div>
+                        <Link to={`/booking/${item._id}`}>
+                          <button className='btn btn-success'> รายละเอียด </button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardBody>
-            </Card>
-          ))}
+                </CardBody>
+              </Card>
+            ))}
+          </div>
         </div>
       )}
     </div>

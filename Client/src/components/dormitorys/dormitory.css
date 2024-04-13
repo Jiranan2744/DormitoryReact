@@ -1,46 +1,52 @@
-.fp {
-    width: 100%;
-    max-width: 1024px;
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
+/* dormitory.css */
+.dormitory-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.dormitory-card {
+  width: calc(50% - 10px); /* Set width for each card (minus margin) */
+  margin: 5px; /* Add margin between cards */
+  margin-top: 5px; /* Remove margin from top */
 }
 
 .fpImg {
-    width: 250px; /* Set width for the image */
-    height: auto; /* Maintain aspect ratio */
-    object-fit: cover;
+  width: 40%; /* Set width of the image to 40% of the container */
+  height: auto; /* Maintain aspect ratio */
+  object-fit: cover;
 }
 
 .fpDetails {
-    flex: 1; /* Allow text details to take remaining space */
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  flex: 1; /* Allow text details to take remaining space */
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .fpName {
   color: #003580;
   font-weight: bold;
-  margin: auto 0; /* Center horizontally */
+  margin: 0; /* Remove auto margins */
 }
 
 .fpCity, .fpPrice {
-  margin: auto 0; /* Center horizontally */
-    font-weight: 300;
+  font-weight: 300;
+  margin: 0; /* Remove auto margins */
 }
 
 .siCheckButton {
-    background-color: #0071c2;
-    color: white;
-    padding: 10px 5px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
+  background-color: #0071c2;
+  color: white;
+  padding: 10px 5px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
 .dormitory-details {
   gap: 10px;
   display: flex;
-  align-items: stretch; /* Adjust alignment */
+  align-items: center; /* Adjust alignment */
+  width: 100%; /* Ensure the details take full width */
 }

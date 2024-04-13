@@ -12,28 +12,31 @@ import axios from 'axios';
 
 function Reserve() {
 
+
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
   const [showListingError, setShowListingError] = useState(false);
   const [userListings, setUserListings] = useState([]);
 
+
+  //จขห. ดูหอพักที่ลงประกาศ
   const handleShowList = async () => {
     try {
       setShowListingError(false);
-  
-      const res = await fetch(`/users/listing/${currentUser._id}`);
-      
+
+      const res = await fetch(`/users/listing`);
+
       const data = await res.json();
-        if (data.success === false) {
+      if (data.success === false) {
         setShowListingError(true);
         return;
       }
-        setUserListings(data);
+      setUserListings(data);
     } catch (error) {
       setShowListingError(true);
     }
   };
-  
+
 
   const handleListDelete = async (listingId) => {
     try {
@@ -52,30 +55,19 @@ function Reserve() {
     }
   };
 
+
+
   //open-close หอพัก
   const [dormitoryId, setDormitoryId] = useState(null);
   const [reservationOpen, setReservationOpen] = useState(false);
   const [listings, setListings] = useState([]);
   const navigate = useNavigate(); // Use the useNavigate hook instead of useHistory
 
-  useEffect(() => {
-    // Fetch dormitory listings when the component mounts
-    const fetchListings = async () => {
-      try {
-        const response = await axios.get('/dormitorys');
-        setListings(response.data);
-      } catch (error) {
-        console.error('Error fetching dormitory listings:', error);
-      }
-    };
-
-    fetchListings();
-  }, []);
 
   const handleToggleReservations = async (dormitoryId) => {
     try {
       // Toggle the reservations status for the specific dormitory
-      await axios.put(`/users/dormitorys/${dormitoryId}/toggle-status`);
+      await axios.put(`/users/status/${dormitoryId}`);
       // Additional actions for toggling reservations for the specific dormitoryId
       setListings((prevListings) =>
         prevListings.map((dormitory) =>
@@ -142,8 +134,6 @@ function Reserve() {
                   คลิกที่นี่ เพื่อดูรายการประกาศหอพัก
                 </Nav.Link>
               </Nav.Item>
-
-
             </div>
           )}
         </div>
@@ -335,23 +325,25 @@ function Reserve() {
 
                   <td style={{ textAlign: 'center' }}>
                     <div>
-                      {listings.map((dormitory) => (
-                        <tr key={dormitory._id}>
-                          <td style={{ textAlign: 'center' }}>
-                            <p style={{ textAlign: 'center' }}>สถานะหอพัก: {dormitory.active ? 'เปิด' : 'ปิด'}</p>
-                          </td>
-                          <td style={{ textAlign: 'center', padding: '1px' }}>
-                            <Form.Check
-                              type="switch"
-                              id={`custom-switch-${dormitory._id}`}
-                              label=""
-                              style={{ display: 'flex', justifyContent: 'center', padding: '20px', marginLeft: '25px' }}
-                              checked={dormitory.active}
-                              onChange={() => handleToggleReservations(dormitory._id)}
-                            />
-                          </td>
-                        </tr>
-                      ))}
+                      <tr>
+                        {listings.map((dormitory) => (
+                          <React.Fragment key={dormitory._id}>
+                            <td style={{ textAlign: 'center' }}>
+                              <p style={{ textAlign: 'center' }}>สถานะหอพัก: {dormitory.active ? 'เปิด' : 'ปิด'}</p>
+                            </td>
+                            <td style={{ textAlign: 'center', padding: '1px' }}>
+                              <Form.Check
+                                type="switch"
+                                id={`custom-switch-${dormitory._id}`}
+                                label=""
+                                style={{ display: 'flex', justifyContent: 'center', padding: '20px', marginLeft: '25px' }}
+                                checked={dormitory.active}
+                                onChange={() => handleToggleReservations(dormitory._id)}
+                              />
+                            </td>
+                          </React.Fragment>
+                        ))}
+                      </tr>
                     </div>
                   </td>
 

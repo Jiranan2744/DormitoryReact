@@ -4,12 +4,14 @@ import { verifyToken } from "../utils/verifyToken.js";
 
 const router = express.Router();
 
-//CREATE
+//สร้างหอพัก
 router.post("/", verifyToken, createDormitory);
 
+//สร้างประเภทห้องพัก
 router.post("/newroom", verifyToken, createNewRoom);
 
-router.get("/viewRoomType/:dormitoryId", verifyToken, getRoomType);
+
+router.get("/viewRoomType", verifyToken, getRoomType);
 
 //UPDATE
 router.put("/update/:id", verifyToken, updateDormitory);

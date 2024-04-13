@@ -14,7 +14,7 @@ function Header() {
           <button className="headerButton">ลงทะเบียนหอพักฟรี</button>
         </Link>
         <br /><br />
-        <div className="headerSearch">
+        {/* <div className="headerSearch">
           <div className="headerSearchItem">
             <input type="text"
               placeholder="Search"
@@ -34,7 +34,7 @@ function Header() {
           <div className="headerSearchItem">
             <button className="headerBtn">Search</button>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   )

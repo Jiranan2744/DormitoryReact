@@ -6,9 +6,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCamera,
   faChair,
-  faCircleArrowLeft,
-  faCircleArrowRight,
-  faCircleXmark,
   faComment,
   faCut,
   faDumbbell,
@@ -16,7 +13,6 @@ import {
   faFan,
   faFingerprint,
   faLocationDot,
-  faLock,
   faMotorcycle,
   faPaw,
   faPhone,
@@ -38,7 +34,6 @@ import { GrUserPolice } from "react-icons/gr";
 import { GiKeyCard } from "react-icons/gi";
 
 import Navbar from "../../components/navbar/Navbar";
-
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
@@ -46,9 +41,6 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import axios from 'axios';
 import QRCode from 'qrcode.react';
-
-import { FaPhone } from 'react-icons/fa'; // Importing the phone icon from react-icons library
-
 
 import { app } from '../../firebase';
 import {
@@ -102,10 +94,22 @@ const Booking = () => {
 
   const navigate = useNavigate()
 
+  const [errorMessage, setErrorMessage] = useState('');
+
   const nextProcess = () => {
-    setqrCode(generatePayload(data.phone, { amount }));
-    setStep((prevStep) => prevStep + 1);
-  }
+    // Check if a room type is selected
+    if (selectedRoomTypeIndex !== null) {
+      // Proceed to the next step
+      setqrCode(generatePayload(data.phone, { amount }));
+      setStep((prevStep) => prevStep + 1);
+      // Clear any previous error message
+      setErrorMessage("");
+    } else {
+      // If no room type is selected, display an error message
+      setErrorMessage("กรุณาเลือกประเภทห้องพัก");
+    }
+  };
+
 
   useEffect(() => {
     axios.get("/users/getuser").then((data) => {
@@ -163,21 +167,23 @@ const Booking = () => {
   };
 
 
-  //เพิ่มประเภทห้องพัก
+  //ดูประเภทห้องพัก
   const [roomTypesList, setRoomTypesList] = useState([]);
 
   useEffect(() => {
     const fetchRoomTypes = async () => {
       try {
-        const response = await fetch(`/dormitorys/viewRoomType/${dormitoryId}`);
+        const response = await fetch(`/users/roomtypeDetails`);
         if (response.ok) {
           const data = await response.json();
           setRoomTypesList(data.roomTypes);
         } else {
           console.error('Failed to fetch room types');
         }
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching room types:', error);
+        setLoading(false);
       }
     };
 
@@ -216,20 +222,18 @@ const Booking = () => {
     });
   };
 
-
   const getDormitoryId = () => {
     const pathArray = window.location.pathname.split('/');
     const dormId = pathArray[pathArray.length - 1];
-
     return dormId;
   };
 
   // ยืนยันการจอง
-
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const handleCloseModal = () => setShow(false);
   const handleCloseSuccessPopup = () => setShowSuccessPopup(false);
   const nextProcessModal = () => setStep(step + 1);
+  const [showModal, setShowModal] = useState(false);
 
   const handleReservationSuccess = async (e) => {
     e.preventDefault();
@@ -238,15 +242,19 @@ const Booking = () => {
       setError(false);
 
       if (formData.imagePayment.length === 0) {
-        alert("Please attach a payment picture before confirming the reservation.");
+        setShowModal(true);
         setLoading(false);
+
+        // Automatically close the modal after 10 seconds
+        setTimeout(() => {
+          setShowModal(false);
+        }, 10000); // 10000 milliseconds = 10 seconds
+
         return;
       }
 
       const imagePayment = formData.imagePayment;
-
       const dormId = getDormitoryId();
-
       const userId = currentUser._id;
 
       const res = await fetch(`/reservation/reserve`, {
@@ -278,16 +286,13 @@ const Booking = () => {
     }
   };
 
-
   const [facilities, setFacilities] = useState([]);
   const [dormitoryId, setDormitoryId] = useState();
 
   useEffect(() => {
-    // Fetch facilities data from your API
     fetch(`/dormitorys/optionselect/${params.id}`)
       .then(response => response.json())
       .then(data => {
-        // Ensure data is an array before setting the state
         if (Array.isArray(data)) {
           setFacilities(data);
         }
@@ -295,23 +300,18 @@ const Booking = () => {
       .catch(error => console.error('Error fetching facilities:', error));
   }, [dormitoryId]);
 
-
   const [isDormitoryOpen, setIsDormitoryOpen] = useState(true);
 
   const handleShow = () => {
     if (isDormitoryOpen) {
-      // Dormitory is open, handle the logic for showing the reservation details or navigating to the reservation page
-      // You can replace this with your actual logic
       console.log('Redirecting to reservation page...');
-      // Add logic to show the modal if needed
       setShow(true);
     } else {
-      // Dormitory is closed, display a message to the user
       alert('The dormitory is currently closed or full. Reservations are not available.');
     }
   };
 
-
+  //สถานะห้องพัก
   useEffect(() => {
     const fetchDormitoryStatus = async () => {
       try {
@@ -326,7 +326,17 @@ const Booking = () => {
     fetchDormitoryStatus();
   }, [dormitoryId]);
 
-  //#FEBA02
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [rooms, setRooms] = useState([]);
+
+  const [selectedRoomTypeIndex, setSelectedRoomTypeIndex] = useState(null);
+
+  const handleRoomTypeSelection = (index) => {
+    setSelectedRoomTypeIndex(index);
+    const selectedRoomType = roomTypesList[index]?.typeRooms; // Retrieve the name of the selected room type
+    console.log('Selected Room Type Index:', index, selectedRoomType);
+  };
+
 
   return (
     <div>
@@ -371,16 +381,12 @@ const Booking = () => {
                 }
               </div> */}
             </div>
-
-
-
             <br />
             {/* Image */}
             <div className="hotelImages">
               {data.image?.map((images, i) => (
                 <div className="hotelImgWrapper" key={i}>
                   <img
-                    // onClick={() => handleOpen(i)}
                     src={images}
                     alt=""
                     className="hotelImg"
@@ -403,8 +409,8 @@ const Booking = () => {
                     </thead>
                     <tbody style={{ textAlign: 'center' }}>
                       <tr>
-                        <td>{data.typeRooms !== null && data.typeRooms !== undefined ? data.typeRooms : "-"}</td>
-                        <td>{data.sizeRooms !== null && data.sizeRooms !== undefined ? data.sizeRooms : "-"}</td>
+                        <td>{data.typeRoom !== null && data.typeRoom !== undefined ? data.typeRoom : "-"}</td>
+                        <td>{data.sizeRoom !== null && data.sizeRoom !== undefined ? data.sizeRoom : "-"}</td>
                         <td>
                           {
                             (data.minDaily !== null && data.minDaily !== undefined && data.maxDaily !== null && data.maxDaily !== undefined)
@@ -421,19 +427,20 @@ const Booking = () => {
                               ? `${data.minMonthly} - ${data.maxMonthly}`
                               : (data.minMonthly !== undefined || data.maxMonthly !== undefined)
                                 ? `${data.minMonthly || ''}  ${data.maxMonthly || ''}`
-                                : ""
+                                : "-"
                           }
                         </td>
                       </tr>
                     </tbody>
 
+                    {/* New Room */}
                     <tbody style={{ textAlign: 'center' }}>
-                      {roomTypesList.map((data, index) => (
-                        <tr key={index}>
-                          <td>{data.typeRooms !== null && data.typeRooms !== undefined ? data.typeRooms : "-"}</td>
-                          <td>{data.sizeRooms !== null && data.sizeRooms !== undefined ? data.sizeRooms : "-"}</td>
-                          <td>{data.minDaily !== null && data.minDaily !== undefined && data.maxDaily !== null && data.maxDaily !== undefined ? `${data.minDaily} - ${data.maxDaily}` : "-"}</td>
-                          <td>{data.minMonthly !== null && data.minMonthly !== undefined && data.maxMonthly !== null && data.maxMonthly !== undefined ? `${data.minMonthly} - ${data.maxMonthly}` : "-"}</td>
+                      {roomTypesList.map(roomType => (
+                        <tr key={roomType.roomId}>
+                          <td>{roomType.typeRooms !== null && roomType.typeRooms !== undefined ? roomType.typeRooms : "-"}</td>
+                          <td>{roomType.sizeRooms !== null && roomType.sizeRooms !== undefined ? roomType.sizeRooms : "-"}</td>
+                          <td>{roomType.minDailys !== null && roomType.minDailys !== undefined && roomType.maxDailys !== null && roomType.maxDailys !== undefined ? `${roomType.minDailys} - ${roomType.maxDailys}` : "-"}</td>
+                          <td>{roomType.minMonthlys !== null && roomType.minMonthlys !== undefined && roomType.maxMonthlys !== null && roomType.maxMonthlys !== undefined ? `${roomType.minMonthlys} - ${roomType.maxMonthlys}` : "-"}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -478,12 +485,11 @@ const Booking = () => {
                         </div>
                       ))}
                     </div>
-
-
                     <div className="" style={{ margin: '10px', padding: '10px', border: '1px solid #ccc', borderRadius: '8px' }}>
                       <h1 style={{ fontSize: '24px', marginBottom: '10px' }}>รายละเอียด</h1>
                       <span style={{ fontSize: '16px', color: '#333' }}>{data.description}</span>
                     </div>
+                    <br />
                   </div>
                 </div>
               </div>
@@ -501,17 +507,9 @@ const Booking = () => {
                     <tr>
                       <td>เงินประกัน: {data.insurance !== null && data.insurance !== undefined ? `${data.insurance} บาท` : "โทรสอบถาม"}</td>
                     </tr>
+
                     <tr>
-                      <td>
-                        ค่ามัดจำ: {data.advance !== null && data.advance !== undefined ? (
-                          <div>
-                            {data.advance} บาท
-                            {data.advance !== null && data.advance !== undefined && <p>ล่วงหน้า 1 เดือน</p>}
-                          </div>
-                        ) : (
-                          "โทรสอบถาม"
-                        )}
-                      </td>
+                      <td>ค่ามัดจำ: {data.advance !== null && data.advance !== undefined ? `${data.advance} บาท` : "โทรสอบถาม"}</td>
                     </tr>
                     <tr>
                       <td>ค่าส่วนกลาง: {data.service !== null && data.service !== undefined ? `${data.service} บาท` : "โทรสอบถาม"}</td>
@@ -557,36 +555,34 @@ const Booking = () => {
                           <Form.Label style={{ display: 'flex', fontWeight: 'bold', fontSize: '20px', color: '#003580' }}>ประเภทห้องพัก</Form.Label>
                           <Form>
                             <Row>
-                              <Form.Control
-                                type="text"
-                                style={{ marginLeft: '10px', width: '30%', height: '5vh' }}
-                                placeholder={`ห้องพัก: ${data.typeRooms !== null && data.typeRooms !== undefined ? data.typeRooms : "-"}`}
-                                aria-label="Disabled input example"
-                                disabled
-                                readOnly
-                              />
+                              <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                                <Row>
+                                  <Col md={4} style={{ marginBottom: '10px' }}>
+                                    <Form.Select
+                                      style={{ width: '130%', padding: '10px', border: '1px solid #007bff', borderRadius: '8px' }}
+                                      onChange={(e) => handleRoomTypeSelection(e.target.value)}
+                                      value={selectedRoomTypeIndex}
+                                    >
+                                      <option value="">เลือกประเภทห้องพัก</option>
+                                      {roomTypesList.map((roomType, index) => (
+                                        <option key={index} value={index}>{roomType.typeRooms}</option>
+                                      ))}
+                                    </Form.Select>
+                                  </Col>
+                                </Row>
+                                {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+                              </Form.Group>
 
-                              <Col>
-                                <Form.Control
-                                  type="text"
-                                  style={{ marginLeft: '20px', width: '55%', height: '5vh' }}
-                                  placeholder={`ขนาดห้องพัก: ${data.sizeRooms !== null && data.sizeRooms !== undefined ? data.sizeRooms : "-"}`}
-                                  aria-label="Disabled input example"
-                                  disabled
-                                  readOnly
-                                />
-
-                              </Col>
                               <br /><br />
                               <Row>
-                                <Form.Control
+                                {/* <Form.Control
                                   type="text"
                                   style={{ marginLeft: '10px', width: '32%', height: '5vh' }}
                                   placeholder={`ค่ามัดจำ: ${data.advance !== null && data.advance !== undefined ? data.advance : "-"}`}
                                   aria-label="Disabled input example"
                                   disabled
                                   readOnly
-                                />
+                                /> */}
                               </Row>
                             </Row>
                           </Form>
@@ -664,16 +660,27 @@ const Booking = () => {
                         </Button>
                       )}
                     </Modal.Footer>
+                    <Modal
+                      show={showModal}
+                      onHide={() => setShowModal(false)}
+                      dialogClassName="modal-position"
+                    >
+                      <Modal.Body style={{ display: 'flex', justifyContent: 'center', color: '#FF4B54' }}>
+                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          กรุณาแนบหลักฐานการชำระเงิน เพื่อยืนยันการจองหอพัก
+                        </span>
+                      </Modal.Body>
+                    </Modal>
                   </Modal.Body>
                 </Modal>
               </div>
 
               <Modal show={showSuccessPopup} onHide={handleCloseSuccessPopup} centered>
                 <Modal.Header closeButton>
-                  <Modal.Title>Success</Modal.Title>
+                  <Modal.Title>การจองสำเร็จ</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                  การจองสำเร็จแล้ว
+                  คุณสามารถไปที่หน้า รายการจองหอพัก เพื่อดูรายการจองของคุณ
                 </Modal.Body>
                 <Modal.Footer>
                   <Button variant="secondary" onClick={handleCloseSuccessPopup}>
@@ -681,7 +688,6 @@ const Booking = () => {
                   </Button>
                 </Modal.Footer>
               </Modal>
-
             </div>
           </div>
         </div>

@@ -31,9 +31,6 @@ router.get("/getuser", verifyUser, getUser);
 //ดูผู้ใช้งานทั้งหมด
 router.get("/", verifyAdmin, getallUser);
 
-
-
-
 //เจ้าของหอพัก ดูหอพักของตัวเอง
 router.get('/listing', verifyToken, getUserListings);
 

@@ -202,43 +202,23 @@ export default function Formdorm() {
   const currentUserDormitoryId = currentUser.dormitoryId;
   const [roomTypesList, setRoomTypesList] = useState([]);
 
-  const handleSaveRoom = async () => {
+  const handleSaveRoom = () => {
     try {
-
       // Update the UI with the entered room data
       setRooms([...rooms, newRoomData]);
 
-      // Send a POST request to create a new room
-      const res = await fetch('/dormitorys/newroom', { // Assuming '/api/createNewRoom' is the endpoint to create a new room
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          dormitoryId: currentUserDormitoryId,
-          ...newRoomData,
-        }),
+      // Reset the form fields
+      setNewRoomData({
+        typeRooms: '',
+        sizeRooms: '',
+        minDailys: '',
+        maxDailys: '',
+        minMonthlys: '',
+        maxMonthlys: '',
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        // If the room is successfully created, update the UI
-        setNewRoomData({
-          typeRooms: '',
-          sizeRooms: '',
-          minDailys: '',
-          maxDailys: '',
-          minMonthlys: '',
-          maxMonthlys: '',
-        });
-
-        // Close the modal
-        setShowModal(false);
-      } else {
-        // Handle error messages if needed
-        console.error('Error saving room data:', data.message);
-      }
+      // Close the modal
+      setShowModal(false);
     } catch (error) {
       console.error('Error saving room data:', error);
       // Handle error messages if needed
@@ -281,6 +261,34 @@ export default function Formdorm() {
     setRooms(updatedRooms);
   };
 
+
+  const [selectedWaterOption, setSelectedWaterOption] = useState([]);
+  const [selectedElectricityOption, setSelectedElectricityOption] = useState([]);
+
+  // Separate change handlers for water and electricity bill checkboxes
+  const handleWaterCheckboxChange = (option) => {
+    setSelectedWaterOption((prevOptions) => {
+      if (prevOptions.includes(option)) {
+        // If the option is already selected, remove it
+        return prevOptions.filter((item) => item !== option);
+      } else {
+        // If the option is not selected, add it
+        return [...prevOptions, option];
+      }
+    });
+  };
+
+  const handleElectricityCheckboxChange = (option) => {
+    setSelectedElectricityOption((prevOptions) => {
+      if (prevOptions.includes(option)) {
+        // If the option is already selected, remove it
+        return prevOptions.filter((item) => item !== option);
+      } else {
+        // If the option is not selected, add it
+        return [...prevOptions, option];
+      }
+    });
+  };
 
 
   return (
@@ -550,9 +558,9 @@ export default function Formdorm() {
                                     <option value="เลือกห้องพัก">เลือกห้องพัก</option>
                                     <option value="สูท">ห้องสูท</option>
                                     <option value="สตูดิโอ">ห้องสตูดิโอ</option>
-                                    <option value="1 ห้อง">1 ห้องนอน</option>
-                                    <option value="2 ห้อง">2 ห้องนอน</option>
-                                    <option value="3 ห้อง">3 ห้องนอน</option>
+                                    <option value="1 ห้องนอน">1 ห้องนอน</option>
+                                    <option value="2 ห้องนอน">2 ห้องนอน</option>
+                                    <option value="3 ห้องนอน">3 ห้องนอน</option>
                                   </FormSelect>
                                 </InputGroup>
                               </td>
@@ -731,8 +739,8 @@ export default function Formdorm() {
                                 id="typeRooms"
                                 className="form-control"
                                 onChange={(e) => setNewRoomData({ ...newRoomData, typeRooms: e.target.value })}
-                                value={newRoomData.typeRooms}
-                              >
+                                value={formData.typeRoom}
+                                >
                                 <option value="เลือกห้องพัก">เลือกห้องพัก</option>
                                 <option value="ห้องสูท">ห้องสูท</option>
                                 <option value="ห้องสตูดิโอ">ห้องสตูดิโอ</option>
@@ -843,11 +851,7 @@ export default function Formdorm() {
                         </Button>
                       </Modal.Footer>
                     </Modal>
-
-
                   </div>
-
-
 
                   <br /><br />
 
@@ -870,11 +874,19 @@ export default function Formdorm() {
                       />
                       <InputGroup.Text id="basic-addon2">บาท/ยูนิต</InputGroup.Text>
                     </InputGroup>
-                    <Form.Label column sm={5} style={{ width: '50vh' }}>
-                      ตามยูนิตที่ใช้ หรือตามที่การประปากำหนด
-                    </Form.Label>
-                  </Form.Group>
+                    <Form.Group controlId="unitUsageOrWaterSpecification">
+                      <Col sm={7} className="text-right" style={{ marginLeft: '10vh', marginTop: '2vh' }}> {/* Remove padding */}
+                        <Form.Check
+                          type="checkbox"
+                          label="ตามยูนิตที่ใช้ ราคาต่อยูนิตตามที่การประปากำหนด"
+                          checked={selectedWaterOption.includes('unitUsage')}
+                          onChange={() => handleWaterCheckboxChange('unitUsage')}
+                        />
+                      </Col>
 
+                    </Form.Group>
+                  </Form.Group>
+                  <br />
                   <Form.Group as={Row} className="m-2" controlId="formHorizontalEmail">
                     <Form.Label column sm={5} style={{ width: '10vh', fontWeight: 'normal', color: '#666666' }}>
                       ค่าไฟ
@@ -890,10 +902,18 @@ export default function Formdorm() {
                       />
                       <InputGroup.Text id="basic-addon2">บาท/ยูนิต</InputGroup.Text>
                     </InputGroup>
-                    <Form.Label column sm={5} style={{ width: '50vh' }}>
-                      ตามยูนิตที่ใช้ หรือตามที่การไฟฟ้ากำหนด
-                    </Form.Label>
+                    <Form.Group controlId="unitUsageOrWaterSpecification">
+                      <Col sm={7} className="text-right" style={{ marginLeft: '10vh', marginTop: '2vh' }}> {/* Remove padding */}
+                        <Form.Check
+                          type="checkbox"
+                          label="ตามยูนิตที่ใช้ ราคาต่อยูนิตตามที่การไฟฟ้ากำหนด"
+                          checked={selectedElectricityOption.includes('unitUsage')}
+                          onChange={() => handleElectricityCheckboxChange('unitUsage')}
+                        />
+                      </Col>
+                    </Form.Group>
                   </Form.Group>
+
 
                   <hr style={{ marginTop: '20px', marginBottom: '20px', borderColor: '#D4D4D4' }} />
 
@@ -1097,8 +1117,8 @@ export default function Formdorm() {
 
                     <div style={{ fontSize: '16px', width: '145vh' }}>
                       <p>
-                        ในการลงประกาศจองหอพักเว็บ Dormitory RMUTT คุณยืนยันว่าได้อ่านข้อตกลงพร้อมทั้งยอมรับและตกลงจะปฏิบัติตามข้อตกลงดังกล่าว
-                        อย่างเคร่งครัด พร้อมทั้งคุณยอมรับให้ทีมงานลงประกาศตามที่คุณได้ลงรายละเอียดไว้ ณ ที่นี้
+                        ในการลงประกาศหอพักบนเว็บ Dormitory RMUTT คุณยินดีที่จะเผยเเพร่ข้อมูลดังกล่าว
+                        พร้อมทั้งยอมรับให้ทีมงานลงประกาศตามที่คุณได้ลงรายละเอียดไว้ ณ ที่นี้ หากทีมงานพบการกระทำที่ไม่เหมาะสม ทางทีมงานจะลบประกาศหอพักของคุณโดยไม่เเจ้งให้ทราบล่วงหน้า 
                       </p>
                     </div>
                   </Form.Label>

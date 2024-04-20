@@ -55,20 +55,29 @@ export const createNewRoom = async (req, res, next) => {
     const userId = req.user.id;
     const { dormitoryId, ...roomTypeData } = req.body;
 
-    if (!dormitoryId) {
-      roomTypeData.dormitory = null;
-    } else {
-      roomTypeData.dormitory = dormitoryId;
+    // Find the dormitory document associated with the user reference
+    const dormitory = await Dormitory.findOne({ userRef: userId });
+
+    if (!dormitory) {
+      return res.status(404).json({ success: false, message: 'No dormitory found for the user' });
     }
 
     // Create the new RoomType with the userRef provided
     const roomType = await RoomType.create({ ...roomTypeData, userRef: userId });
 
-    return res.status(201).json({ success: true, message: 'Room type created successfully', roomType });
+    // Update the Dormitory document to associate the newly created room type
+    const updatedDormitory = await Dormitory.findByIdAndUpdate(
+      dormitory._id,
+      { $push: { roomTypes: roomType._id } },
+      { new: true }
+    );
+
+    return res.status(201).json({ success: true, message: 'Room type created and associated with dormitory successfully', roomType, updatedDormitory });
   } catch (err) {
     next(err);
   }
 };
+
 
 
 

@@ -10,6 +10,8 @@ router.post("/", verifyToken, createDormitory);
 //สร้างประเภทห้องพัก
 router.post("/newroom", verifyToken, createNewRoom);
 
+
+
 router.get("/viewRoomType", verifyToken, getRoomType);
 
 //UPDATE
@@ -26,7 +28,6 @@ router.get("/find/reserve/:id", getDormitoryReserve);
 
 //ลบลูกค้าออกจากหอพัก
 router.delete("/find/reserve/:id", getDormitoryReserveDelete);
-
 
 //GET ALL
 router.get("/", getallDormitory);

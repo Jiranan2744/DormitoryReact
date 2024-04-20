@@ -43,7 +43,7 @@ export default function CustomerReserve() {
                 console.error('Reservation ID to delete is not defined.');
                 return;
             }
-    
+
             const response = await axios.delete(`/dormitorys/find/reserve/${reservationIdToDelete}`);
             if (response.data.success) {
                 console.log('Reservation deleted successfully:', reservationIdToDelete);
@@ -57,42 +57,50 @@ export default function CustomerReserve() {
             setShowModal(false); // Hide the modal regardless of success or failure
         }
     };
-    
-    
-    
 
     return (
         <div>
             <Navbar />
-            <div style={{ padding: '20px' }}>
+            <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
                 {loading ? (
                     <p>Loading...</p>
                 ) : (
                     <div>
                         {reservations.length === 0 ? (
-                            <div style={{ textAlign: 'center', marginTop: '20%' }}>
+                            <div style={{ textAlign: 'center', marginTop: '40vh' }}>
                                 <p>ไม่พบการจอง</p>
-                            </div>                        ) : (
-                            <ul>
+                            </div>
+                        ) : (
+                            <ul style={{ listStyle: 'none', padding: 0 }}>
                                 {reservations.map((reservation) => (
                                     <li key={reservation._id} style={{ marginBottom: '20px' }}>
-                                        <div style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px' }}>
-                                            <p>ชื่อ: {reservation.firstName} นามสกุล: {reservation.lastName}</p>
-                                            <p>เบอร์โทร: 0{reservation.phoneNumber}</p>
-                                            <p>วันที่จอง: {reservation.date}</p>
-                                            <p>เวลาที่จอง: {reservation.time}</p>
-                                            <img src={reservation.imagePayment} alt="User Payment" style={{ maxWidth: '200px', maxHeight: '200px' }} />
-                                            <div>
+                                        <div key={reservation._id} style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <div style={{ textAlign: 'left', marginRight: '20px' }}>
+                                                    <p>ชื่อ: {reservation.firstName}</p>
+                                                    <p>นามสกุล: {reservation.lastName}</p>
+                                                    <p>เบอร์โทร: 0{reservation.phoneNumber}</p>
+                                                    <p>วันที่จอง: {reservation.date}</p>
+                                                    <p>เวลาที่จอง: {reservation.time}</p>
+                                                </div>
+                                                <div>
+                                                    <img
+                                                        src={reservation.imagePayment}
+                                                        alt="User Payment"
+                                                        style={{ maxWidth: '200px', maxHeight: '200px' }}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div style={{ textAlign: 'right', marginLeft: '20px' }}>
                                                 <Button
                                                     style={{
-                                                        backgroundColor: 'red',
                                                         color: 'white',
                                                         padding: '10px',
                                                         border: 'none',
                                                         cursor: 'pointer',
                                                         marginTop: '10px',
                                                     }}
-                                                    onClick={() => handleDelete(reservation.reservationId)} // Pass reservation ID to handleDelete
+                                                    variant="danger" onClick={() => handleDelete(reservation.reservationId)} // Pass reservation ID to handleDelete
                                                 >
                                                     ลบการจอง
                                                 </Button>
@@ -109,7 +117,6 @@ export default function CustomerReserve() {
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>ยกเลิกการจองหอพัก?</Modal.Title>
-
                 </Modal.Header>
                 <Modal.Body>
                     <span>คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการจองนี้? เมื่อยกเลิกเเล้ว โปรดติดต่อเจ้าของหอพัก เพื่อรับเงินค่ามัดจำคืน</span>
@@ -124,5 +131,6 @@ export default function CustomerReserve() {
                 </Modal.Footer>
             </Modal>
         </div>
+
     );
 }

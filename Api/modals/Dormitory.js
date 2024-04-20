@@ -129,13 +129,17 @@ const DormitorySchema = new mongoose.Schema({
     active: { 
         type: Boolean, 
         default: true 
-    }, // Added 'active' field
-
+    }, 
       reservations: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Reserve",
     }],
     
+    roomType: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "RoomType",
+        required: false,
+    },
 }, { timestamps: true });
 
 

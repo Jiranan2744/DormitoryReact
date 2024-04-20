@@ -11,9 +11,11 @@ import { Form } from 'react-bootstrap';
 import axios from 'axios';
 import CustomerReserve from '../../pages/CustomerReserve';
 
-function Reserve() {
+
+const Reserve = ({ dormitoryId }) => {
 
 
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
   const [showListingError, setShowListingError] = useState(false);
@@ -56,31 +58,20 @@ function Reserve() {
     }
   };
 
-
-
   //open-close หอพัก
-  const [dormitoryId, setDormitoryId] = useState(null);
-  const [reservationOpen, setReservationOpen] = useState(false);
-  const [listings, setListings] = useState([]);
-  const navigate = useNavigate(); // Use the useNavigate hook instead of useHistory
+  const [statusMessage, setStatusMessage] = useState('หอพักว่าง'); // Initialize with 'หอพักว่าง' to indicate an empty dormitory
 
-
-  const handleToggleReservations = async (dormitoryId) => {
+  const handleToggle = async (dormitoryId) => {
     try {
-      // Toggle the reservations status for the specific dormitory
-      await axios.put(`/users/status/${dormitoryId}`);
-      // Additional actions for toggling reservations for the specific dormitoryId
-      setListings((prevListings) =>
-        prevListings.map((dormitory) =>
-          dormitory._id === dormitoryId
-            ? { ...dormitory, active: !dormitory.active }
-            : dormitory
-        )
-      );
+      const response = await axios.put(`/users/status/${dormitoryId}`);
+      const updatedStatus = response.data.message; // Assuming the response contains the updated status
+      setStatusMessage(updatedStatus);
     } catch (error) {
       console.error('Error toggling dormitory status:', error);
+      setStatusMessage('Error toggling dormitory status');
     }
   };
+
 
 
 
@@ -172,7 +163,6 @@ function Reserve() {
                     >
                       รายการจองของลูกค้า
                     </Link>
-
                   </td>
 
                   <td>
@@ -326,27 +316,38 @@ function Reserve() {
                   </td>
 
                   <td style={{ textAlign: 'center' }}>
-                    <div>
-                      <tr>
-                        {listings.map((dormitory) => (
-                          <React.Fragment key={dormitory._id}>
-                            <td style={{ textAlign: 'center' }}>
-                              <p style={{ textAlign: 'center' }}>สถานะหอพัก: {dormitory.active ? 'เปิด' : 'ปิด'}</p>
-                            </td>
-                            <td style={{ textAlign: 'center', padding: '1px' }}>
+                    <table style={{ margin: 'auto' }}>
+                      <tbody>
+                        <tr>
+                          <td style={{ textAlign: 'center' }}>
+                            <p style={{ marginBottom: 0 }}>สถานะหอพัก:</p>
+                          </td>
+                          <td style={{ textAlign: 'center', padding: '20px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                              <span
+                                style={{
+                                  marginRight: '10px',
+                                  color: statusMessage === 'หอพักเต็ม' ? 'red' : 'black', // Set text color to red when dormitory is full
+                                }}
+                              >
+                                {statusMessage === 'หอพักว่าง' ? 'ว่าง' : 'เต็ม'}
+                              </span>
+
                               <Form.Check
                                 type="switch"
-                                id={`custom-switch-${dormitory._id}`}
                                 label=""
-                                style={{ display: 'flex', justifyContent: 'center', padding: '20px', marginLeft: '25px' }}
-                                checked={dormitory.active}
-                                onChange={() => handleToggleReservations(dormitory._id)}
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                  margin: 'auto',
+                                }}
+                                onClick={() => handleToggle(listing._id)} // Pass the dormitoryId here
                               />
-                            </td>
-                          </React.Fragment>
-                        ))}
-                      </tr>
-                    </div>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </td>
 
                   <td style={{ textAlign: 'center' }}>
@@ -357,9 +358,9 @@ function Reserve() {
                         borderRadius: '5px',
                         borderRightColor: 'green',
                         display: 'inline-block',
-                        padding: '8px 16px',  // Adjust padding as needed
+                        padding: '8px 16px',
                         textDecoration: 'none',
-                        backgroundColor: 'lightgreen',  // Optional background color
+                        backgroundColor: 'lightgreen',
                         margin: '2vh',
                       }}
                     >

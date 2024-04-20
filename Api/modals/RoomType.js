@@ -31,7 +31,8 @@ const RoomTypeSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
-},
+  },
+  
 }, { timestamps: true });
 
 export default mongoose.model('RoomType', RoomTypeSchema);

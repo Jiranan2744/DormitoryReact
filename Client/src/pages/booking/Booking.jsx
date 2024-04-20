@@ -173,7 +173,7 @@ const Booking = () => {
   useEffect(() => {
     const fetchRoomTypes = async () => {
       try {
-        const response = await fetch(`/users/roomtypeDetails`);
+        const response = await fetch(`/dormitorys/viewRoomType`);
         if (response.ok) {
           const data = await response.json();
           setRoomTypesList(data.roomTypes);
@@ -350,7 +350,7 @@ const Booking = () => {
           <div className="hotelWrapper">
             <h1 style={{ color: '#003580', fontWeight: 'bold' }}>{data.tname} {data.ename} {data.title}</h1>
             <div className="hotelAddress">
-              <FontAwesomeIcon size='20px' icon={faLocationDot} />
+              <FontAwesomeIcon size='1x' icon={faLocationDot} />
               <span style={{ fontSize: '18px' }}>{data.no} {data.street} {data.road} {data.district} {data.subdistrict} {data.province} {data.code}</span>
               <br /><br />
 

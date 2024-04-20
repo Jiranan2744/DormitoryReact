@@ -139,8 +139,7 @@ const Login = () => {
                     </Link>
                   </p>
                 </div>
-                <span style={{ color: '#FF2300' }}>{error && 'เกิดข้อผิดพลาด!'}</span>
-
+                <span style={{ color: '#FF2300' }}>{error && 'อีเมล หรือรหัสผ่านไม่ถูกต้อง! กรุณาลองใหม่อีกครั้ง'}</span>
               </Grid>
             </Grid>
           </Box>
@@ -148,7 +147,6 @@ const Login = () => {
       </Container>
     </ThemeProvider>
     </div>
-    
   );
 }
 

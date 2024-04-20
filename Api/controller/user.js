@@ -103,6 +103,8 @@ export const getUserRoomTypes = async (req, res, next) => {
 };
 
 
+
+
 //เเสดงข้อมูลหอพัก-ประเภทห้องพัก
 export const getUserDormitoryAndRoomTypeDetails = async (req, res, next) => {
     try {
@@ -144,9 +146,9 @@ export const toggleDormitoryStatus = async (req, res, next) => {
         // Determine the status message based on the updated dormitory status
         let statusMessage = '';
         if (dormitory.active) {
-            statusMessage = 'Dormitory has been opened for reservations';
+            statusMessage = 'หอพักว่าง';
         } else {
-            statusMessage = 'Dormitory has been closed for reservations';
+            statusMessage = 'หอพักเต็ม ไม่สามารถจองได้';
         }
 
         // Send response with status message

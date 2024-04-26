@@ -72,8 +72,10 @@ export default function CustomerReserve() {
                             </div>
                         ) : (
                             <ul style={{ listStyle: 'none', padding: 0 }}>
+                                
                                 {reservations.map((reservation) => (
                                     <li key={reservation._id} style={{ marginBottom: '20px' }}>
+                                       
                                         <div key={reservation._id} style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                 <div style={{ textAlign: 'left', marginRight: '20px' }}>
@@ -91,6 +93,7 @@ export default function CustomerReserve() {
                                                     />
                                                 </div>
                                             </div>
+
                                             <div style={{ textAlign: 'right', marginLeft: '20px' }}>
                                                 <Button
                                                     style={{
@@ -100,11 +103,13 @@ export default function CustomerReserve() {
                                                         cursor: 'pointer',
                                                         marginTop: '10px',
                                                     }}
-                                                    variant="danger" onClick={() => handleDelete(reservation.reservationId)} // Pass reservation ID to handleDelete
+                                                    variant="danger" onClick={() => handleDelete(reservation.reservationId)}
                                                 >
                                                     ลบการจอง
                                                 </Button>
                                             </div>
+
+                                            
                                         </div>
                                     </li>
                                 ))}
@@ -113,13 +118,13 @@ export default function CustomerReserve() {
                     </div>
                 )}
             </div>
-            {/* Modal for confirmation */}
+            {/* ลบการจองของลูกค้า */}
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>ยกเลิกการจองหอพัก?</Modal.Title>
+                    <Modal.Title>ลบการจองหอพัก?</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <span>คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการจองนี้? เมื่อยกเลิกเเล้ว โปรดติดต่อเจ้าของหอพัก เพื่อรับเงินค่ามัดจำคืน</span>
+                    <span> ลบการจองของผู้ใช้ ใช่หรือไม่?</span>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowModal(false)}>

@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 const DormitorySchema = new mongoose.Schema({
-
     tname: {
         type: String,
         required: false,
@@ -58,30 +57,37 @@ const DormitorySchema = new mongoose.Schema({
         type: String,
         required: false,
     },
-    typeRoom: {
-        type: String,
-        required: false,
-    },
-    sizeRoom: {
-        type: Number,
-        required: false,
-    },
-    minDaily: {
-        type: Number,
-        required: false,
-    },
-    maxDaily: {
-        type: Number,
-        required: false,
-    },
-    minMonthly: {
-        type: Number,
-        required: false,
-    },
-    maxMonthly: {
-        type: Number,
-        required: false,
-    },
+
+
+    roomTypes: [
+        {
+            typeRooms: {
+                type: String,
+                required: false,
+            },
+            sizeRooms: {
+                type: Number,
+                required: false,
+            },
+            minDailys: {
+                type: Number,
+                required: false,
+            },
+            maxDailys: {
+                type: Number,
+                required: false,
+            },
+            minMonthlys: {
+                type: Number,
+                required: false,
+            },
+            maxMonthlys: {
+                type: Number,
+                required: false,
+            },
+        }
+    ],
+
     billWater: {
         type: Number,
         required: false,
@@ -114,33 +120,24 @@ const DormitorySchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Facility",
     }],
-
     userRef: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
     },
-
     isReservationEnabled: {
         type: Boolean,
-        default: true, // Set the default value to true or false based on your requirement
+        default: true,
     },
-
     active: { 
         type: Boolean, 
         default: true 
     }, 
-      reservations: [{
+    reservations: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Reserve",
     }],
-    
-    roomType: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "RoomType",
-        required: false,
-    },
+   
 }, { timestamps: true });
 
-
-export default mongoose.model("Dormitory", DormitorySchema)
+export default mongoose.model("Dormitory", DormitorySchema);

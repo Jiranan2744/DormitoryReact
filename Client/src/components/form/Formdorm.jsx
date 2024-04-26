@@ -23,7 +23,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 export default function Formdorm() {
   const { currentUser } = useSelector((state) => state.user);
   const [files, setFiles] = useState([]);
-  const [rooms, setRooms] = useState([]);
+  const [rooms, setRooms] = useState([]);  
+  
+  const initialRoomType = {
+    typeRooms: "",
+    sizeRooms: 0,
+    minDailys: 0,
+    maxDailys: 0,
+    minMonthlys: 0,
+    maxMonthlys: 0,
+};
+
   const [formData, setFormData] = useState({
     image: [],
     tname: '',
@@ -39,12 +49,6 @@ export default function Formdorm() {
     province: '',
     code: '',
     description: '',
-    typeRoom: '',
-    sizeRoom: '',
-    minDaily: '',
-    maxDaily: '',
-    minMonthly: '',
-    maxMonthly: '',
     billWater: '',
     billElectrict: '',
     insurance: '',
@@ -53,7 +57,10 @@ export default function Formdorm() {
     billTelephone: '',
     service: '',
     facilities: [],
+    roomTypes: [initialRoomType],
   });
+
+
 
   const [imageUploadError, setImageUploadError] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -132,14 +139,13 @@ export default function Formdorm() {
 
   //เลือกประเภทห้อง
   const handleChangeType = (e) => {
-    const selectedRoomType = e.target.value;
-
-    // Update formData with the selected room type
+    const selectedType = e.target.value;
     setFormData({
       ...formData,
-      typeRoom: selectedRoomType,
+      typeRooms: selectedType, 
     });
   };
+  
 
   const navigate = useNavigate();
 
@@ -148,46 +154,51 @@ export default function Formdorm() {
     e.preventDefault();
 
     try {
-      setLoading(true);
+        setLoading(true);
 
-      const selectedFacilities = selectedOptions.map((facilityId) => ({ _id: facilityId }));
+        // Extract selected facility IDs
+        const selectedFacilities = selectedOptions.map((facilityId) => ({ _id: facilityId }));
 
-      const roomTypesData = roomTypesList.map(({ typeRoom, sizeRoom, minDaily, maxDaily, minMonthly, maxMonthly }) => ({
-        typeRooms: typeRoom,
-        sizeRooms: sizeRoom,
-        minDailys: minDaily,
-        maxDailys: maxDaily,
-        minMonthlys: minMonthly,
-        maxMonthlys: maxMonthly,
-      }));
+        // Map room types data to match backend structure
+        const roomTypesData = roomTypesList.map(({ typeRooms, sizeRooms, minDailys, maxDailys, minMonthlys, maxMonthlys }) => ({
+            typeRooms,
+            sizeRooms,
+            minDailys,
+            maxDailys,
+            minMonthlys,
+            maxMonthlys,
+        }));
 
-      const res = await fetch('/dormitorys', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          userRef: currentUser._id,
-          facilities: selectedFacilities,
-          roomTypes: roomTypesData,
-        }),
-      });
+        // Send POST request to backend API endpoint
+        const res = await fetch('/dormitorys', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                ...formData,
+                userRef: currentUser._id,
+                facilities: selectedFacilities,
+                roomTypes: roomTypesData,
+            }),
+        });
 
-      const data = await res.json();
-      setLoading(false);
+        const data = await res.json();
+        setLoading(false);
 
-      if (!res.ok) {
-        setError(data.message);
-      } else {
-        navigate(`/booking/${data._id}`);
-      }
+        if (!res.ok) {
+            setError(data.message);
+        } else {
+            // Redirect to booking page with the created dormitory ID
+            navigate(`/booking/${data._id}`);
+        }
     } catch (error) {
-      setError(error.message);
-      setLoading(false);
+        setError(error.message);
+        setLoading(false);
     }
-  };
+};
 
+  
   //เพิ่มห้องพัก
   const [showModal, setShowModal] = useState(false);
   const [newRoomData, setNewRoomData] = useState({
@@ -549,11 +560,11 @@ export default function Formdorm() {
                               <td>
                                 <InputGroup>
                                   <FormSelect
-                                    id="typeRoom"
+                                    id="typeRooms"
                                     className="form-control"
                                     style={{ width: '150px' }}
                                     onChange={handleChangeType}
-                                    value={formData.typeRoom}
+                                    value={formData.typeRooms}
                                   >
                                     <option value="เลือกห้องพัก">เลือกห้องพัก</option>
                                     <option value="สูท">ห้องสูท</option>
@@ -568,11 +579,11 @@ export default function Formdorm() {
                                 <InputGroup className="p-3">
                                   <input
                                     type="text"
-                                    id="sizeRoom"
+                                    id="sizeRooms"
                                     className="form-control"
                                     style={{ width: '80px' }}
                                     onChange={handleChange}
-                                    value={formData.sizeRoom}
+                                    value={formData.sizeRooms}
                                   />
                                   <InputGroup.Text>ตร.ม</InputGroup.Text>
                                 </InputGroup>
@@ -581,12 +592,12 @@ export default function Formdorm() {
                                 <InputGroup className="p-3">
                                   <input
                                     type="number"
-                                    id="minDaily"
+                                    id="minDailys"
                                     placeholder="ราคาต่ำสุด"
                                     className="form-control"
                                     style={{ width: '100px' }}
                                     onChange={handleChange}
-                                    value={formData.minDaily}
+                                    value={formData.minDailys}
                                   />
                                   <InputGroup.Text>บาท/วัน</InputGroup.Text>
                                 </InputGroup>
@@ -595,12 +606,12 @@ export default function Formdorm() {
                                 <InputGroup className="p-3">
                                   <input
                                     type="number"
-                                    id="minMonthly"
+                                    id="minMonthlys"
                                     placeholder="ราคาต่ำสุด"
                                     className="form-control"
                                     style={{ width: '120px' }}
                                     onChange={handleChange}
-                                    value={formData.minMonthly}
+                                    value={formData.minMonthlys}
                                   />
                                   <InputGroup.Text>บาท/เดือน</InputGroup.Text>
                                 </InputGroup>
@@ -612,12 +623,12 @@ export default function Formdorm() {
                                 <InputGroup className="p-3">
                                   <input
                                     type="number"
-                                    id="maxDaily"
+                                    id="maxDailys"
                                     placeholder="ราคาสูงสุด"
                                     className="form-control"
                                     style={{ width: '120px' }}
                                     onChange={handleChange}
-                                    value={formData.maxDaily}
+                                    value={formData.maxDailys}
                                   />
                                   <InputGroup.Text>บาท/วัน</InputGroup.Text>
                                 </InputGroup>
@@ -626,12 +637,12 @@ export default function Formdorm() {
                                 <InputGroup className="p-3">
                                   <input
                                     type="number"
-                                    id="maxMonthly"
+                                    id="maxMonthlys"
                                     placeholder="ราคาสูงสุด"
                                     className="form-control"
                                     style={{ width: '100px' }}
                                     onChange={handleChange}
-                                    value={formData.maxMonthly}
+                                    value={formData.maxMonthlys}
                                   />
                                   <InputGroup.Text>บาท/เดือน</InputGroup.Text>
                                 </InputGroup>
@@ -739,8 +750,8 @@ export default function Formdorm() {
                                 id="typeRooms"
                                 className="form-control"
                                 onChange={(e) => setNewRoomData({ ...newRoomData, typeRooms: e.target.value })}
-                                value={formData.typeRoom}
-                                >
+                                value={formData.typeRooms}
+                              >
                                 <option value="เลือกห้องพัก">เลือกห้องพัก</option>
                                 <option value="ห้องสูท">ห้องสูท</option>
                                 <option value="ห้องสตูดิโอ">ห้องสตูดิโอ</option>
@@ -875,7 +886,7 @@ export default function Formdorm() {
                       <InputGroup.Text id="basic-addon2">บาท/ยูนิต</InputGroup.Text>
                     </InputGroup>
                     <Form.Group controlId="unitUsageOrWaterSpecification">
-                      <Col sm={7} className="text-right" style={{ marginLeft: '10vh', marginTop: '2vh' }}> {/* Remove padding */}
+                      <Col sm={7} className="text-right" style={{ marginLeft: '10vh', marginTop: '2vh' }}>
                         <Form.Check
                           type="checkbox"
                           label="ตามยูนิตที่ใช้ ราคาต่อยูนิตตามที่การประปากำหนด"
@@ -883,10 +894,10 @@ export default function Formdorm() {
                           onChange={() => handleWaterCheckboxChange('unitUsage')}
                         />
                       </Col>
-
                     </Form.Group>
                   </Form.Group>
                   <br />
+
                   <Form.Group as={Row} className="m-2" controlId="formHorizontalEmail">
                     <Form.Label column sm={5} style={{ width: '10vh', fontWeight: 'normal', color: '#666666' }}>
                       ค่าไฟ
@@ -903,7 +914,7 @@ export default function Formdorm() {
                       <InputGroup.Text id="basic-addon2">บาท/ยูนิต</InputGroup.Text>
                     </InputGroup>
                     <Form.Group controlId="unitUsageOrWaterSpecification">
-                      <Col sm={7} className="text-right" style={{ marginLeft: '10vh', marginTop: '2vh' }}> {/* Remove padding */}
+                      <Col sm={7} className="text-right" style={{ marginLeft: '10vh', marginTop: '2vh' }}>
                         <Form.Check
                           type="checkbox"
                           label="ตามยูนิตที่ใช้ ราคาต่อยูนิตตามที่การไฟฟ้ากำหนด"
@@ -913,7 +924,6 @@ export default function Formdorm() {
                       </Col>
                     </Form.Group>
                   </Form.Group>
-
 
                   <hr style={{ marginTop: '20px', marginBottom: '20px', borderColor: '#D4D4D4' }} />
 
@@ -978,7 +988,7 @@ export default function Formdorm() {
                         <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                       </InputGroup>
                       <Form.Label column sm={5} style={{ width: '50vh', fontWeight: 'normal' }}>
-                        เช่น ค่าส่วนกลาง 200 บาท/เดือน
+                        เช่น บริการ ค่าส่วนกลาง 200 บาท/เดือน
                       </Form.Label>
                     </Form.Group>
 
@@ -998,7 +1008,7 @@ export default function Formdorm() {
                         <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                       </InputGroup>
                       <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
-                        หากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
+                        สำหรับหอพักที่มีบริการโทรศัพท์ไร้สายเท่านั้น
                       </Form.Label>
                     </Form.Group>
 
@@ -1018,10 +1028,9 @@ export default function Formdorm() {
                         <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                       </InputGroup>
                       <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
-                        หากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
+                        สำหรับหอพักที่มีบริการอินเทอร์เน็ตไร้สายเท่านั้น
                       </Form.Label>
                     </Form.Group>
-
 
                     < br />
 
@@ -1070,9 +1079,11 @@ export default function Formdorm() {
                                 style={{ color: 'white' }}
                                 onClick={handleImageSubmit}
                               >
-                                {uploading ? 'กำลังอัพโหลด...' : 'อัพโหลด'}
+                                {uploading ? 'กำลังอัปโหลด...' : 'อัปโหลด'}
                               </button>
+
                               <p style={{ color: 'red' }}>{imageUploadError && imageUploadError}</p>
+
                               {
                                 formData.image.length > 0 && formData.image.map((url, index) => (
                                   <div
@@ -1096,6 +1107,7 @@ export default function Formdorm() {
                       </Card>
                     </Form.Group>
                     < br />
+
                     <Form.Label column sm={5} style={{ width: '30%', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
                       รายละเอียดหอพัก
                     </Form.Label>
@@ -1110,15 +1122,15 @@ export default function Formdorm() {
                       />
                     </Form.Group>
                   </Form.Group>
+
                   <br />
 
                   <Form.Label column sm={5} style={{ width: '30%', fontWeight: 'normal', fontSize: '20px', color: '#666666' }}>
                     ข้อตกลงในการลงประกาศ
-
                     <div style={{ fontSize: '16px', width: '145vh' }}>
                       <p>
                         ในการลงประกาศหอพักบนเว็บ Dormitory RMUTT คุณยินดีที่จะเผยเเพร่ข้อมูลดังกล่าว
-                        พร้อมทั้งยอมรับให้ทีมงานลงประกาศตามที่คุณได้ลงรายละเอียดไว้ ณ ที่นี้ หากทีมงานพบการกระทำที่ไม่เหมาะสม ทางทีมงานจะลบประกาศหอพักของคุณโดยไม่เเจ้งให้ทราบล่วงหน้า 
+                        พร้อมทั้งยอมรับให้ทีมงานลงประกาศตามที่คุณได้ลงรายละเอียดไว้ ณ ที่นี้ หากทีมงานพบการกระทำที่ไม่เหมาะสม ทางทีมงานจะลบประกาศหอพักของคุณโดยไม่เเจ้งให้ทราบล่วงหน้า
                       </p>
                     </div>
                   </Form.Label>

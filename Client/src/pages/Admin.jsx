@@ -147,13 +147,8 @@ const Admin = () => {
                             </Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey={4}>
-                                ภาพรวมระบบ
-                            </Nav.Link>
-                        </Nav.Item>
-                        <Nav.Item>
                             <Nav.Link eventKey={1} onClick={handleShowListUser}>
-                                ข้อมูลผู้ใช้
+                                ข้อมูลผู้ใช้งาน
                             </Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
@@ -161,19 +156,14 @@ const Admin = () => {
                                 ข้อมูลหอพัก
                             </Nav.Link>
                         </Nav.Item>
-
                     </Nav>
                 </Tab.Container>
             </div>
             <br />
 
-
-
             <div style={{ textAlign: 'center' }}>
                 <p>จำนวนสมาชิกทั้งหมด: {memberCount} | จำนวนหอพักทั้งหมด: {dormitoryCount}</p>
             </div>
-
-
 
             {activeTab === "1" && (
                 <div style={{ textAlign: 'center' }}>
@@ -203,7 +193,7 @@ const Admin = () => {
                             icon={faSearch}
                             style={{
                                 position: 'absolute',
-                                right: '40%',
+                                right: '42%',
                                 color: '#D4D4D4',
                             }}
                         />
@@ -249,7 +239,6 @@ const Admin = () => {
                     )}
                 </div>
             )}
-
 
             {activeTab === "2" && (
                 <div>
@@ -299,6 +288,7 @@ const Admin = () => {
                                 </tr>
                             </thead>
                             <tbody>
+
                                 {dormitorys
                                     .filter((dormitory) =>
                                         dormitory.tname.toLowerCase().includes(dormitorySearchTerm.toLowerCase()) ||
@@ -316,10 +306,9 @@ const Admin = () => {
                                                     ? `${dormitory.no || ''} ${dormitory.street || ''} ${dormitory.road || ''} ${dormitory.subdistrict || ''} ${dormitory.district || ''} ${dormitory.province || ''} ${dormitory.code || ''}`
                                                     : 'ไม่พบข้อมูล'}
                                             </td>
-
-                                            {/* Add other dormitory fields as needed */}
                                         </tr>
                                     ))}
+                                    
                             </tbody>
                         </Table>
                     )}
@@ -362,12 +351,8 @@ const Admin = () => {
                         />
                     </label>
                     <br />
-
-
-
                 </div>
             )}
-
         </div>
     );
 };

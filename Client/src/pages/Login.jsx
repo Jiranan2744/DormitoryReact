@@ -28,14 +28,13 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Check if email and password are provided
     if (!formData.email || !formData.password) {
       return dispatch(logInFailure('Please fill all the fields'));
     }
   
     try {
       dispatch(logInStart());
-      // Send login request to the server
+
       const res = await fetch('/auth/login', {
         method: 'POST',
         headers: {
@@ -44,33 +43,27 @@ const Login = () => {
         body: JSON.stringify(formData),
       });
   
-      // Check if the login request was successful
       if (!res.ok) {
         throw new Error('Failed to log in. Please try again.'); // Handle unsuccessful login
       }
   
       const data = await res.json();
   
-      // Check if login was successful
       if (data.success === false) {
-        dispatch(logInFailure(data.message)); // Dispatch login failure action with error message
+        dispatch(logInFailure(data.message)); 
         return;
       }
   
-      dispatch(logInSuccess(data)); // Dispatch login success action
+      dispatch(logInSuccess(data));
   
-      // Redirect based on user role
       if (data.isAdmin) {
-        // Redirect admin to the admin dashboard
         navigate('/admin-dashboard');
       } else if (data.role === 'owner' || data.role === 'customer' || data.role === 'users') {
-        navigate('/'); // Redirect owner or customer to the main page
+        navigate('/'); 
       } else {
-        // If role is not specified or unrecognized, redirect to admin dashboard as fallback
         navigate('/admin-dashboard');
       }
     } catch (error) {
-      // Handle errors during login process
       dispatch(logInFailure(error.message));
     }
   };
@@ -124,7 +117,6 @@ const Login = () => {
               disabled={loading}
               style={{ backgroundColor: '#4169E1' }}
               sx={{ mt: 3, mb: 2 }}
-              
             >
              {loading ? 'Loading...' : 'เข้าสู่ระบบ'}
             </Button>

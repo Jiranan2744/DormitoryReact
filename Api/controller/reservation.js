@@ -111,7 +111,6 @@ export const deleteReservationById = async (req, res, next) => {
 
 
 
-
 export const getCustomerBooking = async (req, res, next) => {
   try {
     const userId = req.user.id; // Assuming user ID is available in the request object
@@ -137,6 +136,7 @@ export const getCustomerBooking = async (req, res, next) => {
                 id: dormitory._id,
                 name: `${dormitory.tname} ${dormitory.ename}`,
                 address: `${dormitory.no} ${dormitory.street} ${dormitory.district} ${dormitory.province} ${dormitory.code}`,
+                roomTypes: dormitory.roomTypes, // Add roomTypes information
               },
               customerInfo: {
                 firstname: customer.firstname,

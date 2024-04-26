@@ -98,7 +98,7 @@ const Booking = () => {
 
   const nextProcess = () => {
     // Check if a room type is selected
-    if (selectedRoomTypeIndex !== null) {
+    if (selectedRoomType !== null) {
       // Proceed to the next step
       setqrCode(generatePayload(data.phone, { amount }));
       setStep((prevStep) => prevStep + 1);
@@ -245,11 +245,9 @@ const Booking = () => {
         setShowModal(true);
         setLoading(false);
 
-        // Automatically close the modal after 10 seconds
         setTimeout(() => {
           setShowModal(false);
-        }, 10000); // 10000 milliseconds = 10 seconds
-
+        }, 10000); 
         return;
       }
 
@@ -337,6 +335,34 @@ const Booking = () => {
     console.log('Selected Room Type Index:', index, selectedRoomType);
   };
 
+  //ใหม่
+  const [selectedRoomType, setSelectedRoomType] = useState(null);
+
+  const handleRoomSelection = (event) => {
+    const selectedRoomId = event.target.value;
+    const selectedRoomType = data.roomTypes.find(roomType => roomType._id === selectedRoomId);
+    setSelectedRoomType(selectedRoomType);
+  };
+
+
+  const [roomTypes, setRoomTypes] = useState([]);
+
+  useEffect(() => {
+    const fetchRoomTypes = async () => {
+      try {
+        const response = await axios.get('/dormitorys/details'); // Assuming your API endpoint is '/api/viewRoom'
+        setRoomTypes(response.data);
+      } catch (error) {
+        console.error('Error fetching room types:', error);
+      }
+    };
+
+    fetchRoomTypes();
+  }, []);
+
+  const handleRoomTypeChange = (e) => {
+    setSelectedRoomType(e.target.value);
+  };
 
   return (
     <div>
@@ -363,26 +389,10 @@ const Booking = () => {
                   <FontAwesomeIcon icon={faComment} style={{ marginRight: '5px' }} /> {data.line}
                 </Button>
               </div>
-
-              {/* <div className="priceRoom">
-                รายวัน: {
-                  (data.minDaily !== null && data.minDaily !== undefined && data.maxDaily !== null && data.maxDaily !== undefined)
-                    ? `${data.minDaily} - ${data.maxDaily}`
-                    : (data.minDaily !== undefined || data.maxDaily !== undefined)
-                      ? `${data.minDaily || ''}   ${data.maxDaily || ''}`
-                      : "-"
-                }
-                รายเดือน: {
-                  (data.minMonthly !== null && data.minMonthly !== undefined && data.maxMonthly !== null && data.maxMonthly !== undefined)
-                    ? `${data.minMonthly} - ${data.maxMonthly}`
-                    : (data.minMonthly !== undefined || data.maxMonthly !== undefined)
-                      ? `${data.minMonthly || ''}  ${data.maxMonthly || ''}`
-                      : ""
-                }
-              </div> */}
             </div>
             <br />
-            {/* Image */}
+
+            {/* รูปภาพหอพัก */}
             <div className="hotelImages">
               {data.image?.map((images, i) => (
                 <div className="hotelImgWrapper" key={i}>
@@ -407,42 +417,34 @@ const Booking = () => {
                         <th>ค่าเช่ารายเดือน</th>
                       </tr>
                     </thead>
-                    <tbody style={{ textAlign: 'center' }}>
-                      <tr>
-                        <td>{data.typeRoom !== null && data.typeRoom !== undefined ? data.typeRoom : "-"}</td>
-                        <td>{data.sizeRoom !== null && data.sizeRoom !== undefined ? data.sizeRoom : "-"}</td>
-                        <td>
-                          {
-                            (data.minDaily !== null && data.minDaily !== undefined && data.maxDaily !== null && data.maxDaily !== undefined)
-                              ? `${data.minDaily} - ${data.maxDaily}`
-                              : (data.minDaily !== undefined || data.maxDaily !== undefined)
-                                ? `${data.minDaily || ''}   ${data.maxDaily || ''}`
-                                : "-"
-                          }
-                        </td>
 
-                        <td>
-                          {
-                            (data.minMonthly !== null && data.minMonthly !== undefined && data.maxMonthly !== null && data.maxMonthly !== undefined)
-                              ? `${data.minMonthly} - ${data.maxMonthly}`
-                              : (data.minMonthly !== undefined || data.maxMonthly !== undefined)
-                                ? `${data.minMonthly || ''}  ${data.maxMonthly || ''}`
-                                : "-"
-                          }
-                        </td>
-                      </tr>
-                    </tbody>
-
-                    {/* New Room */}
-                    <tbody style={{ textAlign: 'center' }}>
-                      {roomTypesList.map(roomType => (
-                        <tr key={roomType.roomId}>
-                          <td>{roomType.typeRooms !== null && roomType.typeRooms !== undefined ? roomType.typeRooms : "-"}</td>
-                          <td>{roomType.sizeRooms !== null && roomType.sizeRooms !== undefined ? roomType.sizeRooms : "-"}</td>
-                          <td>{roomType.minDailys !== null && roomType.minDailys !== undefined && roomType.maxDailys !== null && roomType.maxDailys !== undefined ? `${roomType.minDailys} - ${roomType.maxDailys}` : "-"}</td>
-                          <td>{roomType.minMonthlys !== null && roomType.minMonthlys !== undefined && roomType.maxMonthlys !== null && roomType.maxMonthlys !== undefined ? `${roomType.minMonthlys} - ${roomType.maxMonthlys}` : "-"}</td>
+                    <tbody>
+                      {data.roomTypes && data.roomTypes.length > 0 ? (
+                        data.roomTypes.map((roomType, index) => (
+                          <tr key={index}>
+                            <td style={{ textAlign: 'center' }}>{roomType.typeRooms || "-"}</td>
+                            <td style={{ textAlign: 'center' }}>{roomType.sizeRooms || "-"}</td>
+                            <td style={{ textAlign: 'center' }}>
+                              {roomType.minDailys !== undefined && roomType.maxDailys !== undefined
+                                ? `${roomType.minDailys} - ${roomType.maxDailys}`
+                                : roomType.minDailys !== undefined || roomType.maxDailys !== undefined
+                                  ? `${roomType.minDailys || ''}   ${roomType.maxDailys || ''}`
+                                  : "-"}
+                            </td>
+                            <td style={{ textAlign: 'center' }}>
+                              {roomType.minMonthlys !== undefined && roomType.maxMonthlys !== undefined
+                                ? `${roomType.minMonthlys} - ${roomType.maxMonthlys}`
+                                : roomType.minMonthlys !== undefined || roomType.maxMonthlys !== undefined
+                                  ? `${roomType.minMonthlys || ''}  ${roomType.maxMonthlys || ''}`
+                                  : "-"}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="4" style={{ textAlign: 'center' }}>ไม่พบประเภทห้องพัก</td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
 
@@ -526,7 +528,7 @@ const Booking = () => {
                 <Button
                   style={{
                     backgroundColor: isDormitoryOpen ? '#003580' : '#003580',
-                    color: 'white', // Set the text color to white for better visibility
+                    color: 'white',
                   }}
                   onClick={handleShow}
                   disabled={!isDormitoryOpen}
@@ -547,7 +549,7 @@ const Booking = () => {
                         <Form.Group className="mb-4" controlId="exampleForm.ControlInput1">
                           <Form.Label style={{ display: 'flex', fontWeight: 'bold', fontSize: '20px', color: '#003580' }}>ข้อมูลผู้จอง</Form.Label>
                           <Form.Control style={{ marginTop: '10px', width: '100%' }} type="name" value={`${userDetail.firstname} ${userDetail.lastname}`} disabled readOnly placeholder="ชื่อ - นามสกุล" autoFocus />
-                          <Form.Control style={{ marginTop: '10px', width: '100%' }} type="email" value={userDetail.email} disabled readOnly placeholder="อีเมล์" autoFocus />
+                          <Form.Control style={{ marginTop: '10px', width: '100%' }} type="email" value={userDetail.email} disabled readOnly placeholder="อีเมล" autoFocus />
                           <Form.Control style={{ marginTop: '10px', width: '100%' }} type="text" value={userDetail.phone} disabled readOnly placeholder="เบอร์โทร" autoFocus />
                         </Form.Group>
 
@@ -558,16 +560,57 @@ const Booking = () => {
                               <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                                 <Row>
                                   <Col md={4} style={{ marginBottom: '10px' }}>
-                                    <Form.Select
-                                      style={{ width: '130%', padding: '10px', border: '1px solid #007bff', borderRadius: '8px' }}
-                                      onChange={(e) => handleRoomTypeSelection(e.target.value)}
-                                      value={selectedRoomTypeIndex}
-                                    >
-                                      <option value="">เลือกประเภทห้องพัก</option>
-                                      {roomTypesList.map((roomType, index) => (
-                                        <option key={index} value={index}>{roomType.typeRooms}</option>
-                                      ))}
-                                    </Form.Select>
+
+                                    <div style={{ fontFamily: 'Arial, sans-serif' }}>
+                                      <Form.Select id="roomType" value={selectedRoomType?._id || ""} onChange={handleRoomSelection} style={{ width: '300px', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}>
+                                        <option value="">เลือกประเภทห้องพัก</option>
+                                        {data.roomTypes && data.roomTypes.map((roomType) => (
+                                          <option key={roomType._id} value={roomType._id}>
+                                            {roomType.typeRooms}
+                                          </option>
+                                        ))}
+                                      </Form.Select>
+
+                                      {selectedRoomType && (
+                                        <div style={{ width: '67vh', marginTop: '20px', backgroundColor: '#f9f9f9', padding: '20px', borderRadius: '8px', boxShadow: '0 0 5px rgba(0, 0, 0, 0.1)' }}>
+                                          <p style={{ fontWeight: 'bold' }}>รายละเอียดหอพักที่จอง</p>
+                                          <table style={{}}>
+                                            <tbody>
+                                              <tr>
+                                                <td style={{ fontWeight: 'bold' }}>ห้องพัก:</td>
+                                                <Button variant="light" disabled style={{}}>
+                                                  {selectedRoomType.typeRooms}
+                                                </Button>
+                                              </tr>
+                                              <tr>
+                                                <td style={{ fontWeight: 'bold' }}>ขนาดห้องพัก:</td>
+                                                <Button variant="light" disabled style={{}}>
+                                                  {selectedRoomType.sizeRooms} ตร.ม
+                                                </Button>
+                                              </tr>
+                                              <tr>
+                                                <td style={{ fontWeight: 'bold' }}>ราคารายวัน:</td>
+                                                <Button variant="light" disabled style={{}}>
+                                                  {selectedRoomType.minDailys} - {selectedRoomType.maxDailys} บาท
+                                                </Button>
+                                              </tr>
+                                              <tr>
+                                                <td style={{ fontWeight: 'bold' }}>ราคารายเดือน:</td>
+                                                <Button variant="light" disabled style={{}}>
+                                                  {selectedRoomType.minMonthlys} - {selectedRoomType.maxMonthlys}  บาท
+                                                </Button>
+                                              </tr>
+                                              <tr>
+                                                <td style={{ fontWeight: 'bold' }}>ค่ามัดจำ:</td>
+                                                <Button variant="light" disabled style={{}}>
+                                                  {data.advance} บาท
+                                                </Button>
+                                              </tr>
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                      )}
+                                    </div>
                                   </Col>
                                 </Row>
                                 {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
@@ -595,7 +638,10 @@ const Booking = () => {
                       <Form>
                         <div className='d-flex mb-5 flex-column justify-content-center align-items-center'>
                           <h3 className='pb-4'>Prompay QR Code</h3>
+
+
                           <QRCode size={250} value={qrCode} />
+
                           <Form>
                             <Form.Group controlId="formFile" className="mb-3 text-center mt-4">
                               <Form.Label>กรุณาแนบสลิป หลังจากชำระเงิน</Form.Label>
@@ -674,7 +720,6 @@ const Booking = () => {
                   </Modal.Body>
                 </Modal>
               </div>
-
               <Modal show={showSuccessPopup} onHide={handleCloseSuccessPopup} centered>
                 <Modal.Header closeButton>
                   <Modal.Title>การจองสำเร็จ</Modal.Title>

@@ -86,7 +86,10 @@ export default function Profile() {
         <>
             <Navbar />
             {currentUser && (
+
                 <div className='p-3 max-w-lg mx-auto'>
+
+                    
                     <h1 className='text-3xl font-semibold text-center my-4'>ข้อมูลส่วนตัว</h1>
                     <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
                         <span style={{ padding: '5px', textAlign: 'left' }} >สถานะผู้ใช้งาน:</span>

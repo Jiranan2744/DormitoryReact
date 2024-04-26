@@ -13,28 +13,6 @@ function Header() {
         <Link to="/formdorm" style={{ color: "inherit", textDecoration: "none" }}>
           <button className="headerButton">ลงทะเบียนหอพักฟรี</button>
         </Link>
-        <br /><br />
-        {/* <div className="headerSearch">
-          <div className="headerSearchItem">
-            <input type="text"
-              placeholder="Search"
-              className="headerSeachInput"
-            />
-          </div>
-
-          <div className="headerSearchItem">
-            <span className="headerSearchText"> date to date </span>
-          </div>
-
-          <div className="headerSearchItem">
-            <span className="headerSearchText"> 1 room </span>
-
-          </div>
-
-          <div className="headerSearchItem">
-            <button className="headerBtn">Search</button>
-          </div>
-        </div> */}
       </div>
     </div>
   )

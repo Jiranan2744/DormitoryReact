@@ -8,47 +8,69 @@ import Reservation from "../modals/Reservation.js";
 
 export const createDormitory = async (req, res, next) => {
   try {
+    // Destructure the request body to extract the necessary fields
     const { userRef, roomTypes, ...dormitoryData } = req.body;
 
+    // Check if userRef is provided
     if (!userRef) {
       return res.status(400).json({ error: "userRef is required for dormitory ownership." });
     }
 
-    // Create the dormitory with user reference and other data
+    // Create a new dormitory instance with the provided data
     const dormitory = await Dormitory.create({
       userRef,
+      roomTypes, // Include roomTypes array
       ...dormitoryData,
     });
 
-    // Update user role to "owner"
+    // Find the user by userRef and update their role to "owner"
     const user = await User.findById(userRef);
     if (user) {
       user.role = "owner";
       await user.save();
     }
 
-    // If roomTypes are provided, associate them with the dormitory
-    if (roomTypes && roomTypes.length > 0) {
-      // Create room types
-      const createdRoomTypes = await Room.create(roomTypes.map(roomType => ({ ...roomType, userRef })));
-
-      // Log the created room types
-      console.log("Created Room Types:", createdRoomTypes);
-
-      // Map created room types to their IDs and associate them with the dormitory
-      dormitory.roomTypes = createdRoomTypes.map(room => room._id);
-    }
-
-    // Save the updated dormitory with roomTypes
+    // Save the dormitory to the database
     await dormitory.save();
 
-    // Return the saved dormitory
+    // Return the created dormitory as a JSON response
     return res.status(201).json(dormitory);
   } catch (err) {
     console.error('Error creating dormitory:', err);
     next(err);
   }
 };
+
+
+export const viewRoom = async (req, res) => {
+  try {
+    const dormitories = await Dormitory.find({ roomTypes: { $exists: true, $ne: [] } }, 'roomTypes');
+
+    const roomTypesByDormitory = dormitories.reduce((result, dormitory) => {
+      result[dormitory._id] = dormitory.roomTypes.map(roomType => ({
+        _id: roomType._id,
+        typeRooms: roomType.typeRooms,
+        sizeRooms: roomType.sizeRooms,
+        minDailys: roomType.minDailys,
+        maxDailys: roomType.maxDailys,
+        minMonthlys: roomType.minMonthlys,
+        maxMonthlys: roomType.maxMonthlys,
+        // Include other fields as needed
+      }));
+      return result;
+    }, {});
+
+    res.status(200).json(roomTypesByDormitory);
+  } catch (error) {
+    console.error('Error fetching dormitories:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+
+
+
 
 export const createNewRoom = async (req, res, next) => {
   try {
@@ -85,7 +107,7 @@ export const createNewRoom = async (req, res, next) => {
 export const getRoomType = async (req, res, next) => {
   try {
     // Assuming dormitoryId is obtained from the authenticated user
-    const { dormitoryId } = req.user;
+    const { dormitoryId } = req.user.id;
 
     // Fetch room types based on the authenticated user's dormitory ID
     const roomTypes = await RoomType.find({ dormitory: dormitoryId });
@@ -161,6 +183,22 @@ export const getDormitory = async (req, res, next) => {
     next(err);
   }
 };
+
+export const getRoomTypesByDormitoryId = async (req, res, next) => {
+  try {
+ 
+
+    // Find room types associated with the provided dormitory ID
+    const roomTypes = await RoomType.find();
+
+    // Send the room types data as a JSON response
+    res.status(200).json({ success: true, roomTypes: roomTypes });
+  } catch (error) {
+    // If an error occurs, pass it to the error handling middleware
+    next(error);
+  }
+};
+
 
 export const getallDormitory = async (req, res, next) => {
   try {

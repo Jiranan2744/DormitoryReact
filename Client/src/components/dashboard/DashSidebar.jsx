@@ -21,6 +21,7 @@ export default function DashSidebar() {
 
 
     return (
+
         <Sidebar>
             <Sidebar.Items>
                 <Sidebar.ItemGroup>
@@ -44,11 +45,12 @@ export default function DashSidebar() {
 
                     <Sidebar.Item>
                         <FontAwesomeIcon icon={faSignOutAlt} style={{ marginRight: '10px' }} />
-                        Sign Out
+                        ออกจากระบบ
                     </Sidebar.Item>
                 </Sidebar.ItemGroup>
             </Sidebar.Items>
         </Sidebar>
+
     )
 }
 

@@ -78,6 +78,7 @@ export default function Mybooking() {
               }}>ไม่พบการจองของคุณ</p>
             ) : (
               <ul>
+
                 {bookings.map((booking) => (
                   <li key={booking.reservationId}
                     style={{
@@ -97,11 +98,21 @@ export default function Mybooking() {
                         <p>ที่อยู่หอพัก: {booking.dormitoryInfo.address}</p>
                         <p>วันที่จอง: {booking.date}</p>
                         <p>เวลาที่จอง: {booking.time}</p>
+
                       </>
                     ) : (
                       <p>ไม่พบข้อมูลหอพัก</p>
                     )}
-                    {/* Delete button */}
+{/* 
+                    {booking.dormitoryInfo.roomTypes.map((roomType, roomIndex) => (
+                      <div key={roomIndex}>
+                        <p>ประเภทห้องพัก: {roomType.typeRooms}</p>
+                        <p>ขนาดห้องพัก: {roomType.sizeRooms}</p>
+                        <p>ราคารายวัน: {roomType.minDailys} - {roomType.minMonthlys}</p>
+                        <p>ราคารายเดือน: {roomType.maxDailys} - {roomType.maxMonthlys}</p>
+                      </div>
+                    ))} */}
+
                     <Button
                       style={{
                         backgroundColor: 'red',
@@ -111,7 +122,7 @@ export default function Mybooking() {
                         cursor: 'pointer',
                         marginTop: '10px',
                       }}
-                      onClick={() => handleDelete(booking.reservationId)} // Pass reservation ID to handleDelete
+                      onClick={() => handleDelete(booking.reservationId)}
                     >
                       ยกเลิกการจอง
                     </Button>

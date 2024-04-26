@@ -29,6 +29,7 @@ export default function SignUp() {
     try {
       setLoading(true);
       setError(false);
+      
       const res = await fetch('http://localhost:8800/api/auth/register', {
         method: 'POST',
         headers: {
@@ -132,7 +133,6 @@ export default function SignUp() {
                     autoComplete="new-password"
                     onChange={handleChange}
                   />
-
                 </Grid>
               </Grid>
               <Button
@@ -157,7 +157,7 @@ export default function SignUp() {
                     </p>
                   </div>
                 </Grid>
-                <span style={{ color: '#FF2300' }}>{error && 'Something went wrong!'}</span>
+                <span style={{ color: '#FF2300' }}>{error && 'มีบางอย่างผิดพลาด! กรุณาลองใหม่อีกครั้ง'}</span>
               </Grid>
             </Box>
           </Box>

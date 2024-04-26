@@ -323,11 +323,12 @@ const Reserve = ({ dormitoryId }) => {
                             <p style={{ marginBottom: 0 }}>สถานะหอพัก:</p>
                           </td>
                           <td style={{ textAlign: 'center', padding: '20px' }}>
+                          
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                               <span
                                 style={{
                                   marginRight: '10px',
-                                  color: statusMessage === 'หอพักเต็ม' ? 'red' : 'black', // Set text color to red when dormitory is full
+                                  color: statusMessage === 'หอพักเต็ม' ? 'red' : 'black', 
                                 }}
                               >
                                 {statusMessage === 'หอพักว่าง' ? 'ว่าง' : 'เต็ม'}
@@ -341,9 +342,10 @@ const Reserve = ({ dormitoryId }) => {
                                   justifyContent: 'center',
                                   margin: 'auto',
                                 }}
-                                onClick={() => handleToggle(listing._id)} // Pass the dormitoryId here
+                                onClick={() => handleToggle(listing._id)}
                               />
                             </div>
+                            
                           </td>
                         </tr>
                       </tbody>
@@ -351,6 +353,7 @@ const Reserve = ({ dormitoryId }) => {
                   </td>
 
                   <td style={{ textAlign: 'center' }}>
+
                     <Link
                       to={`/update/${listing._id}`}
                       style={{
@@ -366,8 +369,18 @@ const Reserve = ({ dormitoryId }) => {
                     >
                       <FontAwesomeIcon icon={faEdit} style={{ marginRight: '8px' }} /> เเก้ไข
                     </Link>
-                    <Button onClick={() => handleListDelete(listing._id)} style={{ color: 'red', borderRadius: '5px', margin: '1vh', backgroundColor: '#ff7f7f', border: 'none', padding: '8px 16px' }}>
-                      <FontAwesomeIcon icon={faTrash} style={{ marginRight: '8px' }} /> ลบ
+
+                    <Button onClick={() => handleListDelete(listing._id)}
+                      style={{
+                        color: 'red',
+                        borderRadius: '5px',
+                        margin: '1vh',
+                        backgroundColor: '#ff7f7f',
+                        border: 'none',
+                        padding: '8px 16px'
+                      }}>
+                      <FontAwesomeIcon icon={faTrash} style={{ marginRight: '8px' }} />
+                      ลบ
                     </Button>
                   </td>
                 </tr>

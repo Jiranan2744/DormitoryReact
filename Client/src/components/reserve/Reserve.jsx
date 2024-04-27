@@ -134,16 +134,17 @@ const Reserve = ({ dormitoryId }) => {
           <br />
           <Table striped bordered style={{ width: '100%' }}>
 
-            {/* <thead style={{ textAlign: 'center' }} >
+            <thead style={{ textAlign: 'center' }} >
               <tr>
-                <th>ไอดี</th>
+                <th></th>
                 <th>ชื่อหอพัก (ไทย)</th>
                 <th>ชื่อหอพัก (อังกฤษ)</th>
-                <th>อีเมล์</th>
+                <th>อีเมล</th>
                 <th>เบอร์โทร</th>
                 <th>ไลน์</th>
+                <th>สถานะหอพัก</th>
               </tr>
-            </thead> */}
+            </thead>
 
             <tbody>
               {userListings && userListings.length > 0 && userListings.map((listing) => (
@@ -323,12 +324,11 @@ const Reserve = ({ dormitoryId }) => {
                             <p style={{ marginBottom: 0 }}>สถานะหอพัก:</p>
                           </td>
                           <td style={{ textAlign: 'center', padding: '20px' }}>
-                          
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                               <span
                                 style={{
                                   marginRight: '10px',
-                                  color: statusMessage === 'หอพักเต็ม' ? 'red' : 'black', 
+                                  color: statusMessage === 'หอพักเต็ม' ? 'red' : 'black',
                                 }}
                               >
                                 {statusMessage === 'หอพักว่าง' ? 'ว่าง' : 'เต็ม'}
@@ -345,7 +345,6 @@ const Reserve = ({ dormitoryId }) => {
                                 onClick={() => handleToggle(listing._id)}
                               />
                             </div>
-                            
                           </td>
                         </tr>
                       </tbody>
@@ -357,13 +356,12 @@ const Reserve = ({ dormitoryId }) => {
                     <Link
                       to={`/update/${listing._id}`}
                       style={{
-                        color: 'green',
+                        color: '#FFFFFF',
                         borderRadius: '5px',
-                        borderRightColor: 'green',
                         display: 'inline-block',
                         padding: '8px 16px',
                         textDecoration: 'none',
-                        backgroundColor: 'lightgreen',
+                        backgroundColor: '#54A915',
                         margin: '2vh',
                       }}
                     >
@@ -372,10 +370,10 @@ const Reserve = ({ dormitoryId }) => {
 
                     <Button onClick={() => handleListDelete(listing._id)}
                       style={{
-                        color: 'red',
+                        color: '#FFFFFF',
                         borderRadius: '5px',
                         margin: '1vh',
-                        backgroundColor: '#ff7f7f',
+                        backgroundColor: '#DF130C',
                         border: 'none',
                         padding: '8px 16px'
                       }}>

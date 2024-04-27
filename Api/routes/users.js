@@ -40,8 +40,6 @@ router.get('/roomtypes', verifyToken, getUserRoomTypes);
 //เเสดงข้อมูลหอพัก-ประเภทห้องพักของตัวเอง
 router.get('/roomtypeDetails', verifyToken, getUserDormitoryAndRoomTypeDetails);
 
-
-
 //open-close
 router.put('/status/:dormitoryId', toggleDormitoryStatus);
 

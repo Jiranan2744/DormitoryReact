@@ -92,6 +92,7 @@ export const viewReservationById = async (req, res, next) => {
 };
 
 
+
 export const deleteReservationById = async (req, res, next) => {
   try {
     const { reservationId } = req.params;
@@ -110,7 +111,6 @@ export const deleteReservationById = async (req, res, next) => {
 };
 
 
-
 export const getCustomerBooking = async (req, res, next) => {
   try {
     const userId = req.user.id; // Assuming user ID is available in the request object
@@ -127,11 +127,15 @@ export const getCustomerBooking = async (req, res, next) => {
 
           // Ensure dormitory and customer objects exist and have the required properties
           if (dormitory && customer) {
+            // Get the confirmation status message based on the confirmation status
+            const confirmationMessage = reservation.confirm ? 'ยืนยันการจองสำเร็จ' : 'ยังไม่ได้รับการยืนยัน';
+
             return {
-              dormitoryId: dormitory._id, // Add dormitory ID to the response
               reservationId: reservation._id, // Add reservation ID to the response
               date: new Date(reservation.createdAt).toLocaleDateString(), // Add date of reservation to the response
               time: new Date(reservation.createdAt).toLocaleTimeString(), // Add time of reservation to the response
+              confirmationStatus: reservation.confirm, // Add confirmation status to the response
+              confirmationMessage, // Add confirmation status message to the response
               dormitoryInfo: {
                 id: dormitory._id,
                 name: `${dormitory.tname} ${dormitory.ename}`,
@@ -210,5 +214,31 @@ export const getDormitoryCustomers = async (req, res, next) => {
   } catch (error) {
     console.error('Error in fetching dormitory customers:', error);
     res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+};
+
+
+export const getConfirm = async (req, res, next) => {
+  try {
+    const reservationId = req.params.reservationId;
+
+    const reservation = await Reserve.findById(reservationId);
+
+    if (!reservation) {
+      return res.status(404).json({ message: 'Reservation not found' });
+    }
+
+    // Toggle the reservation status
+    reservation.confirm = !reservation.confirm;
+
+    // Save the updated reservation document
+    await reservation.save();
+
+    // Determine the status message based on the updated status
+    const statusMessage = reservation.confirm ? 'ยืนยันการจองสำเร็จ' : 'ยังไม่ได้รับการยืนยัน';
+
+    res.status(200).json({ message: statusMessage, reservation });
+  } catch (error) {
+    next(error);
   }
 };

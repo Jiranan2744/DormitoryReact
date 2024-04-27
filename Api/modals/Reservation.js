@@ -16,6 +16,11 @@ const reservationSchema = new mongoose.Schema({
         required: true
     },
 
+    confirm: {
+        type: Boolean,
+        default: false 
+    }
+
 }, { timestamps: true });
 
 export default mongoose.model("Reserve", reservationSchema);

@@ -1,5 +1,5 @@
 import express from "express";
-import { createReservation, deleteReservationById, getCustomerBooking, getDormitoryCustomers, viewReservation, viewReservationById } from "../controller/reservation.js";
+import { createReservation, deleteReservationById, getConfirm, getCustomerBooking, getDormitoryCustomers, viewReservation, viewReservationById } from "../controller/reservation.js";
 import { verifyToken } from "../utils/verifyToken.js";
 
 const router = express.Router();
@@ -21,6 +21,11 @@ router.get("/reserve/customer/:userId", verifyToken, getCustomerBooking);
 
 //GET หอพักดูว่ามีลูกค้า
 router.get("/reserve/owner/:dormitoryId", verifyToken, getDormitoryCustomers);
+
+
+//ยืนยันการจอง
+router.put('/confirm/:reservationId', getConfirm);
+
 
 
 

@@ -23,16 +23,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 export default function Formdorm() {
   const { currentUser } = useSelector((state) => state.user);
   const [files, setFiles] = useState([]);
-  const [rooms, setRooms] = useState([]);  
-  
-  const initialRoomType = {
-    typeRooms: "",
-    sizeRooms: 0,
-    minDailys: 0,
-    maxDailys: 0,
-    minMonthlys: 0,
-    maxMonthlys: 0,
-};
+  const [rooms, setRooms] = useState([]);
 
   const [formData, setFormData] = useState({
     image: [],
@@ -57,8 +48,30 @@ export default function Formdorm() {
     billTelephone: '',
     service: '',
     facilities: [],
-    roomTypes: [initialRoomType],
   });
+
+  const [roomTypes, setRoomTypes] = useState([
+    {
+      typeRooms: '',
+      sizeRooms: '',
+      minDailys: '',
+      maxDailys: '',
+      minMonthlys: '',
+      maxMonthlys: '',
+    },
+  ]);
+
+
+
+  const handleInputChange = (index, field, value) => {
+    setRoomTypes(prevRoomTypesList => {
+      const updatedRoomTypesList = [...prevRoomTypesList];
+      updatedRoomTypesList[index][field] = value;
+      return updatedRoomTypesList;
+    });
+  };
+
+
 
 
 
@@ -142,63 +155,64 @@ export default function Formdorm() {
     const selectedType = e.target.value;
     setFormData({
       ...formData,
-      typeRooms: selectedType, 
+      typeRooms: selectedType,
     });
   };
-  
+
 
   const navigate = useNavigate();
 
   //CREATE DORMITORYS
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-        setLoading(true);
+      setLoading(true);
 
-        // Extract selected facility IDs
-        const selectedFacilities = selectedOptions.map((facilityId) => ({ _id: facilityId }));
+      // Extract selected facility IDs
+      const selectedFacilities = selectedOptions.map((facilityId) => ({ _id: facilityId }));
 
-        // Map room types data to match backend structure
-        const roomTypesData = roomTypesList.map(({ typeRooms, sizeRooms, minDailys, maxDailys, minMonthlys, maxMonthlys }) => ({
-            typeRooms,
-            sizeRooms,
-            minDailys,
-            maxDailys,
-            minMonthlys,
-            maxMonthlys,
-        }));
+      // Map room types data to match backend structure
+      const roomTypesData = roomTypes.map(({ typeRooms, sizeRooms, minDailys, maxDailys, minMonthlys, maxMonthlys }) => ({
+        typeRooms,
+        sizeRooms,
+        minDailys,
+        maxDailys,
+        minMonthlys,
+        maxMonthlys,
+      }));
 
-        // Send POST request to backend API endpoint
-        const res = await fetch('/dormitorys', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                ...formData,
-                userRef: currentUser._id,
-                facilities: selectedFacilities,
-                roomTypes: roomTypesData,
-            }),
-        });
+      // Send POST request to backend API endpoint
+      const res = await fetch('/dormitorys', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          userRef: currentUser._id,
+          facilities: selectedFacilities,
+          roomTypes: roomTypesData,
+        }),
+      });
 
-        const data = await res.json();
-        setLoading(false);
+      const data = await res.json();
+      setLoading(false);
 
-        if (!res.ok) {
-            setError(data.message);
-        } else {
-            // Redirect to booking page with the created dormitory ID
-            navigate(`/booking/${data._id}`);
-        }
+      if (!res.ok) {
+        setError(data.message);
+      } else {
+        // Redirect to booking page with the created dormitory ID
+        navigate(`/booking/${data._id}`);
+      }
     } catch (error) {
-        setError(error.message);
-        setLoading(false);
+      setError(error.message);
+      setLoading(false);
     }
-};
+  };
 
-  
+
   //เพิ่มห้องพัก
   const [showModal, setShowModal] = useState(false);
   const [newRoomData, setNewRoomData] = useState({
@@ -301,11 +315,18 @@ export default function Formdorm() {
     });
   };
 
+  //เพิ่มห้องพัก
+  const [showUI, setShowUI] = useState(false);
+
+  const handleDeleteRow = () => {
+    setShowUI(false); // Hide the card from the page
+  };
 
   return (
     <div>
       <Navbar />
       < br />
+
       <div className="d-flex justify-content-center">
         <Card style={{ display: 'flex', border: '2px solid #D4D4D4', width: '70%' }}>
           <Form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'left', justifyContent: 'left' }}>
@@ -543,326 +564,229 @@ export default function Formdorm() {
                     ประเภทห้องพัก
                   </Form.Label>
 
-                  <Card style={{ width: '148vh', height: '27vh' }}>
+                  <Card style={{ width: '148vh', height: '20vh' }}>
                     <Card.Body>
                       <Form>
-                        <table style={{ marginTop: '20px' }}>
-                          <thead>
+                        <table className="table table-bordered">
+                          <thead className="thead-light">
                             <tr>
-                              <th>รูปแบบห้องพัก</th>
-                              <th style={{ padding: '0 20px' }}>ขนาดห้องพัก</th>
-                              <th style={{ padding: '0 20px' }}>ห้องพักรายวัน (บาท/วัน)</th>
-                              <th style={{ padding: '0 20px' }}>ห้องพักรายเดือน (บาท/เดือน)</th>
+                              <th style={{ width: '8%', textAlign: 'center' }}>รูปแบบห้องพัก</th>
+                              <th style={{ width: '14%', textAlign: 'center' }}>ขนาดห้องพัก</th>
+                              <th style={{ width: '39%', textAlign: 'center' }}>ห้องพักรายวัน (บาท/วัน)</th>
+                              <th style={{ width: '50%', textAlign: 'center' }}>ห้องพักรายเดือน (บาท/เดือน)</th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr>
-                              <td>
-                                <InputGroup>
-                                  <FormSelect
-                                    id="typeRooms"
-                                    className="form-control"
-                                    style={{ width: '150px' }}
-                                    onChange={handleChangeType}
-                                    value={formData.typeRooms}
-                                  >
-                                    <option value="เลือกห้องพัก">เลือกห้องพัก</option>
-                                    <option value="สูท">ห้องสูท</option>
-                                    <option value="สตูดิโอ">ห้องสตูดิโอ</option>
-                                    <option value="1 ห้องนอน">1 ห้องนอน</option>
-                                    <option value="2 ห้องนอน">2 ห้องนอน</option>
-                                    <option value="3 ห้องนอน">3 ห้องนอน</option>
-                                  </FormSelect>
-                                </InputGroup>
-                              </td>
-                              <td>
-                                <InputGroup className="p-3">
-                                  <input
-                                    type="text"
-                                    id="sizeRooms"
-                                    className="form-control"
-                                    style={{ width: '80px' }}
-                                    onChange={handleChange}
-                                    value={formData.sizeRooms}
-                                  />
-                                  <InputGroup.Text>ตร.ม</InputGroup.Text>
-                                </InputGroup>
-                              </td>
-                              <td>
-                                <InputGroup className="p-3">
-                                  <input
-                                    type="number"
-                                    id="minDailys"
-                                    placeholder="ราคาต่ำสุด"
-                                    className="form-control"
-                                    style={{ width: '100px' }}
-                                    onChange={handleChange}
-                                    value={formData.minDailys}
-                                  />
-                                  <InputGroup.Text>บาท/วัน</InputGroup.Text>
-                                </InputGroup>
-                              </td>
-                              <td>
-                                <InputGroup className="p-3">
-                                  <input
-                                    type="number"
-                                    id="minMonthlys"
-                                    placeholder="ราคาต่ำสุด"
-                                    className="form-control"
-                                    style={{ width: '120px' }}
-                                    onChange={handleChange}
-                                    value={formData.minMonthlys}
-                                  />
-                                  <InputGroup.Text>บาท/เดือน</InputGroup.Text>
-                                </InputGroup>
-                              </td>
-                            </tr>
-                            <tr style={{ height: '10vh' }}>
-                              <td colSpan="2"></td>
-                              <td style={{ paddingTop: '0.5vh', paddingBottom: '0.5vh' }}>
-                                <InputGroup className="p-3">
-                                  <input
-                                    type="number"
-                                    id="maxDailys"
-                                    placeholder="ราคาสูงสุด"
-                                    className="form-control"
-                                    style={{ width: '120px' }}
-                                    onChange={handleChange}
-                                    value={formData.maxDailys}
-                                  />
-                                  <InputGroup.Text>บาท/วัน</InputGroup.Text>
-                                </InputGroup>
-                              </td>
-                              <td>
-                                <InputGroup className="p-3">
-                                  <input
-                                    type="number"
-                                    id="maxMonthlys"
-                                    placeholder="ราคาสูงสุด"
-                                    className="form-control"
-                                    style={{ width: '100px' }}
-                                    onChange={handleChange}
-                                    value={formData.maxMonthlys}
-                                  />
-                                  <InputGroup.Text>บาท/เดือน</InputGroup.Text>
-                                </InputGroup>
-                              </td>
-                            </tr>
+                            {roomTypes.map((roomType, index) => (
+                              <tr key={index}>
+                                <td>
+                                  <div className="input-group">
+                                    <FormSelect
+                                      id={`typeRooms-${index}`}
+                                      className="form-select"
+                                      style={{ width: '140px' }}
+                                      onChange={e => handleInputChange(index, 'typeRooms', e.target.value)}
+                                      value={roomType.typeRooms}
+                                    >
+                                      <option value="เลือกห้องพัก">เลือกห้องพัก</option>
+                                      <option value="สูท">ห้องสูท</option>
+                                      <option value="สตูดิโอ">ห้องสตูดิโอ</option>
+                                      <option value="1 ห้องนอน">1 ห้องนอน</option>
+                                      <option value="2 ห้องนอน">2 ห้องนอน</option>
+                                      <option value="3 ห้องนอน">3 ห้องนอน</option>
+                                    </FormSelect>
+                                  </div>
+                                </td>
+                                <td>
+                                  <div className="input-group">
+                                    <input
+                                      type="text"
+                                      id={`sizeRooms-${index}`}
+                                      className="form-control"
+                                      onChange={e => handleInputChange(index, 'sizeRooms', e.target.value)}
+                                      value={roomType.sizeRooms}
+                                    />
+                                    <InputGroup.Text>ตร.ม</InputGroup.Text>
+                                  </div>
+                                </td>
+                                <td>
+                                  <div className="d-flex">
+                                    <div className="input-group me-2">
+                                      <input
+                                        type="number"
+                                        id={`minDailys-${index}`}
+                                        placeholder="ราคาต่ำสุด"
+                                        style={{ fontSize: '16px' }}
+                                        className="form-control"
+                                        onChange={e => handleInputChange(index, 'minDailys', e.target.value)}
+                                        value={roomType.minDailys || ''}
+                                      />
+                                      <InputGroup.Text>บาท</InputGroup.Text>
+                                    </div>
+
+                                    <div className="input-group">
+                                      <input
+                                        type="number"
+                                        id={`maxDailys-${index}`}
+                                        placeholder="ราคาสูงสุด"
+                                        className="form-control"
+                                        onChange={e => handleInputChange(index, 'maxDailys', e.target.value)}
+                                        value={roomType.maxDailys || ''}
+                                      />
+                                      <InputGroup.Text>บาท</InputGroup.Text>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td>
+                                  <div className="d-flex">
+                                    <div className="input-group me-2">
+                                      <input
+                                        type="number"
+                                        id={`minMonthlys-${index}`}
+                                        placeholder="ราคาต่ำสุด"
+                                        className="form-control"
+                                        onChange={e => handleInputChange(index, 'minMonthlys', e.target.value)}
+                                        value={roomType.minMonthlys || ''}
+                                      />
+                                      <InputGroup.Text>บาท</InputGroup.Text>
+                                    </div>
+                                    <div className="input-group">
+                                      <input
+                                        type="number"
+                                        id={`maxMonthlys-${index}`}
+                                        placeholder="ราคาสูงสุด"
+                                        className="form-control"
+                                        onChange={e => handleInputChange(index, 'maxMonthlys', e.target.value)}
+                                        value={roomType.maxMonthlys || ''}
+                                      />
+                                      <InputGroup.Text>บาท</InputGroup.Text>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>
                       </Form>
                     </Card.Body>
                   </Card>
+
+                  <>
+                    {showUI && (
+                      <Card style={{ width: '148vh', marginTop: '20px', position: 'relative' }}>
+                        <FontAwesomeIcon
+                          onClick={handleDeleteRow}
+                          icon={faTrashAlt}
+                          style={{ position: 'absolute', top: '10px', right: '20px', cursor: 'pointer', zIndex: '999' }}
+                        />
+                        <Card.Body>
+                          <Form style={{ marginTop: '20px' }}>
+                            <table className="table table-bordered">
+                              <thead className="thead-light">
+                                <tr>
+                                  <th style={{ width: '15%', textAlign: 'center' }}>รูปแบบห้องพัก</th>
+                                  <th style={{ width: '14%', textAlign: 'center' }}>ขนาดห้องพัก</th>
+                                  <th style={{ width: '35%', textAlign: 'center' }}>ห้องพักรายวัน (บาท/วัน)</th>
+                                  <th style={{ width: '36%', textAlign: 'center' }}>ห้องพักรายเดือน (บาท/เดือน)</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {roomTypes.map((roomType, index) => (
+                                  <tr key={index}>
+                                    <td>
+                                      <FormSelect
+                                        id={`typeRooms-${index}`}
+                                        className="form-select"
+                                        style={{ width: '100%' }}
+                                        onChange={e => handleInputChange(index, 'typeRooms', e.target.value)}
+                                        value={roomType.typeRooms}
+                                      >
+                                        <option value="เลือกห้องพัก">เลือกห้องพัก</option>
+                                        <option value="สูท">ห้องสูท</option>
+                                        <option value="สตูดิโอ">ห้องสตูดิโอ</option>
+                                        <option value="1 ห้องนอน">1 ห้องนอน</option>
+                                        <option value="2 ห้องนอน">2 ห้องนอน</option>
+                                        <option value="3 ห้องนอน">3 ห้องนอน</option>
+                                      </FormSelect>
+                                    </td>
+                                    <td>
+                                      <div className="input-group">
+                                        <input
+                                          type="text"
+                                          id={`sizeRooms-${index}`}
+                                          className="form-control"
+                                          onChange={e => handleInputChange(index, 'sizeRooms', e.target.value)}
+                                          value={roomType.sizeRooms}
+                                        />
+                                        <InputGroup.Text>ตร.ม</InputGroup.Text>
+                                      </div>
+                                    </td>
+                                    <td>
+                                      <div className="d-flex">
+                                        <div className="input-group me-2">
+                                          <input
+                                            type="number"
+                                            id={`minDailys-${index}`}
+                                            placeholder="ราคาต่ำสุด"
+                                            style={{ fontSize: '16px' }}
+                                            className="form-control"
+                                            onChange={e => handleInputChange(index, 'minDailys', e.target.value)}
+                                            value={roomType.minDailys}
+                                          />
+                                          <InputGroup.Text>บาท</InputGroup.Text>
+                                        </div>
+                                        <div className="input-group">
+                                          <input
+                                            type="number"
+                                            id={`maxDailys-${index}`}
+                                            placeholder="ราคาสูงสุด"
+                                            className="form-control"
+                                            onChange={e => handleInputChange(index, 'maxDailys', e.target.value)}
+                                            value={roomType.maxDailys}
+                                          />
+                                          <InputGroup.Text>บาท</InputGroup.Text>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td>
+                                      <div className="d-flex">
+                                        <div className="input-group me-2">
+                                          <input
+                                            type="number"
+                                            id={`minMonthlys-${index}`}
+                                            placeholder="ราคาต่ำสุด"
+                                            style={{ fontSize: '16px' }}
+                                            className="form-control"
+                                            onChange={e => handleInputChange(index, 'minMonthlys', e.target.value)}
+                                            value={roomType.minMonthlys}
+                                          />
+                                          <InputGroup.Text>บาท</InputGroup.Text>
+                                        </div>
+                                        <div className="input-group">
+                                          <input
+                                            type="number"
+                                            id={`maxMonthlys-${index}`}
+                                            placeholder="ราคาสูงสุด"
+                                            className="form-control"
+                                            onChange={e => handleInputChange(index, 'maxMonthlys', e.target.value)}
+                                            value={roomType.maxMonthlys}
+                                          />
+                                          <InputGroup.Text>บาท</InputGroup.Text>
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </Form>
+                        </Card.Body>
+                      </Card>
+                    )}
+                  </>
                   <br />
 
-                  {rooms.map((room, index) => (
-                    <Card key={index} style={{ width: '148vh', marginBottom: '20px', height: '20vh' }}>
-                      <Card.Body className="d-flex justify-content-center align-items-center"> {/* Center align content */}
-                        <div className="row">
-                          <div className="col-sm-12">
-                            <div className="d-flex flex-wrap justify-content-center"> {/* Center align text boxes */}
-                              <div className="d-flex flex-wrap justify-content-center align-items-center">
-                                <td className='p-1'>
-                                  <button style={{
-                                    padding: '8px',
-                                    border: '1px solid #007bff',
-                                    borderRadius: '5px',
-                                    fontSize: '16px',
-                                    backgroundColor: '#ffffff',
-                                    color: '#007bff'
-                                  }}>
-                                    {room.typeRooms ? `รูปแบบห้องพัก: ${room.typeRooms}` : 'ไม่พบข้อมูล'}
-                                  </button>
-                                </td>
-
-                                <td className='p-1'>
-                                  <button style={{
-                                    padding: '8px',
-                                    border: '1px solid #007bff',
-                                    borderRadius: '5px',
-                                    fontSize: '16px',
-                                    backgroundColor: '#ffffff',
-                                    color: '#007bff'
-                                  }}>
-                                    {room.sizeRooms ? `ขนาดห้องพัก: ${room.sizeRooms} ตร.ม` : 'ไม่พบข้อมูล'}
-                                  </button>
-                                </td>
-
-                                <td className='p-1'>
-                                  <button style={{
-                                    padding: '8px',
-                                    border: '1px solid #007bff',
-                                    borderRadius: '5px',
-                                    fontSize: '16px',
-                                    backgroundColor: '#ffffff',
-                                    color: '#007bff'
-                                  }}>
-                                    {room.minDailys && room.maxDailys ? `ห้องพักรายวัน: ${room.minDailys} - ${room.maxDailys} บาท/วัน` :
-                                      room.minDailys ? `ห้องพักรายวัน: ${room.minDailys} บาท/วัน` :
-                                        room.maxDailys ? `ห้องพักรายวัน: ${room.maxDailys} บาท/วัน` : 'ไม่พบข้อมูล'}
-                                  </button>
-                                </td>
-
-                                <td className='p-1'>
-                                  <button style={{
-                                    padding: '8px',
-                                    margin: '0px 0px',
-                                    border: '1px solid #007bff',
-                                    borderRadius: '5px',
-                                    fontSize: '16px',
-                                    backgroundColor: '#ffffff',
-                                    color: '#007bff'
-                                  }}>
-                                    {room.minMonthlys && room.maxMonthlys ? `ห้องพักรายเดือน: ${room.minMonthlys} - ${room.maxMonthlys} บาท/เดือน` :
-                                      room.minMonthlys ? `ห้องพักรายเดือน: ${room.minMonthlys} บาท/เดือน` :
-                                        room.maxMonthlys ? `ห้องพักรายเดือน: ${room.maxMonthlys} บาท/เดือน` : 'ไม่พบข้อมูล'}
-                                  </button>
-                                </td>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="col-sm-10 d-flex justify-content-end align-items-center" style={{ position: 'absolute', top: '10px', right: '10px' }}> {/* Adjusted position */}
-                          <FontAwesomeIcon icon={faTrashAlt} onClick={() => handleDeleteRoom(index)} color='#BABABA' size='sm' />
-                        </div>
-                        <div className="col-sm-10 d-flex justify-content-start align-items-center" style={{ position: 'absolute', top: '10px', left: '10px' }}> {/* Display at top left */}
-                          <p> ประเภทห้องพัก {index + 1}</p> {/* Display the room number */}
-                        </div>
-                      </Card.Body>
-                    </Card>
-                  ))}
-
-                  <br />
-
-                  {/* เพิ่มประเภทห้องพัก */}
-                  <div>
-                    <Button onClick={handleShowModal}>เพิ่มประเภทห้องพัก</Button>
-                    <Modal show={showModal} onHide={handleCloseModal} size="m" style={{ width: 'auto', margin: 'auto', marginLeft: '35%' }} centered>
-                      <Modal.Header closeButton>
-                        <Modal.Title>เพิ่มประเภทห้องพัก</Modal.Title>
-                      </Modal.Header>
-                      <Modal.Body>
-                        <Form>
-                          <Form.Group controlId="formRoomType">
-                            <Form.Label>รูปเแบบห้องพัก</Form.Label>
-                            <InputGroup style={{ width: '200px', marginTop: '5px', marginBottom: '5px' }}>
-                              <FormSelect
-                                id="typeRooms"
-                                className="form-control"
-                                onChange={(e) => setNewRoomData({ ...newRoomData, typeRooms: e.target.value })}
-                                value={formData.typeRooms}
-                              >
-                                <option value="เลือกห้องพัก">เลือกห้องพัก</option>
-                                <option value="ห้องสูท">ห้องสูท</option>
-                                <option value="ห้องสตูดิโอ">ห้องสตูดิโอ</option>
-                                <option value="1 ห้องนอน">1 ห้องนอน</option>
-                                <option value="2 ห้องนอน">2 ห้องนอน</option>
-                                <option value="3 ห้องนอน">3 ห้องนอน</option>
-                              </FormSelect>
-                            </InputGroup>
-                          </Form.Group>
-
-                          <Form.Group controlId="formSizeRoom">
-                            <Form.Label>ขนาดห้องพัก</Form.Label>
-                            <InputGroup style={{ width: '200px', marginTop: '5px', marginBottom: '5px' }}>
-                              <input
-                                type="text"
-                                id="sizeRooms"
-                                placeholder=""
-                                aria-describedby="basic-addon2"
-                                className="form-control"
-                                onChange={(e) => setNewRoomData({ ...newRoomData, sizeRooms: e.target.value })}
-                                value={newRoomData.sizeRooms}
-                              />
-                              <InputGroup.Text id="basic-addon2">ตร.ม</InputGroup.Text>
-                            </InputGroup>
-                          </Form.Group>
-
-                          <Form.Group controlId="formPriceDaily">
-                            <Form.Label>ราคาห้องพักรายวัน</Form.Label>
-                            <InputGroup className="mb-2" style={{ width: '430px', marginTop: '5px', marginBottom: '5px' }}>
-                              <input
-                                type="number"
-                                id="minDailys"
-                                placeholder="ราคาต่ำสุด"
-                                aria-label="ราคาต่ำสุด"
-                                aria-describedby="basic-addon2"
-                                className="form-control"
-                                style={{ borderRadius: '4px 0 0 4px' }}
-                                onChange={(e) => setNewRoomData({ ...newRoomData, minDailys: e.target.value })}
-                                value={newRoomData.minDailys}
-                              />
-                              <InputGroup.Text
-                                style={{ borderRadius: '0 4px 4px 0' }}
-                                id="basic-addon2">บาท/วัน
-                              </InputGroup.Text>
-
-                              <input
-                                type="number"
-                                id="maxDailys"
-                                placeholder="ราคาสูงสุด"
-                                aria-label="ราคาสูงสุด"
-                                aria-describedby="basic-addon2"
-                                className="form-control"
-                                style={{ marginLeft: '10px', borderRadius: '4px 0 0 4px' }}
-                                onChange={(e) => setNewRoomData({ ...newRoomData, maxDailys: e.target.value })}
-                                value={newRoomData.maxDailys}
-                              />
-                              <InputGroup.Text
-                                style={{ borderRadius: '0 4px 4px 0' }}
-                                id="basic-addon2">บาท/เดือน
-                              </InputGroup.Text>
-                            </InputGroup>
-                          </Form.Group>
-
-                          <Form.Group controlId="formPriceMonthly">
-                            <Form.Label>ราคาห้องพักรายเดือน</Form.Label>
-                            <InputGroup className="mb-2" style={{ width: '430px', marginTop: '5px', marginBottom: '5px' }}>
-                              <input
-                                type="number"
-                                id="minMonthlys"
-                                placeholder="ราคาต่ำสุด"
-                                aria-label="ราคาต่ำสุด"
-                                aria-describedby="basic-addon2"
-                                className="form-control"
-                                style={{ borderRadius: '4px 0 0 4px' }}
-                                onChange={(e) => setNewRoomData({ ...newRoomData, minMonthlys: e.target.value })}
-                                value={newRoomData.minMonthlys}
-                              />
-                              <InputGroup.Text
-                                style={{ borderRadius: '0 4px 4px 0' }}
-                                id="basic-addon2">บาท/วัน
-                              </InputGroup.Text>
-
-                              <input
-                                type="number"
-                                id="maxMonthlys"
-                                placeholder="ราคาสูงสุด"
-                                aria-label="ราคาสูงสุด"
-                                aria-describedby="basic-addon2"
-                                className="form-control"
-                                style={{ marginLeft: '10px', borderRadius: '4px 0 0 4px' }}
-                                onChange={(e) => setNewRoomData({ ...newRoomData, maxMonthlys: e.target.value })}
-                                value={newRoomData.maxMonthlys}
-                              />
-                              <InputGroup.Text
-                                style={{ borderRadius: '0 4px 4px 0' }}
-                                id="basic-addon2">บาท/เดือน
-                              </InputGroup.Text>
-                            </InputGroup>
-                          </Form.Group>
-                        </Form>
-                      </Modal.Body>
-                      <Modal.Footer>
-                        <Button variant="secondary" onClick={handleCloseModal}>
-                          ปิด
-                        </Button>
-                        <Button variant="primary" onClick={handleSaveRoom}>
-                          บันทึก
-                        </Button>
-                      </Modal.Footer>
-                    </Modal>
-                  </div>
+                  <Button onClick={() => setShowUI(true)}>เพิ่มห้องพัก</Button>
 
                   <br /><br />
 
@@ -948,7 +872,7 @@ export default function Formdorm() {
                         <InputGroup.Text id="basic-addon2">บาท</InputGroup.Text>
                       </InputGroup>
                       <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
-                        หากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
+                        ในกรณีที่ไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
                       </Form.Label>
                     </Form.Group>
 
@@ -965,10 +889,10 @@ export default function Formdorm() {
                           onChange={handleChange}
                           value={formData.insurance}
                         />
-                        <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
+                        <InputGroup.Text id="basic-addon2">บาท</InputGroup.Text>
                       </InputGroup>
                       <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
-                        หากท่านไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
+                        ในกรณีที่ยกเลิกสัญญาเช่าก่อนกำหนดจะไม่ได้รับค่าประกันความเสียหายคืน
                       </Form.Label>
                     </Form.Group>
 
@@ -988,7 +912,7 @@ export default function Formdorm() {
                         <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                       </InputGroup>
                       <Form.Label column sm={5} style={{ width: '50vh', fontWeight: 'normal' }}>
-                        เช่น บริการ ค่าส่วนกลาง 200 บาท/เดือน
+                        เช่น ค่าฟิตเนส 200 บาท/เดือน
                       </Form.Label>
                     </Form.Group>
 
@@ -1008,7 +932,7 @@ export default function Formdorm() {
                         <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                       </InputGroup>
                       <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
-                        สำหรับหอพักที่มีบริการโทรศัพท์ไร้สายเท่านั้น
+                        สำหรับหอพักที่มีบริการโทรศัพท์สายตรงเท่านั้น
                       </Form.Label>
                     </Form.Group>
 

@@ -21,7 +21,7 @@ const Admin = () => {
     const { currentUser } = useSelector((state) => state.user);
     const [showModal, setShowModal] = useState(false);
     const [userId, setUserId] = useState(null);
-    const [currentRole, setCurrentRole] = useState(''); 
+    const [currentRole, setCurrentRole] = useState('');
     const [newRole, setNewRole] = useState('');
 
     //รายการผู้ใช้งาน
@@ -203,12 +203,12 @@ const Admin = () => {
                         <Table striped bordered hover size="sm" style={{ backgroundColor: '#F2F6FA', maxWidth: '68%', margin: 'auto', textAlign: 'center' }}>
                             <thead>
                                 <tr style={{ backgroundColor: '#F2F6FA', color: '#003580' }}>
+                                    <th>วันที่สมัคร</th>
                                     <th>ชื่อ</th>
                                     <th>นามสกุล</th>
                                     <th>อีเมล</th>
                                     <th>เบอร์โทร</th>
                                     <th>บทบาท</th>
-                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -218,6 +218,7 @@ const Admin = () => {
                                     )
                                     .map((user) => (
                                         <tr key={user._id}>
+                                            <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'ไม่พบข้อมูล'}</td>
                                             <td>{user.firstname || 'ไม่พบข้อมูล'}</td>
                                             <td>{user.lastname || 'ไม่พบข้อมูล'}</td>
                                             <td>{user.email || 'ไม่พบข้อมูล'}</td>
@@ -275,16 +276,16 @@ const Admin = () => {
                     </label>
                     <br />
                     {dormitorys.length > 0 && (
-                        <Table striped bordered hover size="sm" style={{ backgroundColor: '#F2F6FA', maxWidth: '68%', margin: 'auto' }}>
+                        <Table striped bordered hover size="sm" style={{ backgroundColor: '#F2F6FA', maxWidth: '68%', margin: 'auto', textAlign: 'center' }}>
                             <thead>
                                 <tr style={{ backgroundColor: '#F2F6FA', color: '#003580' }}>
-                                    <th style={{ width: '25vh' }}> ชื่อหอพัก (ไทย) </th>
-                                    <th style={{ width: '25vh' }}> ชื่อหอพัก (อังกฤษ) </th>
-                                    <th>อีเมล</th>
-                                    <th>เบอร์โทร</th>
-                                    <th>ไลน์</th>
-                                    <th>ที่อยู่</th>
-                                    {/* Add other dormitory fields as needed */}
+                                    <th style={{ width: '25vh' }} >วันที่ลงประกาศ</th>
+                                    <th style={{ width: '30vh' }}> ชื่อหอพัก (ไทย) </th>
+                                    <th style={{ width: '30vh' }}> ชื่อหอพัก (อังกฤษ) </th>
+                                    <th style={{ width: '30vh' }}>อีเมล</th>
+                                    <th style={{ width: '20vh' }}>เบอร์โทร</th>
+                                    <th style={{ width: '25vh' }}>ไลน์</th>
+                                    <th style={{ width: '50vh' }}>ที่อยู่</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -296,19 +297,19 @@ const Admin = () => {
                                     )
                                     .map((dormitory) => (
                                         <tr key={dormitory._id}>
+                                            <td>{dormitory.createdAt ? new Date(dormitory.createdAt).toLocaleDateString() : 'ไม่พบข้อมูล'}</td>
                                             <td>{dormitory.tname || 'ไม่พบข้อมูล'}</td>
                                             <td>{dormitory.ename || 'ไม่พบข้อมูล'}</td>
                                             <td>{dormitory.email || 'ไม่พบข้อมูล'}</td>
                                             <td>{dormitory.phone || 'ไม่พบข้อมูล'}</td>
                                             <td>{dormitory.line || 'ไม่พบข้อมูล'}</td>
-                                            <td>
+                                            <td style={{ width: '50vh' }}>
                                                 {dormitory.no || dormitory.street || dormitory.road || dormitory.subdistrict || dormitory.district || dormitory.province || dormitory.code
                                                     ? `${dormitory.no || ''} ${dormitory.street || ''} ${dormitory.road || ''} ${dormitory.subdistrict || ''} ${dormitory.district || ''} ${dormitory.province || ''} ${dormitory.code || ''}`
                                                     : 'ไม่พบข้อมูล'}
                                             </td>
                                         </tr>
                                     ))}
-                                    
                             </tbody>
                         </Table>
                     )}

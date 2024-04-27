@@ -34,18 +34,23 @@ export default function Mybooking() {
   }, []);
 
   const handleDelete = async (reservationId) => {
-    // Set the reservation ID to delete and show the modal
-    setReservationIdToDelete(reservationId);
-    setShowModal(true);
+    // Find the reservation from the bookings array
+    const booking = bookings.find(booking => booking.reservationId === reservationId);
+
+    // Check if the reservation exists and if it has been confirmed
+    if (booking && !booking.confirmationStatus) {
+      // Set the reservation ID to delete and show the modal
+      setReservationIdToDelete(reservationId);
+      setShowModal(true);
+    }
   };
+
 
   const confirmDelete = async () => {
     try {
-      // Send DELETE request to delete the reservation
       const response = await axios.delete(`/reservation/reservations/${reservationIdToDelete}`);
       if (response.data.success) {
-        // // If successful, remove the deleted reservation from the state
-        // setBookings(prevBookings => prevBookings.filter(item => item.reservation._id !== reservationIdToDelete));
+
       } else {
         // Handle error response
         console.error('Failed to delete reservation:', response.data.message);
@@ -96,36 +101,46 @@ export default function Mybooking() {
                       <>
                         <h3>{booking.dormitoryInfo.name}</h3>
                         <p>ที่อยู่หอพัก: {booking.dormitoryInfo.address}</p>
+                        <p>สถานะการจอง: {booking.confirmationMessage}</p>
                         <p>วันที่จอง: {booking.date}</p>
                         <p>เวลาที่จอง: {booking.time}</p>
-
                       </>
                     ) : (
                       <p>ไม่พบข้อมูลหอพัก</p>
                     )}
-{/* 
-                    {booking.dormitoryInfo.roomTypes.map((roomType, roomIndex) => (
+                    
+                    {/* {booking.dormitoryInfo.roomTypes.map((roomType, roomIndex) => (
                       <div key={roomIndex}>
                         <p>ประเภทห้องพัก: {roomType.typeRooms}</p>
                         <p>ขนาดห้องพัก: {roomType.sizeRooms}</p>
-                        <p>ราคารายวัน: {roomType.minDailys} - {roomType.minMonthlys}</p>
-                        <p>ราคารายเดือน: {roomType.maxDailys} - {roomType.maxMonthlys}</p>
                       </div>
                     ))} */}
 
-                    <Button
-                      style={{
-                        backgroundColor: 'red',
-                        color: 'white',
-                        padding: '10px',
-                        border: 'none',
-                        cursor: 'pointer',
-                        marginTop: '10px',
-                      }}
-                      onClick={() => handleDelete(booking.reservationId)}
-                    >
-                      ยกเลิกการจอง
-                    </Button>
+
+                    <div style={{ textAlign: 'right' }}>
+
+                      <Button
+                        style={{
+                          backgroundColor: booking.confirmationStatus ? '' : '#DF130C',
+                          color: 'white',
+                          padding: '10px',
+                          border: 'none',
+                          cursor: 'pointer',
+                          marginTop: '10px',
+                        }}
+                        onClick={() => handleDelete(booking.reservationId)}
+                        disabled={booking.confirmationStatus}
+                      >
+                        {booking.confirmationStatus ? 'จองสำเร็จ' : 'ยกเลิกการจอง'}
+                      </Button>
+
+
+
+
+
+                    </div>
+
+
                   </li>
                 ))}
               </ul>

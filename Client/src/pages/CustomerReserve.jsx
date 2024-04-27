@@ -4,16 +4,19 @@ import Navbar from '../components/navbar/Navbar';
 import axios from 'axios';
 import useFetch from '../hooks/useFetch';
 import { useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 export default function CustomerReserve() {
     const [reservations, setReservations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [reservationIdToDelete, setReservationIdToDelete] = useState(null);
+    const [confirmationMessages, setConfirmationMessages] = useState({}); // State to store confirmation messages
     const location = useLocation();
     const id = location.pathname.split("/")[2]; // Get id from URL path
 
-    const { data: dormitoryData } = useFetch(`/dormitorys/find/${id}`); // Fetch dormitory data using id
+    const { data: dormitoryData } = useFetch(`/dormitorys/find/${id}`);
 
     useEffect(() => {
         const fetchReservations = async () => {
@@ -32,29 +35,34 @@ export default function CustomerReserve() {
         }
     }, [id]);
 
-    const handleDelete = async (reservationId) => {
-        setReservationIdToDelete(reservationId);
-        setShowModal(true);
-    };
-
-    const confirmDelete = async () => {
+    const handleDelete = async () => {
         try {
-            if (!reservationIdToDelete) {
-                console.error('Reservation ID to delete is not defined.');
-                return;
-            }
-
-            const response = await axios.delete(`/dormitorys/find/reserve/${reservationIdToDelete}`);
+            const response = await axios.delete(`/reservation/reservations/${reservationIdToDelete}`);
             if (response.data.success) {
                 console.log('Reservation deleted successfully:', reservationIdToDelete);
                 // Optionally update state or refetch reservations
+                setReservationIdToDelete(null); // Reset reservationIdToDelete state
             } else {
                 console.error('Failed to delete reservation:', response.data.message);
             }
         } catch (error) {
             console.error('Error deleting reservation:', error);
         } finally {
-            setShowModal(false); // Hide the modal regardless of success or failure
+            setShowModal(false); // Close the modal
+        }
+    };
+
+    const handleConfirmBooking = async (reservationId) => {
+        try {
+            const response = await axios.put(`/reservation/confirm/${reservationId}`);
+            // Update the confirmation message state for the corresponding reservation ID
+            setConfirmationMessages(prevState => ({
+                ...prevState,
+                [reservationId]: response.data.message
+            }));
+        } catch (error) {
+            console.error('Error confirming reservation:', error);
+            // Handle error (optional)
         }
     };
 
@@ -72,44 +80,43 @@ export default function CustomerReserve() {
                             </div>
                         ) : (
                             <ul style={{ listStyle: 'none', padding: 0 }}>
-                                
-                                {reservations.map((reservation) => (
+                                {reservations.map((reservation, index) => (
                                     <li key={reservation._id} style={{ marginBottom: '20px' }}>
-                                       
                                         <div key={reservation._id} style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <div style={{ textAlign: 'left', marginRight: '20px' }}>
-                                                    <p>ชื่อ: {reservation.firstName}</p>
-                                                    <p>นามสกุล: {reservation.lastName}</p>
-                                                    <p>เบอร์โทร: 0{reservation.phoneNumber}</p>
-                                                    <p>วันที่จอง: {reservation.date}</p>
-                                                    <p>เวลาที่จอง: {reservation.time}</p>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                                <div style={{ flex: '1' }}>
+                                                    <p style={{ marginBottom: '5px' }}>รหัสการจอง: {index + 1}</p>
+                                                    <p style={{ marginBottom: '5px' }}>ชื่อ: {reservation.firstName}</p>
+                                                    <p style={{ marginBottom: '5px' }}>นามสกุล: {reservation.lastName}</p>
+                                                    <p style={{ marginBottom: '5px' }}>เบอร์โทร: 0{reservation.phoneNumber}</p>
+                                                    <p style={{ marginBottom: '5px' }}>วันที่จอง: {reservation.date}</p>
+                                                    <p style={{ marginBottom: '5px' }}>เวลาที่จอง: {reservation.time}</p>
                                                 </div>
-                                                <div>
-                                                    <img
-                                                        src={reservation.imagePayment}
-                                                        alt="User Payment"
-                                                        style={{ maxWidth: '200px', maxHeight: '200px' }}
-                                                    />
+                                                <div style={{ flex: '1', textAlign: 'right' }}>
+                                                    <img src={reservation.imagePayment} alt="User Payment" style={{ maxWidth: '200px', maxHeight: '200px' }} />
                                                 </div>
                                             </div>
-
-                                            <div style={{ textAlign: 'right', marginLeft: '20px' }}>
-                                                <Button
-                                                    style={{
-                                                        color: 'white',
-                                                        padding: '10px',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                        marginTop: '10px',
-                                                    }}
-                                                    variant="danger" onClick={() => handleDelete(reservation.reservationId)}
-                                                >
+                                            <div style={{ textAlign: 'right' }}>
+                                                <Button style={{backgroundColor: '#DF130C', border: 'none' }} onClick={() => handleDelete(reservation.reservationId)}>
                                                     ลบการจอง
                                                 </Button>
-                                            </div>
 
-                                            
+                                                <Button
+                                                    onClick={() => handleConfirmBooking(reservation.reservationId)} // Pass the reservationId to the handler function
+                                                    disabled={loading || confirmationMessages[reservation.reservationId]} // Disable the button if confirmation process is in progress or already confirmed
+                                                    style={{ marginLeft: '10px', backgroundColor: '#54A915', border: 'none' }} // Set border to none
+                                                >
+                                                    ยืนยันการจอง
+                                                </Button>
+
+
+                                                {confirmationMessages[reservation.reservationId] && (
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: '10px', color: 'green' }}>
+                                                        <FontAwesomeIcon icon={faCheckCircle} style={{ marginRight: '5px' }} />
+                                                        <p style={{ margin: '0' }}>{confirmationMessages[reservation.reservationId]}</p>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </li>
                                 ))}
@@ -118,24 +125,17 @@ export default function CustomerReserve() {
                     </div>
                 )}
             </div>
-            {/* ลบการจองของลูกค้า */}
+            {/* Modal for delete confirmation */}
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>ลบการจองหอพัก?</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
-                    <span> ลบการจองของผู้ใช้ ใช่หรือไม่?</span>
-                </Modal.Body>
+                <Modal.Body>คุณแน่ใจหรือไม่ว่าต้องการลบการจองหอพักนี้?</Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>
-                        ยกเลิก
-                    </Button>
-                    <Button variant="danger" onClick={confirmDelete}>
-                        ยืนยัน
-                    </Button>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>ยกเลิก</Button>
+                    <Button variant="danger" onClick={handleDelete}>ลบ</Button>
                 </Modal.Footer>
             </Modal>
         </div>
-
     );
 }

@@ -247,7 +247,7 @@ const Booking = () => {
 
         setTimeout(() => {
           setShowModal(false);
-        }, 10000); 
+        }, 10000);
         return;
       }
 
@@ -423,32 +423,36 @@ const Booking = () => {
                         data.roomTypes.map((roomType, index) => (
                           <tr key={index}>
                             <td style={{ textAlign: 'center' }}>{roomType.typeRooms || "-"}</td>
-                            <td style={{ textAlign: 'center' }}>{roomType.sizeRooms || "-"}</td>
+
                             <td style={{ textAlign: 'center' }}>
-                              {roomType.minDailys !== undefined && roomType.maxDailys !== undefined
-                                ? `${roomType.minDailys} - ${roomType.maxDailys}`
-                                : roomType.minDailys !== undefined || roomType.maxDailys !== undefined
-                                  ? `${roomType.minDailys || ''}   ${roomType.maxDailys || ''}`
-                                  : "-"}
+                              {roomType.sizeRooms !== null ? `${roomType.sizeRooms} ตร.ม` : "-"}
                             </td>
+
                             <td style={{ textAlign: 'center' }}>
-                              {roomType.minMonthlys !== undefined && roomType.maxMonthlys !== undefined
-                                ? `${roomType.minMonthlys} - ${roomType.maxMonthlys}`
-                                : roomType.minMonthlys !== undefined || roomType.maxMonthlys !== undefined
-                                  ? `${roomType.minMonthlys || ''}  ${roomType.maxMonthlys || ''}`
-                                  : "-"}
+                              {(roomType.minDailys !== undefined && roomType.maxDailys !== undefined) ?
+                                `${roomType.minDailys || ""} - ${roomType.maxDailys || ""}` :
+                                (roomType.minDailys !== undefined ? `${roomType.minDailys}` :
+                                  roomType.maxDailys !== undefined ? `${roomType.maxDailys}` : "-")
+                              }
                             </td>
+
+                            <td style={{ textAlign: 'center' }}>
+                              {(roomType.minMonthlys !== undefined && roomType.maxMonthlys !== undefined) ?
+                                `${roomType.minMonthlys || ""} - ${roomType.maxMonthlys || ""}` :
+                                (roomType.minMonthlys !== undefined ? roomType.minMonthlys :
+                                  roomType.maxMonthlys !== undefined ? roomType.maxMonthlys : "-")
+                              }
+                            </td>
+
                           </tr>
                         ))
-                      ) : (
-                        <tr>
-                          <td colSpan="4" style={{ textAlign: 'center' }}>ไม่พบประเภทห้องพัก</td>
-                        </tr>
-                      )}
+                      ) : null}
                     </tbody>
+
+
                   </table>
 
-                  <br />  <br />
+                  <br /><br />
 
                   <div style={{ height: '30vh', alignItems: 'left', justifyContent: 'center' }}>
                     <h1>สิ่งอำนวยความสะดวก</h1>
@@ -576,6 +580,7 @@ const Booking = () => {
                                           <p style={{ fontWeight: 'bold' }}>รายละเอียดหอพักที่จอง</p>
                                           <table style={{}}>
                                             <tbody>
+
                                               <tr>
                                                 <td style={{ fontWeight: 'bold' }}>ห้องพัก:</td>
                                                 <Button variant="light" disabled style={{}}>
@@ -588,24 +593,42 @@ const Booking = () => {
                                                   {selectedRoomType.sizeRooms} ตร.ม
                                                 </Button>
                                               </tr>
+
                                               <tr>
                                                 <td style={{ fontWeight: 'bold' }}>ราคารายวัน:</td>
-                                                <Button variant="light" disabled style={{}}>
-                                                  {selectedRoomType.minDailys} - {selectedRoomType.maxDailys} บาท
+                                                <Button variant="light" disabled>
+                                                  {selectedRoomType.minDailys !== undefined && selectedRoomType.maxDailys !== undefined
+                                                    ? `${selectedRoomType.minDailys} - ${selectedRoomType.maxDailys} บาท`
+                                                    : selectedRoomType.minDailys !== undefined && selectedRoomType.maxDailys === undefined
+                                                      ? `${selectedRoomType.minDailys} บาท`
+                                                      : selectedRoomType.minDailys === undefined && selectedRoomType.maxDailys !== undefined
+                                                        ? `${selectedRoomType.maxDailys} บาท`
+                                                        : '-'}
                                                 </Button>
                                               </tr>
+
                                               <tr>
                                                 <td style={{ fontWeight: 'bold' }}>ราคารายเดือน:</td>
-                                                <Button variant="light" disabled style={{}}>
-                                                  {selectedRoomType.minMonthlys} - {selectedRoomType.maxMonthlys}  บาท
+                                                <Button variant="light" disabled>
+                                                  {selectedRoomType.minMonthlys !== undefined && selectedRoomType.maxMonthlys !== undefined
+                                                    ? `${selectedRoomType.minMonthlys} - ${selectedRoomType.maxMonthlys} บาท`
+                                                    : selectedRoomType.minMonthlys !== undefined && selectedRoomType.maxMonthlys === undefined
+                                                      ? `${selectedRoomType.minMonthlys} บาท`
+                                                      : selectedRoomType.minMonthlys === undefined && selectedRoomType.maxMonthlys !== undefined
+                                                        ? `${selectedRoomType.maxMonthlys} บาท`
+                                                        : "-"}
                                                 </Button>
                                               </tr>
+
+
                                               <tr>
                                                 <td style={{ fontWeight: 'bold' }}>ค่ามัดจำ:</td>
-                                                <Button variant="light" disabled style={{}}>
-                                                  {data.advance} บาท
+                                                <Button variant="light" disabled>
+                                                  {data.advance !== null && data.advance !== undefined ? `${data.advance} บาท` : ""}
                                                 </Button>
                                               </tr>
+
+
                                             </tbody>
                                           </table>
                                         </div>
@@ -615,18 +638,6 @@ const Booking = () => {
                                 </Row>
                                 {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
                               </Form.Group>
-
-                              <br /><br />
-                              <Row>
-                                {/* <Form.Control
-                                  type="text"
-                                  style={{ marginLeft: '10px', width: '32%', height: '5vh' }}
-                                  placeholder={`ค่ามัดจำ: ${data.advance !== null && data.advance !== undefined ? data.advance : "-"}`}
-                                  aria-label="Disabled input example"
-                                  disabled
-                                  readOnly
-                                /> */}
-                              </Row>
                             </Row>
                           </Form>
                           <Form.Group>
@@ -637,11 +648,8 @@ const Booking = () => {
                     {step === 2 && (
                       <Form>
                         <div className='d-flex mb-5 flex-column justify-content-center align-items-center'>
-                          <h3 className='pb-4'>Prompay QR Code</h3>
-
-
+                          <h3 className='pb-4'>Promptay QR Code</h3>
                           <QRCode size={250} value={qrCode} />
-
                           <Form>
                             <Form.Group controlId="formFile" className="mb-3 text-center mt-4">
                               <Form.Label>กรุณาแนบสลิป หลังจากชำระเงิน</Form.Label>

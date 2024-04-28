@@ -52,24 +52,33 @@ export const deleteUser = async (req, res, next) => {
 //ผู้ใช้ ดูข้อมูลตัวเอง (/)
 export const getUser = async (req, res, next) => {
     try {
-        const user = await User.findById(req.user.id)
-        res.status(200).json(user)
-
+        const user = await User.findById(req.user.id);
+        const roles = user.role === 'owner' ? ['owner', 'customer'] : [user.role];
+        res.status(200).json({ 
+            ...user.toObject(),
+            roles: roles  // Include the roles field in the response
+        });
     } catch (err) {
         next(err);
     }
 }
 
+
 //ดูผู้ใช้ทั้งหมด (/)
 export const getallUser = async (req, res, next) => {
     try {
-        const users = await User.find();
-        res.status(200).json(users);
-
+        const users = await User.find({}, '-password'); // Exclude password field
+        const usersWithRoles = users.map(user => ({
+            ...user.toObject(),
+            role: user.role === 'owner' ? ['owner', 'customer'] : [user.role]
+        }));
+        res.status(200).json(usersWithRoles);
     } catch (error) {
         next(error);
     }
 }
+
+
 
 //เจ้าของหอพัก ดูข้อมูลหอพักตัวเอง (/)
 export const getUserListings = async (req, res, next) => {

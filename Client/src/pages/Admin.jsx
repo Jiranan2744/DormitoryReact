@@ -223,8 +223,8 @@ const Admin = () => {
                                             <td>{user.lastname || 'ไม่พบข้อมูล'}</td>
                                             <td>{user.email || 'ไม่พบข้อมูล'}</td>
                                             <td>0{user.phone || 'ไม่พบข้อมูล'}</td>
-                                            <td>{user.role || 'ไม่พบข้อมูล'}</td>
-                                            <td style={{ textAlign: 'center' }}>
+                                            <td>{Array.isArray(user.role) ? user.role.join(', ') : user.role || 'ไม่พบข้อมูล'}</td>
+                                            <td style={{ width: '10vh',textAlign: 'center' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                     <FontAwesomeIcon
                                                         icon={faTrash}
@@ -316,8 +316,6 @@ const Admin = () => {
                 </div>
             )}
 
-
-
             {activeTab === "3" && (
                 <div>
                     <label style={{
@@ -354,6 +352,7 @@ const Admin = () => {
                     <br />
                 </div>
             )}
+            <br /> <br />
         </div>
     );
 };

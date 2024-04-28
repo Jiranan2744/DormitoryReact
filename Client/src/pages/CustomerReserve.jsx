@@ -12,9 +12,9 @@ export default function CustomerReserve() {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [reservationIdToDelete, setReservationIdToDelete] = useState(null);
-    const [confirmationMessages, setConfirmationMessages] = useState({}); // State to store confirmation messages
+    const [confirmationMessages, setConfirmationMessages] = useState({});
     const location = useLocation();
-    const id = location.pathname.split("/")[2]; // Get id from URL path
+    const id = location.pathname.split("/")[2];
 
     const { data: dormitoryData } = useFetch(`/dormitorys/find/${id}`);
 
@@ -40,29 +40,29 @@ export default function CustomerReserve() {
             const response = await axios.delete(`/reservation/reservations/${reservationIdToDelete}`);
             if (response.data.success) {
                 console.log('Reservation deleted successfully:', reservationIdToDelete);
-                // Optionally update state or refetch reservations
-                setReservationIdToDelete(null); // Reset reservationIdToDelete state
+                setReservationIdToDelete(null);
             } else {
                 console.error('Failed to delete reservation:', response.data.message);
             }
         } catch (error) {
             console.error('Error deleting reservation:', error);
         } finally {
-            setShowModal(false); // Close the modal
+            setShowModal(false);
         }
     };
 
     const handleConfirmBooking = async (reservationId) => {
         try {
             const response = await axios.put(`/reservation/confirm/${reservationId}`);
-            // Update the confirmation message state for the corresponding reservation ID
             setConfirmationMessages(prevState => ({
                 ...prevState,
                 [reservationId]: response.data.message
             }));
+
+            // Update local storage with the status
+            localStorage.setItem(`reservationStatus_${reservationId}`, 'Verified Successful');
         } catch (error) {
             console.error('Error confirming reservation:', error);
-            // Handle error (optional)
         }
     };
 
@@ -97,18 +97,17 @@ export default function CustomerReserve() {
                                                 </div>
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
-                                                <Button style={{backgroundColor: '#DF130C', border: 'none' }} onClick={() => handleDelete(reservation.reservationId)}>
-                                                    ลบการจอง
-                                                </Button>
-
                                                 <Button
-                                                    onClick={() => handleConfirmBooking(reservation.reservationId)} // Pass the reservationId to the handler function
-                                                    disabled={loading || confirmationMessages[reservation.reservationId]} // Disable the button if confirmation process is in progress or already confirmed
-                                                    style={{ marginLeft: '10px', backgroundColor: '#54A915', border: 'none' }} // Set border to none
+                                                    onClick={() => handleConfirmBooking(reservation.reservationId)}
+                                                    disabled={loading || confirmationMessages[reservation.reservationId] || localStorage.getItem(`reservationStatus_${reservation.reservationId}`) === 'Verified Successful'}
+                                                    style={{
+                                                        marginLeft: '10px',
+                                                        backgroundColor: localStorage.getItem(`reservationStatus_${reservation.reservationId}`) === 'Verified Successful' ? '#54A915' : '#feba02',
+                                                        border: 'none'
+                                                    }}
                                                 >
-                                                    ยืนยันการจอง
+                                                    {localStorage.getItem(`reservationStatus_${reservation.reservationId}`) === 'Verified Successful' ? 'ยืนยันการจอง' : 'รอดำเนินการ'}
                                                 </Button>
-
 
                                                 {confirmationMessages[reservation.reservationId] && (
                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: '10px', color: 'green' }}>
@@ -125,8 +124,7 @@ export default function CustomerReserve() {
                     </div>
                 )}
             </div>
-            {/* Modal for delete confirmation */}
-            <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+            {/* <Modal show={showModal} onHide={() => setShowModal(false)} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>ลบการจองหอพัก?</Modal.Title>
                 </Modal.Header>
@@ -135,7 +133,7 @@ export default function CustomerReserve() {
                     <Button variant="secondary" onClick={() => setShowModal(false)}>ยกเลิก</Button>
                     <Button variant="danger" onClick={handleDelete}>ลบ</Button>
                 </Modal.Footer>
-            </Modal>
+            </Modal> */}
         </div>
     );
 }

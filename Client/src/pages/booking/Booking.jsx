@@ -648,7 +648,7 @@ const Booking = () => {
                     {step === 2 && (
                       <Form>
                         <div className='d-flex mb-5 flex-column justify-content-center align-items-center'>
-                          <h3 className='pb-4'>Promptay QR Code</h3>
+                          <h3 className='pb-4'>Promptpay QR Code</h3>
                           <QRCode size={250} value={qrCode} />
                           <Form>
                             <Form.Group controlId="formFile" className="mb-3 text-center mt-4">

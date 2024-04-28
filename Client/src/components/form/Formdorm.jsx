@@ -17,7 +17,7 @@ import {
 import { useSelector } from 'react-redux';
 import Button from 'react-bootstrap/esm/Button';
 import FormSelect from 'react-bootstrap/esm/FormSelect';
-import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function Formdorm() {
@@ -70,9 +70,6 @@ export default function Formdorm() {
       return updatedRoomTypesList;
     });
   };
-
-
-
 
 
   const [imageUploadError, setImageUploadError] = useState(false);
@@ -138,15 +135,60 @@ export default function Formdorm() {
     });
   };
 
-  //HandleChange
-  const handleChange = (e) => {
-    const allowedTypes = ['number', 'text', 'textarea'];
+  const [showWarningTname, setShowWarningTname] = useState(false);
+  const [showWarningPhone, setShowWarningPhone] = useState(false);
+  const [showWarningNo, setShowWarningNo] = useState(false);
+  const [showWarningSubdistrict, setShowWarningSubdistrict] = useState(false);
+  const [showWarningDistrict, setShowWarningDistrict] = useState(false);
+  const [showWarningProvince, setShowWarningProvince] = useState(false);
+  const [showWarningCode, setShowWarningCode] = useState(false);
+  const [showWarningAdvance, setShowWarningAdvance] = useState(false);
+  const [showWarningTyperooms, setShowWarningTyperooms] = useState(false);
+  const [showWarningSizerooms, setShowWarningSizerooms] = useState(false);
 
-    if (allowedTypes.includes(e.target.type)) {
-      setFormData({
-        ...formData,
-        [e.target.id]: e.target.value,
-      });
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData({
+      ...formData,
+      [id]: value,
+    });
+
+    switch (id) {
+      case 'tname':
+        setShowWarningTname(value.trim() === '');
+        break;
+      case 'phone':
+        setShowWarningPhone(value.trim() === '');
+        break;
+      case 'no':
+        setShowWarningNo(value.trim() === '');
+        break;
+      case 'subdistrict':
+        setShowWarningSubdistrict(value.trim() === '');
+        break;
+      case 'district':
+        setShowWarningDistrict(value.trim() === '');
+        break;
+      case 'province':
+        setShowWarningProvince(value.trim() === '');
+        break;
+      case 'code':
+        setShowWarningCode(value.trim() === '');
+        break;
+      case 'advance':
+        setShowWarningAdvance(value.trim() === '');
+        break;
+
+      case 'typerooms':
+        setShowWarningTyperooms(value.trim() === '');
+        break;
+      case 'sizerooms':
+        setShowWarningSizerooms(value.trim() === '');
+        break;
+
+      default:
+        break;
     }
   };
 
@@ -322,6 +364,31 @@ export default function Formdorm() {
     setShowUI(false); // Hide the card from the page
   };
 
+  const handleAddCard = () => {
+    // Create a new room type object with empty fields
+    const newRoomType = {
+      typeRooms: '',
+      sizeRooms: '',
+      minDailys: '',
+      maxDailys: '',
+      minMonthlys: '',
+      maxMonthlys: '',
+    };
+
+    // Add the new room type object to the roomTypes state
+    setRoomTypes(prevRoomTypes => [...prevRoomTypes, newRoomType]);
+  };
+
+
+  const handleDelete = (index) => {
+    setRoomTypes((prevRoomTypes) => {
+      const updatedRoomTypes = [...prevRoomTypes];
+      updatedRoomTypes.splice(index, 1);
+      return updatedRoomTypes;
+    });
+  };
+
+
   return (
     <div>
       <Navbar />
@@ -340,14 +407,19 @@ export default function Formdorm() {
                   ชื่อที่พัก
                 </Form.Label>
                 <Col sm={6} style={{ width: '50vh' }}>
-                  <input
-                    type="text"
-                    placeholder="ชื่อ (ภาษาไทย)"
-                    id="tname"
-                    className='form-control'
-                    onChange={handleChange}
-                    value={formData.tname}
-                  />
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="ชื่อ (ภาษาไทย)"
+                      id="tname"
+                      className={`form-control ${showWarningTname ? 'border-danger' : ''}`}
+                      onChange={handleChange}
+                      value={formData.tname}
+                      onBlur={() => setShowWarningTname(formData.tname.trim() === '')}
+                      style={{ marginBottom: '10px' }}
+                    />
+                    {showWarningTname && <span style={{ color: 'red' }}>กรุณาระบุชื่อที่พัก</span>}
+                  </div>
                 </Col>
               </Form.Group>
 
@@ -388,14 +460,19 @@ export default function Formdorm() {
                   เบอร์โทร
                 </Form.Label>
                 <Col sm={6} style={{ width: '50vh' }}>
-                  <input
-                    type="text"
-                    placeholder="เบอร์โทร"
-                    id="phone"
-                    className='form-control'
-                    onChange={handleChange}
-                    value={formData.phone}
-                  />
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="เบอร์โทร"
+                      id="phone"
+                      className={`form-control ${showWarningPhone ? 'border-danger' : ''}`}
+                      onChange={handleChange}
+                      value={formData.phone}
+                      onBlur={() => setShowWarningPhone(formData.phone.trim() === '')}
+                      style={{ marginBottom: '10px' }}
+                    />
+                    {showWarningPhone && <span style={{ color: 'red' }}>กรุณาระบุชื่อที่พัก</span>}
+                  </div>
                 </Col>
               </Form.Group>
 
@@ -425,15 +502,19 @@ export default function Formdorm() {
                     <Col>
                       <Form.Label>เลขที่/หมู่</Form.Label>
                       <Form.Group as={Col} controlId="formGridNumber">
-                        <input
-                          type="text"
-                          placeholder="เลขที่/หมู่."
-                          id="no"
-                          style={{ width: '20vh' }}
-                          className='form-control'
-                          onChange={handleChange}
-                          value={formData.no}
-                        />
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="เลขที่."
+                            id="no"
+                            className={`form-control ${showWarningNo ? 'border-danger' : ''}`}
+                            onChange={handleChange}
+                            value={formData.no}
+                            onBlur={() => setShowWarningNo(formData.no.trim() === '')}
+                            style={{ marginBottom: '10px' }}
+                          />
+                          {showWarningNo && <span style={{ color: 'red' }}>กรุณาระบุชื่อที่พัก</span>}
+                        </div>
                       </Form.Group>
                     </Col>
 
@@ -471,57 +552,80 @@ export default function Formdorm() {
                   <Form.Group>
                     <Row className="mt-2 pb-1" xs={5}>
                       <Form.Label column sm={3} style={{ width: '30vh' }}></Form.Label>
-                      <Form.Group as={Col} controlId="formGridAdistrict">
+
+                      <Form.Group as={Col} controlId="formGridSubdistrict">
                         <Form.Label>ตำบล/แขวง</Form.Label>
-                        <input
-                          type="text"
-                          placeholder="ตำบล/แขวง."
-                          id="subdistrict"
-                          style={{ width: '20vh' }}
-                          className='form-control'
-                          onChange={handleChange}
-                          value={formData.subdistrict}
-                        />
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="ตำบล/แขวง."
+                            id="subdistrict"
+                            className={`form-control ${showWarningSubdistrict ? 'border-danger' : ''}`}
+                            onChange={handleChange}
+                            value={formData.subdistrict}
+                            onBlur={() => setShowWarningSubdistrict(formData.subdistrict.trim() === '')}
+                            style={{ marginBottom: '10px' }}
+                          />
+                          {showWarningSubdistrict && <span style={{ color: 'red' }}>กรุณาระบุชื่อที่พัก</span>}
+
+                          {/* Repeat similar blocks for other input fields */}
+                        </div>
+                      </Form.Group>
+
+                      <Form.Group as={Col} controlId="formGridDistrict">
+                        <Form.Label>อำเภอ/เขต</Form.Label>
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="อำเภอ/เขต."
+                            id="district"
+                            className={`form-control ${showWarningDistrict ? 'border-danger' : ''}`}
+                            onChange={handleChange}
+                            value={formData.district}
+                            onBlur={() => setShowWarningDistrict(formData.district.trim() === '')}
+                            style={{ marginBottom: '10px' }}
+                          />
+                          {showWarningDistrict && <span style={{ color: 'red' }}>กรุณาระบุชื่อที่พัก</span>}
+                        </div>
                       </Form.Group>
 
                       <Form.Group as={Col} controlId="formGridProvince">
-                        <Form.Label>อำเภอ/เขต</Form.Label>
-                        <input
-                          type="text"
-                          placeholder="อำเภอ/เขต."
-                          id="district"
-                          style={{ width: '20vh' }}
-                          className='form-control'
-                          onChange={handleChange}
-                          value={formData.district}
-                        />
-                      </Form.Group>
-                      <Form.Group as={Col} controlId="formGridZipcode">
                         <Form.Label>จังหวัด</Form.Label>
-                        <input
-                          type="text"
-                          placeholder="จังหวัด."
-                          id="province"
-                          style={{ width: '20vh' }}
-                          className='form-control'
-                          onChange={handleChange}
-                          value={formData.province}
-                        />
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="จังหวัด."
+                            id="province"
+                            className={`form-control ${showWarningProvince ? 'border-danger' : ''}`}
+                            onChange={handleChange}
+                            value={formData.province}
+                            onBlur={() => setShowWarningProvince(formData.province.trim() === '')}
+                            style={{ marginBottom: '10px' }}
+                          />
+                          {showWarningProvince && <span style={{ color: 'red' }}>กรุณาระบุชื่อที่พัก</span>}
+                        </div>
                       </Form.Group>
-                      <Form.Group as={Col} controlId="formGridZipcode">
+
+                      <Form.Group as={Col} controlId="formGridCode">
                         <Form.Label>รหัสไปรษณีย์</Form.Label>
-                        <input
-                          type="text"
-                          placeholder="รหัสไปรษณีย์."
-                          id="code"
-                          style={{ width: '20vh' }}
-                          className='form-control'
-                          onChange={handleChange}
-                          value={formData.code}
-                        />
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="รหัสไปรษณีย์."
+                            id="code"
+                            className={`form-control ${showWarningCode ? 'border-danger' : ''}`}
+                            onChange={handleChange}
+                            value={formData.code}
+                            onBlur={() => setShowWarningCode(formData.code.trim() === '')}
+                            style={{ marginBottom: '10px' }}
+                          />
+                          {showWarningCode && <span style={{ color: 'red' }}>กรุณาระบุชื่อที่พัก</span>}
+                        </div>
                       </Form.Group>
+
                     </Row>
                   </Form.Group>
+
                   < br /> < br />
 
                   <Form>
@@ -564,99 +668,124 @@ export default function Formdorm() {
                     ประเภทห้องพัก
                   </Form.Label>
 
-                  <Card style={{ width: '148vh', height: '20vh' }}>
+                  <Card style={{ width: '100%', marginTop: '20px' }}>
                     <Card.Body>
                       <Form>
                         <table className="table table-bordered">
                           <thead className="thead-light">
                             <tr>
-                              <th style={{ width: '8%', textAlign: 'center' }}>รูปแบบห้องพัก</th>
+                              <th style={{ width: '15%', textAlign: 'center' }}>รูปแบบห้องพัก</th>
                               <th style={{ width: '14%', textAlign: 'center' }}>ขนาดห้องพัก</th>
-                              <th style={{ width: '39%', textAlign: 'center' }}>ห้องพักรายวัน (บาท/วัน)</th>
-                              <th style={{ width: '50%', textAlign: 'center' }}>ห้องพักรายเดือน (บาท/เดือน)</th>
+                              <th style={{ width: '35%', textAlign: 'center' }}>ห้องพักรายวัน (บาท/วัน)</th>
+                              <th style={{ width: '36%', textAlign: 'center' }}>ห้องพักรายเดือน (บาท/เดือน)</th>
                             </tr>
                           </thead>
                           <tbody>
                             {roomTypes.map((roomType, index) => (
                               <tr key={index}>
                                 <td>
-                                  <div className="input-group">
-                                    <FormSelect
-                                      id={`typeRooms-${index}`}
-                                      className="form-select"
-                                      style={{ width: '140px' }}
-                                      onChange={e => handleInputChange(index, 'typeRooms', e.target.value)}
-                                      value={roomType.typeRooms}
-                                    >
-                                      <option value="เลือกห้องพัก">เลือกห้องพัก</option>
-                                      <option value="สูท">ห้องสูท</option>
-                                      <option value="สตูดิโอ">ห้องสตูดิโอ</option>
-                                      <option value="1 ห้องนอน">1 ห้องนอน</option>
-                                      <option value="2 ห้องนอน">2 ห้องนอน</option>
-                                      <option value="3 ห้องนอน">3 ห้องนอน</option>
-                                    </FormSelect>
-                                  </div>
+                                  <div style={{ marginTop: '10px', width: 'px' }} className="outfit-type">ประเภท {index + 1}</div>
+                                  <FormSelect
+                                    id={`typeRooms-${index}`}
+                                    className="form-select"
+                                    style={{ width: '100%', marginTop: '10px' }}
+                                    onChange={(e) => handleInputChange(index, 'typeRooms', e.target.value)}
+                                    value={roomType.typeRooms}
+                                  >
+                                    <option value="เลือกห้องพัก">เลือกห้องพัก</option>
+                                    <option value="สูท">ห้องสูท</option>
+                                    <option value="สตูดิโอ">ห้องสตูดิโอ</option>
+                                    <option value="1 ห้องนอน">1 ห้องนอน</option>
+                                    <option value="2 ห้องนอน">2 ห้องนอน</option>
+                                    <option value="3 ห้องนอน">3 ห้องนอน</option>
+                                  </FormSelect>
+                                  <div style={{ marginTop: '1vh' }}>
+                                    {roomType.typeRooms === "เลือกห้องพัก" && (
+                                      <span style={{ marginLeft: '1vh', color: 'red' }}>กรุณาเลือกห้องพัก</span>
+                                    )}</div>
                                 </td>
+
                                 <td>
-                                  <div className="input-group">
+                                  <div style={{ marginTop: '6vh' }} className="input-group">
                                     <input
                                       type="text"
                                       id={`sizeRooms-${index}`}
-                                      className="form-control"
-                                      onChange={e => handleInputChange(index, 'sizeRooms', e.target.value)}
+                                      className={`form-control ${showWarningSizerooms ? 'border-danger' : ''}`}
+                                      onChange={(e) => {
+                                        handleInputChange(index, 'sizeRooms', e.target.value);
+                                        setShowWarningSizerooms(e.target.value.trim() === '');
+                                      }}
                                       value={roomType.sizeRooms}
+                                      onBlur={() => setShowWarningSizerooms(roomType.sizeRooms.trim() === '')}
                                     />
                                     <InputGroup.Text>ตร.ม</InputGroup.Text>
                                   </div>
+                                  {showWarningSizerooms && (
+                                    <div style={{ marginLeft: '2vh', marginTop: '1vh', color: 'red' }}>
+                                      ระบุขนาดห้อง
+                                    </div>
+                                  )}
                                 </td>
+
                                 <td>
                                   <div className="d-flex">
-                                    <div className="input-group me-2">
+                                    <div style={{ marginTop: '6vh' }} className="input-group me-2">
                                       <input
                                         type="number"
                                         id={`minDailys-${index}`}
                                         placeholder="ราคาต่ำสุด"
-                                        style={{ fontSize: '16px' }}
                                         className="form-control"
-                                        onChange={e => handleInputChange(index, 'minDailys', e.target.value)}
+                                        onChange={(e) => handleInputChange(index, 'minDailys', e.target.value)}
                                         value={roomType.minDailys || ''}
                                       />
                                       <InputGroup.Text>บาท</InputGroup.Text>
                                     </div>
-
-                                    <div className="input-group">
+                                    <div style={{ marginTop: '6vh' }} className="input-group">
                                       <input
                                         type="number"
                                         id={`maxDailys-${index}`}
                                         placeholder="ราคาสูงสุด"
                                         className="form-control"
-                                        onChange={e => handleInputChange(index, 'maxDailys', e.target.value)}
+                                        onChange={(e) => handleInputChange(index, 'maxDailys', e.target.value)}
                                         value={roomType.maxDailys || ''}
                                       />
                                       <InputGroup.Text>บาท</InputGroup.Text>
                                     </div>
                                   </div>
                                 </td>
+
                                 <td>
                                   <div className="d-flex">
-                                    <div className="input-group me-2">
+                                    {index > 0 && ( 
+                                      <td style={{ position: 'relative' }}>
+                                        <div style={{ position: 'absolute', left: '45vh' }}>
+                                          <FontAwesomeIcon
+                                            icon={faTrash}
+                                            size='sm'
+                                            style={{ cursor: 'pointer', color: 'red' }}
+                                            onClick={() => handleDelete(index)}
+                                          />
+                                        </div>
+                                      </td>
+                                    )}
+                                    <div style={{ marginTop: '6vh' }} className="input-group me-2">
                                       <input
                                         type="number"
                                         id={`minMonthlys-${index}`}
                                         placeholder="ราคาต่ำสุด"
                                         className="form-control"
-                                        onChange={e => handleInputChange(index, 'minMonthlys', e.target.value)}
+                                        onChange={(e) => handleInputChange(index, 'minMonthlys', e.target.value)}
                                         value={roomType.minMonthlys || ''}
                                       />
                                       <InputGroup.Text>บาท</InputGroup.Text>
                                     </div>
-                                    <div className="input-group">
+                                    <div style={{ marginTop: '6vh' }} className="input-group">
                                       <input
                                         type="number"
                                         id={`maxMonthlys-${index}`}
                                         placeholder="ราคาสูงสุด"
                                         className="form-control"
-                                        onChange={e => handleInputChange(index, 'maxMonthlys', e.target.value)}
+                                        onChange={(e) => handleInputChange(index, 'maxMonthlys', e.target.value)}
                                         value={roomType.maxMonthlys || ''}
                                       />
                                       <InputGroup.Text>บาท</InputGroup.Text>
@@ -671,122 +800,13 @@ export default function Formdorm() {
                     </Card.Body>
                   </Card>
 
-                  <>
-                    {showUI && (
-                      <Card style={{ width: '148vh', marginTop: '20px', position: 'relative' }}>
-                        <FontAwesomeIcon
-                          onClick={handleDeleteRow}
-                          icon={faTrashAlt}
-                          style={{ position: 'absolute', top: '10px', right: '20px', cursor: 'pointer', zIndex: '999' }}
-                        />
-                        <Card.Body>
-                          <Form style={{ marginTop: '20px' }}>
-                            <table className="table table-bordered">
-                              <thead className="thead-light">
-                                <tr>
-                                  <th style={{ width: '15%', textAlign: 'center' }}>รูปแบบห้องพัก</th>
-                                  <th style={{ width: '14%', textAlign: 'center' }}>ขนาดห้องพัก</th>
-                                  <th style={{ width: '35%', textAlign: 'center' }}>ห้องพักรายวัน (บาท/วัน)</th>
-                                  <th style={{ width: '36%', textAlign: 'center' }}>ห้องพักรายเดือน (บาท/เดือน)</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {roomTypes.map((roomType, index) => (
-                                  <tr key={index}>
-                                    <td>
-                                      <FormSelect
-                                        id={`typeRooms-${index}`}
-                                        className="form-select"
-                                        style={{ width: '100%' }}
-                                        onChange={e => handleInputChange(index, 'typeRooms', e.target.value)}
-                                        value={roomType.typeRooms}
-                                      >
-                                        <option value="เลือกห้องพัก">เลือกห้องพัก</option>
-                                        <option value="สูท">ห้องสูท</option>
-                                        <option value="สตูดิโอ">ห้องสตูดิโอ</option>
-                                        <option value="1 ห้องนอน">1 ห้องนอน</option>
-                                        <option value="2 ห้องนอน">2 ห้องนอน</option>
-                                        <option value="3 ห้องนอน">3 ห้องนอน</option>
-                                      </FormSelect>
-                                    </td>
-                                    <td>
-                                      <div className="input-group">
-                                        <input
-                                          type="text"
-                                          id={`sizeRooms-${index}`}
-                                          className="form-control"
-                                          onChange={e => handleInputChange(index, 'sizeRooms', e.target.value)}
-                                          value={roomType.sizeRooms}
-                                        />
-                                        <InputGroup.Text>ตร.ม</InputGroup.Text>
-                                      </div>
-                                    </td>
-                                    <td>
-                                      <div className="d-flex">
-                                        <div className="input-group me-2">
-                                          <input
-                                            type="number"
-                                            id={`minDailys-${index}`}
-                                            placeholder="ราคาต่ำสุด"
-                                            style={{ fontSize: '16px' }}
-                                            className="form-control"
-                                            onChange={e => handleInputChange(index, 'minDailys', e.target.value)}
-                                            value={roomType.minDailys}
-                                          />
-                                          <InputGroup.Text>บาท</InputGroup.Text>
-                                        </div>
-                                        <div className="input-group">
-                                          <input
-                                            type="number"
-                                            id={`maxDailys-${index}`}
-                                            placeholder="ราคาสูงสุด"
-                                            className="form-control"
-                                            onChange={e => handleInputChange(index, 'maxDailys', e.target.value)}
-                                            value={roomType.maxDailys}
-                                          />
-                                          <InputGroup.Text>บาท</InputGroup.Text>
-                                        </div>
-                                      </div>
-                                    </td>
-                                    <td>
-                                      <div className="d-flex">
-                                        <div className="input-group me-2">
-                                          <input
-                                            type="number"
-                                            id={`minMonthlys-${index}`}
-                                            placeholder="ราคาต่ำสุด"
-                                            style={{ fontSize: '16px' }}
-                                            className="form-control"
-                                            onChange={e => handleInputChange(index, 'minMonthlys', e.target.value)}
-                                            value={roomType.minMonthlys}
-                                          />
-                                          <InputGroup.Text>บาท</InputGroup.Text>
-                                        </div>
-                                        <div className="input-group">
-                                          <input
-                                            type="number"
-                                            id={`maxMonthlys-${index}`}
-                                            placeholder="ราคาสูงสุด"
-                                            className="form-control"
-                                            onChange={e => handleInputChange(index, 'maxMonthlys', e.target.value)}
-                                            value={roomType.maxMonthlys}
-                                          />
-                                          <InputGroup.Text>บาท</InputGroup.Text>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </Form>
-                        </Card.Body>
-                      </Card>
-                    )}
-                  </>
-                  <br />
 
-                  <Button onClick={() => setShowUI(true)}>เพิ่มห้องพัก</Button>
+                  <br /><br />
+
+                  <Button onClick={handleAddCard}>เพิ่มห้องพัก</Button>
+
+
+                  <br />
 
                   <br /><br />
 
@@ -856,25 +876,29 @@ export default function Formdorm() {
                       ค่าบริการส่วนอื่นๆ
                     </Form.Label>
 
-                    <Form.Group as={Row} className="m-2" controlId="formHorizontalEmail">
-                      <Form.Label column sm={5} style={{ width: '20vh', fontWeight: 'normal', color: '#666666' }}>
-                        ค่ามัดจำ
-                      </Form.Label>
-                      <InputGroup style={{ width: '30vh' }} className="mb-2">
-                        <input
-                          type='number'
-                          id="advance"
-                          aria-describedby="basic-addon2"
-                          className='form-control'
-                          onChange={handleChange}
-                          value={formData.advance}
-                        />
-                        <InputGroup.Text id="basic-addon2">บาท</InputGroup.Text>
-                      </InputGroup>
-                      <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
-                        ในกรณีที่ไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
-                      </Form.Label>
+                    <Form.Group as={Row} className="m-2" controlId="formHorizontalAdvance" style={{ display: 'flex', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}>
+                        <Form.Label column sm={5} style={{ width: '18.5vh', fontWeight: 'normal', color: '#666666', marginRight: '10px' }}>
+                          ค่ามัดจำ
+                        </Form.Label>
+                        <InputGroup style={{ width: '26.5vh', marginRight: '10px' }} className="mb-2">
+                          <input
+                            type='number'
+                            id="advance"
+                            aria-describedby="basic-addon2"
+                            className={`form-control ${showWarningAdvance ? 'border-danger' : ''}`}
+                            onChange={handleChange}
+                            value={formData.advance}
+                          />
+                          <InputGroup.Text id="basic-addon2">บาท</InputGroup.Text>
+                        </InputGroup>
+                        <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
+                          ในกรณีที่ไม่ได้มาตามที่ตกลง ทางหอพักจะไม่คืนเงินในส่วนนี้
+                        </Form.Label>
+                      </div>
+                      {showWarningAdvance && <span style={{ color: 'red', marginLeft: '20vh' }}>กรุณาระบุค่ามัดจำ</span>}
                     </Form.Group>
+
 
                     <Form.Group as={Row} className="m-2" controlId="formHorizontalEmail">
                       <Form.Label column sm={5} style={{ width: '20vh', fontWeight: 'normal', color: '#666666' }}>
@@ -891,9 +915,10 @@ export default function Formdorm() {
                         />
                         <InputGroup.Text id="basic-addon2">บาท</InputGroup.Text>
                       </InputGroup>
-                      <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
+                      <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal', marginLeft: '-2vh' }}>
                         ในกรณีที่ยกเลิกสัญญาเช่าก่อนกำหนดจะไม่ได้รับค่าประกันความเสียหายคืน
                       </Form.Label>
+
                     </Form.Group>
 
                     <Form.Group as={Row} className="m-2" controlId="formHorizontalEmail">
@@ -911,7 +936,7 @@ export default function Formdorm() {
                         />
                         <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                       </InputGroup>
-                      <Form.Label column sm={5} style={{ width: '50vh', fontWeight: 'normal' }}>
+                      <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal', marginLeft: '-2vh' }}>
                         เช่น ค่าฟิตเนส 200 บาท/เดือน
                       </Form.Label>
                     </Form.Group>
@@ -931,7 +956,7 @@ export default function Formdorm() {
                         />
                         <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                       </InputGroup>
-                      <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
+                      <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal', marginLeft: '-2vh' }}>
                         สำหรับหอพักที่มีบริการโทรศัพท์สายตรงเท่านั้น
                       </Form.Label>
                     </Form.Group>
@@ -951,7 +976,7 @@ export default function Formdorm() {
                         />
                         <InputGroup.Text id="basic-addon2">บาท/เดือน</InputGroup.Text>
                       </InputGroup>
-                      <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal' }}>
+                      <Form.Label column sm={5} style={{ width: '80vh', fontWeight: 'normal', marginLeft: '-2vh' }}>
                         สำหรับหอพักที่มีบริการอินเทอร์เน็ตไร้สายเท่านั้น
                       </Form.Label>
                     </Form.Group>
@@ -1064,14 +1089,15 @@ export default function Formdorm() {
                     <button disabled={loading || uploading} className='btn btn-primary'>
                       {loading ? 'ลงประกาศหอพัก...' : 'ลงประกาศหอพัก'}
                     </button>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
                   </div>
+                  {error && <p style={{ color: 'red', marginTop: '1vh' }}> กรุณากรอกข้อมูลให้ครบถ้วน </p>}
                 </Form.Group>
               </Form.Group><br />
             </Row>
           </Form>
         </Card>
       </div>
+      <br />
     </div>
   )
 }

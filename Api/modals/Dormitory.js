@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const DormitorySchema = new mongoose.Schema({
     tname: {
         type: String,
-        required: false,
+        required: true,
     },
     ename: {
         type: String,
@@ -15,7 +15,7 @@ const DormitorySchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        required: false,
+        required: true,
     },
     line: {
         type: String,
@@ -23,7 +23,7 @@ const DormitorySchema = new mongoose.Schema({
     },
     no: {
         type: String,
-        required: false,
+        required: true,
     },
     street: {
         type: String,
@@ -35,19 +35,19 @@ const DormitorySchema = new mongoose.Schema({
     },
     district: {
         type: String,
-        required: false,
+        required: true,
     },
     subdistrict: {
         type: String,
-        required: false,
+        required: true,
     },
     province: {
         type: String,
-        required: false,
+        required: true,
     },
     code: {
         type: String,
-        required: false,
+        required: true,
     },
     image: {
         type: Array,
@@ -58,16 +58,15 @@ const DormitorySchema = new mongoose.Schema({
         required: false,
     },
 
-
     roomTypes: [
         {
             typeRooms: {
                 type: String,
-                required: false,
+                required: true,
             },
             sizeRooms: {
                 type: Number,
-                required: false,
+                required: true,
             },
             minDailys: {
                 type: Number,
@@ -102,7 +101,7 @@ const DormitorySchema = new mongoose.Schema({
     },
     advance: {
         type: Number,
-        required: false,
+        required: true,
     },
     billInternet: {
         type: Number,

@@ -24,9 +24,11 @@ export const createReservation = async (req, res, next) => {
       return res.status(400).json({ success: false, error: 'ImagePayment is required.' });
     }
 
-    // Set Customer ID and change user role to 'customer'
-    user.role = 'customer';
-    await user.save();
+    // Set Customer ID and change user role to 'customer' if not already 'customer'
+    if (user.role !== 'customer') {
+      user.role = 'customer';
+      await user.save();
+    }
 
     // Create a new reservation using the Reserve model
     const reserve = new Reserve({
@@ -49,7 +51,8 @@ export const createReservation = async (req, res, next) => {
       username: `${user.firstname} ${user.lastname}`,
       imagePayment,
       ...reservationData,
-      message: "Reservation created successfully. User is marked as a customer.",
+      roles: [user.role, 'owner'], // Include both 'owner' and 'customer' roles
+      message: "Reservation created successfully.",
     };
 
     // Respond with the created reservation details
@@ -90,6 +93,7 @@ export const viewReservationById = async (req, res, next) => {
     next(error);
   }
 };
+
 
 
 

@@ -23,7 +23,6 @@ export const createDormitory = async (req, res, next) => {
       ...dormitoryData,
     });
 
-    // Find the user by userRef and update their role to "owner"
     const user = await User.findById(userRef);
     if (user) {
       user.role = "owner";
@@ -68,37 +67,6 @@ export const viewRoom = async (req, res) => {
 };
 
 
-
-
-
-
-export const createNewRoom = async (req, res, next) => {
-  try {
-    const userId = req.user.id;
-    const { dormitoryId, ...roomTypeData } = req.body;
-
-    // Find the dormitory document associated with the user reference
-    const dormitory = await Dormitory.findOne({ userRef: userId });
-
-    if (!dormitory) {
-      return res.status(404).json({ success: false, message: 'No dormitory found for the user' });
-    }
-
-    // Create the new RoomType with the userRef provided
-    const roomType = await RoomType.create({ ...roomTypeData, userRef: userId });
-
-    // Update the Dormitory document to associate the newly created room type
-    const updatedDormitory = await Dormitory.findByIdAndUpdate(
-      dormitory._id,
-      { $push: { roomTypes: roomType._id } },
-      { new: true }
-    );
-
-    return res.status(201).json({ success: true, message: 'Room type created and associated with dormitory successfully', roomType, updatedDormitory });
-  } catch (err) {
-    next(err);
-  }
-};
 
 
 
@@ -186,7 +154,7 @@ export const getDormitory = async (req, res, next) => {
 
 export const getRoomTypesByDormitoryId = async (req, res, next) => {
   try {
- 
+
 
     // Find room types associated with the provided dormitory ID
     const roomTypes = await RoomType.find();
@@ -341,7 +309,6 @@ export const updateStatus = async (req, res, next) => {
 };
 
 
-
 export const getDormitoryReserve = async (req, res, next) => {
   try {
     const dormitory = await Dormitory.findById(req.params.id);
@@ -353,22 +320,23 @@ export const getDormitoryReserve = async (req, res, next) => {
     const reservations = await Reservation.find({ dormitoryId: dormitory._id }).populate('userId', 'firstname lastname phone');
 
     // Format the response to include user's name (first and last), phone number, reservation date, time, imagePayment, and booking ID
-    const formattedReservations = reservations.map(reservation => ({      
+    const formattedReservations = reservations.map(reservation => ({
       reservationId: reservation._id,
       firstName: reservation.userId[0].firstname,
       lastName: reservation.userId[0].lastname,
-      phoneNumber: reservation.userId[0].phone,      
+      phoneNumber: reservation.userId[0].phone,
       imagePayment: reservation.imagePayment,
       date: new Date(reservation.createdAt).toLocaleDateString(),
       time: new Date(reservation.createdAt).toLocaleTimeString(),
+      confirmationStatus: reservation.confirm ? 'ยืนยันการจอง' : 'รอดำเนินการ'
     }));
+
 
     res.status(200).json(formattedReservations);
   } catch (err) {
     next(err);
   }
 };
-
 
 
 export const getDormitoryReserveDelete = async (req, res, next) => {

@@ -19,6 +19,12 @@ const reservationSchema = new mongoose.Schema({
     confirm: {
         type: Boolean,
         default: false 
+    },
+
+    confirmationStatus: {
+        type: String,
+        enum: ['Pending', 'Confirmed'],
+        default: 'Pending' // Set default value to 'Pending'
     }
 
 }, { timestamps: true });

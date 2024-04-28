@@ -133,14 +133,7 @@ export default function Mybooking() {
                       >
                         {booking.confirmationStatus ? 'จองสำเร็จ' : 'ยกเลิกการจอง'}
                       </Button>
-
-
-
-
-
                     </div>
-
-
                   </li>
                 ))}
               </ul>

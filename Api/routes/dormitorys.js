@@ -1,14 +1,11 @@
 import express from "express";
-import { createDormitory, createNewRoom, deleteDormitory, getDormitory, getDormitoryReserve, getDormitoryReserveDelete, getOptionSelect, getOptions, getRoomType, getRoomTypesByDormitoryId, getallDormitory, saveOptions, saveStatus, updateDormitory, viewRoom } from "../controller/dormitory.js";
+import { createDormitory, deleteDormitory, getDormitory, getDormitoryReserve, getDormitoryReserveDelete, getOptionSelect, getOptions, getRoomType, getRoomTypesByDormitoryId, getallDormitory, saveOptions, saveStatus, updateDormitory, viewRoom } from "../controller/dormitory.js";
 import { verifyToken } from "../utils/verifyToken.js";
 
 const router = express.Router();
 
 //สร้างหอพัก
 router.post("/", verifyToken, createDormitory);
-
-//สร้างประเภทห้องพัก
-router.post("/newroom", verifyToken, createNewRoom);
 
 router.get('/details', verifyToken, viewRoom),
 

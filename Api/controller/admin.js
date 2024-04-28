@@ -23,8 +23,17 @@ export const getAllUsers = async (req, res) => {
   }
 };
   
+
 export const deleteUser = async (req, res) => {
   try {
+    // Check if the user making the request is an admin
+    const isAdmin = req.user.role === 'admin';
+
+    // If the user is not an admin, return a 403 Forbidden error
+    if (!isAdmin) {
+      return res.status(403).json({ error: 'Only admins can delete users' });
+    }
+
     const { id } = req.params;
 
     // Check if the user exists
